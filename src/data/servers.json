@@ -1,0 +1,131 @@
+{
+  "id": "444200",
+  "alias_name": "wot_blitz",
+  "name": "World of Tanks Blitz",
+  "icon": "/Games/444200/mini.png",
+  "posters": [
+    "/Games/444200/coaav1.jpg",
+    "/Games/444200/coaav2.jpg",
+    "/Games/444200/coaav3.jpg",
+    "/Games/444200/coaav4.jpg"
+  ],
+  "clusters": [
+    {
+      "id": "tanks_blitz",
+      "name": "Tanks Blitz",
+      "alias_name": "RU",
+      "icon": "/Games/444200/356.png",
+      "clusters": [
+        {
+          "id": "C0",
+          "domain": "login0.tanksblitz.ru",
+          "location": "Мосрентген (Москва)"
+        },
+        {
+          "id": "C1",
+          "domain": "login1.tanksblitz.ru",
+          "location": "Долгопрудный (Москва)"
+        },
+        {
+          "id": "C2",
+          "domain": "login2.tanksblitz.ru",
+          "location": "Красноярск"
+        },
+        {
+          "id": "C3",
+          "domain": "login3.tanksblitz.ru",
+          "location": "Екатеринбург"
+        },
+        {
+          "id": "C4",
+          "domain": "login4.tanksblitz.ru",
+          "location": "Мосрентген (Москва)"
+        },
+        {
+          "id": "C5",
+          "domain": "login5.tanksblitz.ru",
+          "location": "Москва"
+        }
+      ]
+    },
+    {
+      "id": "wot_eu",
+      "name": "Европа",
+      "alias_name": "EU",
+      "icon": "/Games/444200/276.png",
+      "clusters": [
+        {
+          "id": "C0",
+          "domain": "login0.wotblitz.eu",
+          "location": "Амстердам (Нидерланды)"
+        },
+        {
+          "id": "C1",
+          "domain": "login1.wotblitz.eu",
+          "location": "Амстердам (Нидерланды)"
+        },
+        {
+          "id": "C2",
+          "domain": "login2.wotblitz.eu",
+          "location": "Франкфурт-на-Майне (Германия)"
+        },
+        {
+          "id": "C3",
+          "domain": "login3.wotblitz.eu",
+          "location": "Варшава (Польша)"
+        },
+        {
+          "id": "C4",
+          "domain": "login4.wotblitz.eu",
+          "location": "Алматы (Казахстан)"
+        }
+      ]
+    },
+    {
+      "id": "wot_asia",
+      "name": "Азия",
+      "alias_name": "ASIA",
+      "icon": "/Games/444200/276.png",
+      "clusters": [
+        {
+          "id": "C0",
+          "domain": "login0.wotblitz.asia",
+          "location": "Сингапур"
+        },
+        {
+          "id": "C1",
+          "domain": "login1.wotblitz.asia",
+          "location": "Сингапур"
+        },
+        {
+          "id": "C2",
+          "domain": "login2.wotblitz.asia",
+          "location": "Токио (Япония)"
+        }
+      ]
+    },
+    {
+      "id": "wot_na",
+      "name": "Северная Америка",
+      "alias_name": "NA",
+      "icon": "/Games/444200/276.png",
+      "clusters": [
+        {
+          "id": "C0",
+          "domain": "login0.wotblitz.com",
+          "location": "Чикаго, Иллинойс (США)"
+        },
+        {
+          "id": "C1",
+          "domain": "login1.wotblitz.com",
+          "location": "Манассас, Вирджиния (США)"
+        },
+        {
+          "id": "C2",
+          "domain": "login2.wotblitz.com",
+          "location": "Санта Клара, Калифорния (США)"
+        }
+      ]
+    }
+  ]
+}

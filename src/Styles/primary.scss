@@ -1,0 +1,329 @@
+@font-face {
+  src: url("/Fonts/Play-Bold.ttf");
+  font-family: "Play";
+  font-weight: 600;
+  font-style: bold;
+}
+
+@font-face {
+  src: url("/Fonts/Play-Regular.ttf");
+  font-family: "Play";
+  font-weight: 400;
+  font-style: normal;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  font-family: "Play";
+  font-weight: 400;
+  background: #0d1117;
+  color: #fff;
+}
+
+button {
+  cursor: pointer;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 600;
+  margin: 0;
+}
+
+small {
+  color: #7d8590;
+}
+
+.dropdownButton {
+  cursor: pointer;
+  transition: 0.15s;
+
+  &:hover {
+    transition: 0.15s;
+  }
+}
+
+.dropdownInteractiveItem {
+  cursor: pointer;
+}
+
+.dropdown_items {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  gap: 5px;
+  background: #2b30378e;
+  backdrop-filter: blur(10px);
+  border-radius: 10px;
+  padding: 5px 10px;
+  margin-top: 0.3em;
+}
+
+.navbar {
+  padding-left: 1.2em;
+  padding-right: 1.2em;
+  padding-top: 0.35em;
+  padding-bottom: 0.35em;
+  background: #2b303763;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  h3 {
+    font-weight: 400;
+  }
+
+  .game-select {
+    padding: 2px 5px;
+    border-radius: 0px;
+    width: fit-content;
+
+    & > h3 {
+      font-weight: 400;
+    }
+  }
+}
+
+.gameStatus {
+  width: 100%;
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  & > .statusE {
+    width: fit-content;
+    position: relative;
+    padding: 0 6px;
+    background: #000000c2;
+    backdrop-filter: blur(2em);
+    border-radius: 100px;
+  }
+}
+
+.gameButtons {
+  position: absolute;
+  width: 100%;
+  left: 0;
+  bottom: 0;
+  //   background: #00000041;
+  //   backdrop-filter: blur(2px);
+  overflow: hidden;
+  border-bottom: 10px;
+}
+
+#layer-ingame {
+  .inGameContainer {
+    display: flex;
+    margin: 1em 1em;
+    gap: 1.2em;
+  }
+
+  .inGamePoster {
+    min-width: 300px;
+    max-width: 300px;
+    height: 500px;
+
+    .status {
+      position: absolute;
+      top: 0;
+      z-index: 1000;
+    }
+
+    & #poster {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      border-radius: 10px;
+
+      // &::before {
+      //   content: "";
+      //   position: absolute;
+      //   width: 100%;
+      //   height: 100%;
+      //   border-radius: 10px;
+      //   background: #00000041;
+      // }
+
+      & > div {
+        z-index: 20;
+      }
+
+      & > .posterBlur {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        filter: blur(80px);
+        transform: scale(1.05);
+        opacity: 0.8;
+        z-index: -1 !important;
+      }
+    }
+  }
+
+  .inGameOption {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .scrollbarYAuto {
+    max-height: 345px;
+    overflow-y: auto;
+    scrollbar-width: thin; /* Firefox: thin */
+    scrollbar-color: rgba(43, 48, 55, 0.6) transparent; /* Firefox: thumb track */
+    scrollbar-gutter: stable;
+
+    /* WebKit (Edge/Chrome) */
+    &::-webkit-scrollbar {
+      width: 2px; /* точная ширина */
+      height: 8px;
+    }
+    &::-webkit-scrollbar-track {
+      background: transparent; /* либо цвет трека */
+      border-radius: 999px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: rgba(43, 48, 55, 0.6);
+      border-radius: 999px;
+      border: 1px solid rgba(0, 0, 0, 0); /* создаёт внутренний отступ */
+      background-clip: padding-box;
+    }
+    &::-webkit-scrollbar-thumb:hover {
+      background: rgba(43, 48, 55, 0.85);
+    }
+  }
+
+  .whilecard {
+    .title {
+      width: 100%;
+      background: #2b303763;
+      padding: 3px 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .content {
+      width: 100%;
+      padding-top: 0.15em;
+      padding-left: 0.3em;
+    }
+  }
+}
+
+hr.vertical {
+  width: 1px;
+  height: 20px;
+  color: #7d8590;
+  background: #7d8590;
+  margin: 0 10px;
+}
+
+.server-select {
+  width: fit-content;
+}
+
+/* Прячем стандартный кружок */
+.SelectInteractRadio input[type="radio"] {
+  display: none;
+}
+
+/* Базовый стиль квадрата (label) */
+.SelectInteractRadio label {
+  width: 100%;
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+  font-size: 16px;
+  color: #ffffff;
+}
+
+/* Рисуем сам квадрат (обводка #333 с прозрачностью 80%) */
+.SelectInteractRadio label::before {
+  content: "";
+  position: relative;
+  width: 2px;
+  height: 16px;
+  //   border: 2px solid rgba(51, 51, 51, 0.8); /* #333 / 80% */
+  border-radius: 4px; /* Скругление углов квадрата */
+  background: rgba(42, 44, 42, 0.993);
+  transition: all 0.2s ease;
+}
+
+@keyframes SelectOptionBlumAnim1 {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Рисуем галочку (скрыта по умолчанию) */
+.SelectInteractRadio label::after {
+  content: "вкл."; /* Можно использовать SVG фоном для идеальной четкости */
+  position: absolute;
+  right: 0;
+  top: -1px;
+  font-size: 16px;
+  color: rgb(103, 240, 85);
+  display: none;
+}
+
+/* Состояние, когда радиокнопка выбрана */
+.SelectInteractRadio input[type="radio"]:checked + label::after {
+  display: block; /* Показываем галочку */
+}
+
+/* Опционально: меняем цвет рамки при выборе */
+.SelectInteractRadio input[type="radio"]:checked + label::before {
+  background: rgba(48, 255, 82, 0.993);
+  animation: SelectOptionAnim1 normal 1s;
+}
+
+.steam-btn {
+  display: block;
+  text-transform: uppercase;
+  width: 100%;
+  padding: 15px;
+  border-radius: 5px;
+  filter: drop-shadow(0px 3px 6px rgba(0, 0, 0, 0.16));
+  font-size: 18px;
+  letter-spacing: 0.03em;
+  text-align: center;
+  color: #fff;
+  position: relative;
+  font-family: "Motiva Sans", Sans-serif;
+  background: linear-gradient(to right, #06bfff 50%, #2b74ff 100%);
+  background-size: 200%;
+  background-position: right 0;
+  transition: background-position 300ms ease-in;
+}
+
+.steam-btn:hover {
+  display: block;
+  text-transform: uppercase;
+  position: relative;
+  background: linear-gradient(to right, #06bfff 50%, #2b74ff 100%);
+  background-size: 200%;
+  background-position: 0 0;
+  transition: background-position 300ms ease-in;
+  cursor: pointer;
+}
