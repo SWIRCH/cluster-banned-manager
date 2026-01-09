@@ -1,6 +1,6 @@
 # World of Tanks Blitz Cluster Banned
 
-![ClasterBanned](https://github.com/SWIRCH/clusterbanned/blob/main/public/banner.png)
+![ClasterBanned](/public/banner.png)
 
 <div align="center">
   
