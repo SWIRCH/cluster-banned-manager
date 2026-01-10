@@ -10,10 +10,11 @@ type LoadingScreenProps = {
 };
 
 type AppStatus =
-  | "initializing" // Инициализация приложения (2-3 секунды)
+  | "initializing" // Инициализация приложения
   | "checking_updates" // Проверка обновлений
   | "update_available" // Обновление найдено
   | "downloading" // Скачивание
+  | "downloaded" // Скачано
   | "installing" // Установка
   | "completed" // Обновление установлено
   | "error" // Ошибка
@@ -29,7 +30,7 @@ export default function LoadingScreen({
   const [updateInfo, setUpdateInfo] = useState<Update | null>(null);
   const [errorMessage, setErrorMessage] = useState<string>("");
 
-  // Этап 1: Инициализация приложения (2-3 секунды)
+  // Этап 1: Инициализация приложения
   useEffect(() => {
     const initTimer = setTimeout(() => {
       console.log("Инициализация завершена, проверяем обновления...");
@@ -80,17 +81,41 @@ export default function LoadingScreen({
 
     try {
       setAppStatus("downloading");
-      await updateInfo.install();
-      setAppStatus("completed");
+
+      await updateInfo.download();
+
+      setAppStatus("downloaded");
 
       setTimeout(async () => {
-        await relaunch();
-      }, 1500);
-    } catch (error) {
-      console.error("Ошибка при установке обновления:", error);
+        try {
+          setAppStatus("installing");
+
+          // Этап 2: Установка обновления
+          await updateInfo.install();
+
+          setAppStatus("completed");
+
+          // Перезапуск приложения
+          setTimeout(async () => {
+            await relaunch();
+          }, 1500);
+        } catch (installError) {
+          console.error("Ошибка при установке обновления:", installError);
+          setAppStatus("error");
+          setErrorMessage(
+            installError instanceof Error
+              ? installError.message
+              : "Ошибка установки обновления"
+          );
+        }
+      }, 500);
+    } catch (downloadError) {
+      console.error("Ошибка при скачивании обновления:", downloadError);
       setAppStatus("error");
       setErrorMessage(
-        error instanceof Error ? error.message : "Ошибка установки"
+        downloadError instanceof Error
+          ? downloadError.message
+          : "Ошибка скачивания обновления"
       );
     }
   }
@@ -138,6 +163,26 @@ export default function LoadingScreen({
           progress: 80,
         };
       case "downloading":
+        return {
+          icon: <Loader2 size={48} className="text-blue-400" strokeWidth={2} />,
+          title: "Скачивание обновления...",
+          description: "Пожалуйста, подождите",
+          showSpinner: true,
+          showButtons: false,
+          progress: 70,
+        };
+
+      case "downloaded":
+        return {
+          icon: (
+            <CheckCircle size={48} className="text-green-400" strokeWidth={2} />
+          ),
+          title: "Обновление скачано!",
+          description: "Подготовка к установке...",
+          showSpinner: false,
+          showButtons: false,
+          progress: 85,
+        };
       case "installing":
         return {
           icon: (
