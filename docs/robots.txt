@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+Sitemap: https://swirch.github.io/wotblitz-cluster-banned/sitemap.xml
+Disallow: /assets/
