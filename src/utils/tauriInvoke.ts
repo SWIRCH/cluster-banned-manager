@@ -1,32 +1,25 @@
-// Простая версия для Tauri 2.x
 export async function safeInvoke<T = any>(
   cmd: string,
   args?: Record<string, any>
 ): Promise<T> {
-  // Verify window
   if (typeof window === "undefined") throw new Error("Window is not defined");
 
-  // Try the modern core API first
   try {
     const core = await import("@tauri-apps/api/core");
     const { invoke } = core as any;
     console.debug(`[TAURI] Invoking (core): ${cmd}`, args);
 
-    // Primary attempt: invoke(cmd, args)
     try {
       return await invoke(cmd, args);
     } catch (invokeErr) {
-      // Some runtimes expect the payload wrapped as { args: ... }
       if (typeof args !== "undefined") {
         try {
           console.debug("[TAURI] Retrying invoke with { args }");
           return await invoke(cmd, { args });
         } catch (invokeErr2) {
-          // Fall through to surface original error
           console.error("[TAURI] core.invoke retry failed:", invokeErr2);
         }
       }
-      // Re-throw the original invoke error to surface it
       throw invokeErr;
     }
   } catch (err) {
@@ -35,14 +28,12 @@ export async function safeInvoke<T = any>(
       err
     );
 
-    // Fallback: try the internal invoke with a couple of shapes
     const internals = (window as any).__TAURI_INTERNALS__;
     if (internals?.invoke) {
       console.debug(`[TAURI] Invoking (internals): ${cmd}`, args);
       try {
         return await internals.invoke(cmd, args);
       } catch (e1) {
-        // try wrapper
         try {
           console.debug("[TAURI] Retrying internals.invoke with { args }");
           return await internals.invoke(cmd, { args });
@@ -68,7 +59,6 @@ export async function directInvoke<T = any>(
   return await invoke(cmd, args);
 }
 
-// Упрощенная диагностика
 export async function diagnoseTauri() {
   const result: any = {
     timestamp: new Date().toISOString(),
@@ -79,7 +69,6 @@ export async function diagnoseTauri() {
     hasTauriGlobal: !!(window as any).__TAURI__,
   };
 
-  // Пробуем вызвать тестовую команду
   try {
     const testResult = await safeInvoke("test_tauri");
     result.testInvoke = {
@@ -96,7 +85,6 @@ export async function diagnoseTauri() {
   return result;
 }
 
-// Game launch / process helpers
 export async function launchGame(appid: string) {
   return safeInvoke("launch_game", { appid });
 }

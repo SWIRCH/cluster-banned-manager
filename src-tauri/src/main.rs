@@ -32,9 +32,12 @@ fn main() {
 
 // Helpers for hosts management
 use sysinfo::{PidExt, ProcessExt, SystemExt};
+use serde_json::Value;
+use std::fs;
 
 const START_MARKER: &str = "# clusterbanned start";
 const END_MARKER: &str = "# clusterbanned end";
+
 
 fn hosts_paths() -> [&'static str; 2] {
     ["C:\\Windows\\System32\\drivers\\etc\\hosts", "/etc/hosts"]
@@ -223,7 +226,61 @@ async fn debug_network(hostname: String) -> Result<serde_json::Value, String> {
     Ok(results)
 }
 
-// Команда 1: Проверка ping (не блокирующая, выполняется в blocking-пуле с таймаутом)
+// Получаем кластеры из внешнего файла с fallback на локальный
+async fn get_clusters_with_fallback() -> Value {
+    // 1. Пробуем GitHub
+    let github_url = "https://raw.githubusercontent.com/SWIRCH/cluster-banned-manager/main/src/data/servers.json";
+    
+    match reqwest::get(github_url).await {
+        Ok(response) if response.status().is_success() => {
+            match response.json::<Value>().await {
+                Ok(data) => {
+                    println!("✅ Данные загружены с GitHub");
+                    return data;
+                }
+                Err(e) => {
+                    println!("⚠️ Ошибка парсинга GitHub: {}", e);
+                }
+            }
+        }
+        Ok(response) => {
+            println!("⚠️ GitHub статус: {}", response.status());
+        }
+        Err(e) => {
+            println!("⚠️ Не подключиться к GitHub: {}", e);
+        }
+    }
+    
+    // 2. Fallback: локальный файл
+    let local_path = "../../src/data/servers.json";
+    match fs::read_to_string(local_path) {
+        Ok(content) => {
+            match serde_json::from_str(&content) {
+                Ok(data) => {
+                    println!("✅ Используем локальный файл");
+                    return data;
+                }
+                Err(e) => {
+                    println!("⚠️ Ошибка парсинга локального файла: {}", e);
+                }
+            }
+        }
+        Err(e) => {
+            println!("⚠️ Не прочитать локальный файл: {}", e);
+        }
+    }
+    
+    // 3. Fallback: встроенный файл
+    println!("⚠️ Используем встроенный servers.json");
+    serde_json::from_str(
+        include_str!("../../src/data/servers.json")
+    ).unwrap_or_else(|_| {
+        println!("⛔ Все источники недоступны!");
+        serde_json::json!({})
+    })
+}
+
+// Проверка ping (не блокирующая, выполняется в blocking-пуле с таймаутом)
 #[tauri::command]
 async fn ping_server(
     hostname: String,
@@ -717,8 +774,10 @@ fn update_hosts_block(
     }
 }
 
+
+
 #[tauri::command]
-fn update_firewall_rules(
+async fn update_firewall_rules(
     region_id: String,
     blocked_domains: Vec<String>,
     enable: bool, // true = блокировать, false = разблокировать
@@ -744,9 +803,7 @@ fn update_firewall_rules(
         );
 
         // Получаем данные о кластерах из файла
-        let clusters_data: Value =
-            serde_json::from_str(include_str!("../../src/data/servers.json"))
-                .map_err(|e| format!("Failed to parse servers.json: {}", e))?;
+        let clusters_data: Value = get_clusters_with_fallback().await;
 
         let mut results = Vec::new();
         let mut total_ips_blocked = 0;
@@ -882,7 +939,7 @@ async fn update_cluster_rules(
 
     // 2. Обновляем правила брандмауэра если нужно
     if use_firewall {
-        match update_firewall_rules(region_id.clone(), blocked_domains.clone(), enable) {
+        match update_firewall_rules(region_id.clone(), blocked_domains.clone(), enable).await {
             Ok(msg) => results["firewall"] = serde_json::Value::String(msg),
             Err(e) => {
                 results["success"] = serde_json::Value::Bool(false);
@@ -898,7 +955,7 @@ async fn update_cluster_rules(
 
 // Команда 4.1: Очистить все блоки, созданные clusterbanned (не трогая остальное)
 #[tauri::command]
-fn clear_cluster_blocks() -> Result<String, String> {
+async fn clear_cluster_blocks() -> Result<String, String> {
     println!("[TAURI] clear_cluster_blocks called");
     // Читаем настройки из файла, если не переданы явно
     let backup_saved = {
@@ -1013,7 +1070,7 @@ fn clear_cluster_blocks() -> Result<String, String> {
     #[cfg(windows)]
     {
         println!("[TAURI] Cleaning up firewall rules...");
-        match clear_firewall_rules() {
+        match clear_firewall_rules().await {
             Ok(fw_msg) => {
                 messages.push(fw_msg);
                 println!("[TAURI] Firewall cleanup successful");
@@ -1307,7 +1364,7 @@ fn block_with_firewall(domain: String, ips: Vec<String>, enable: bool) -> Result
 }
 
 #[tauri::command]
-fn clear_firewall_rules() -> Result<String, String> {
+async fn clear_firewall_rules() -> Result<String, String> {
     #[cfg(windows)]
     {
         use std::process::Command;
@@ -1393,9 +1450,7 @@ fn clear_firewall_rules() -> Result<String, String> {
 
         // Также пробуем удалить правила напрямую по известным доменам из servers.json
         // Это нужно на случай, если парсинг не сработал
-        let clusters_data: serde_json::Value = serde_json::from_str(
-            include_str!("../../src/data/servers.json")
-        ).unwrap_or(serde_json::json!({}));
+        let clusters_data: serde_json::Value = get_clusters_with_fallback().await;
         
         if let serde_json::Value::Array(regions) = &clusters_data["clusters"] {
             for region_data in regions {

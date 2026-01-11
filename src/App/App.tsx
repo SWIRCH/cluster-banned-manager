@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { AnimatePresence } from "framer-motion";
-import clustersData from "../data/servers.json";
+import clustersDataLocal from "../data/servers.json";
 import ClusterMenu from "./components/ClusterMenu";
 import Navbar from "./components/Navbar";
 import GamePoster from "./components/GamePoster";
@@ -23,6 +23,27 @@ import { getSavedRegionId, saveRegionId } from "../utils/regionStorage";
 import type { Game } from "../types/cluster";
 
 export default function App() {
+  const [clustersData, setClustersData] = useState(clustersDataLocal);
+
+  useEffect(() => {
+    async function loadClusters() {
+      try {
+        const response = await fetch(
+          "https://raw.githubusercontent.com/SWIRCH/cluster-banned-manager/main/src/data/servers.json"
+        );
+        const data = await response.json();
+        setClustersData(data);
+      } catch (error) {
+        console.error("Ошибка загрузки кластеров:", error);
+        import("../data/servers.json").then((module) => {
+          setClustersData(module.default);
+        });
+      }
+    }
+
+    loadClusters();
+  }, []);
+
   const game = clustersData as Game;
   const [isLoading, setIsLoading] = useState(true);
 
