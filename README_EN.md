@@ -1,4 +1,4 @@
-# World of Tanks Blitz Cluster Banned Manager
+# Cluster Banned Manager
 
 ![ClasterBanned](/public/banner.png)
 
