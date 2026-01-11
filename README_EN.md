@@ -78,8 +78,8 @@
 3. Run the application as administrator to access system files
 4. Select a game region in the top menu
 5. Configure the desired servers for blocking
-   > [!IMPORTANT]
-   > A white indicator in the server list means it is enabled and available for connection.
+> [!IMPORTANT]
+> A white indicator in the server list means it is enabled and available for connection.
 
 ## Building the Application Yourself
 
