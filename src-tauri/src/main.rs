@@ -1040,7 +1040,7 @@ fn clear_cluster_blocks() -> Result<String, String> {
 #[tauri::command]
 fn get_app_info() -> Result<serde_json::Value, String> {
     let info = serde_json::json!({
-        "name": "WoT Blitz Cluster Banned",
+        "name": "WoT Blitz Cluster Banned Manager",
         "version": "0.1.0",
         "tauri_version": "2.x",
         "platform": std::env::consts::OS,
