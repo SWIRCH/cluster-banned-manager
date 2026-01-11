@@ -136,11 +136,11 @@ body {
   z-index: 5;
 }
 
-@media (max-width: 1300px) {
+/* @media (max-width: 1300px) {
   .i1-image {
-    /* height: 500px; */
+    height: 500px;
   }
-}
+} */
 
 .origin-header {
   position: fixed;
