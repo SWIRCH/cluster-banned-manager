@@ -15,6 +15,7 @@
       "name": "Tanks Blitz",
       "alias_name": "RU",
       "icon": "/Games/444200/356.png",
+      "flag_icon": "/Flags/ru.svg",
       "clusters": [
         {
           "id": "C0",
@@ -82,6 +83,7 @@
       "name": "Европа",
       "alias_name": "EU",
       "icon": "/Games/444200/276.png",
+      "flag_icon": "/Flags/eu.svg",
       "clusters": [
         {
           "id": "C0",
@@ -137,6 +139,7 @@
       "name": "Азия",
       "alias_name": "ASIA",
       "icon": "/Games/444200/276.png",
+      "flag_icon": "/Flags/jp.svg",
       "clusters": [
         {
           "id": "C0",
@@ -163,6 +166,7 @@
       "name": "Северная Америка",
       "alias_name": "NA",
       "icon": "/Games/444200/276.png",
+      "flag_icon": "/Flags/us.svg",
       "clusters": [
         {
           "id": "C0",
