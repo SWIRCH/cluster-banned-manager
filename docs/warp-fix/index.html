@@ -1,0 +1,865 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Фикс пинга и loss в WoT Blitz через Cloudflare WARP</title>
+    <meta
+      name="description"
+      content="Пошаговая инструкция по снижению пинга и устранению потерь пакетов в World of Tanks Blitz с помощью Cloudflare WARP (1.1.1.1)."
+    />
+
+    <!-- Подключаем существующий primary.css -->
+    <link rel="stylesheet" href="../assets/primary.css" />
+    <!-- Font Awesome и шрифты (уже есть в primary.css, но дублируем для безопасности) -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;600;700;900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Только новые стили, которых нет в primary.css -->
+    <style>
+      /* Дополнительные стили для WARP-страницы */
+      .badge-warp {
+        display: inline-block;
+        background: rgba(251, 191, 36, 0.15);
+        border: 1px solid var(--accent-yellow);
+        color: var(--accent-yellow);
+        padding: 6px 18px;
+        border-radius: 30px;
+        font-weight: 600;
+        font-size: 14px;
+        letter-spacing: 0.5px;
+        margin-bottom: 15px;
+      }
+
+      .step-card {
+        background: var(--card-bg);
+        border-radius: 16px;
+        border: 1px solid var(--border-color);
+        padding: 30px 35px;
+        display: flex;
+        gap: 25px;
+        align-items: flex-start;
+        transition:
+          border-color 0.3s,
+          transform 0.2s;
+        margin-bottom: 25px;
+      }
+
+      .step-card:hover {
+        border-color: var(--accent-yellow);
+        transform: translateY(-3px);
+      }
+
+      .step-number {
+        min-width: 48px;
+        height: 48px;
+        background: linear-gradient(135deg, var(--accent-yellow), #d97706);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        font-weight: 900;
+        color: #0d1117;
+        flex-shrink: 0;
+      }
+
+      .step-content h3 {
+        font-size: 22px;
+        margin-bottom: 10px;
+        color: var(--text-primary);
+      }
+
+      .step-content p {
+        color: var(--text-secondary);
+        margin-bottom: 12px;
+      }
+
+      .step-content ul,
+      .step-content ol {
+        color: var(--text-secondary);
+        padding-left: 20px;
+        margin-bottom: 12px;
+      }
+
+      .step-content li {
+        margin-bottom: 6px;
+      }
+
+      .code-block {
+        background: rgba(0, 0, 0, 0.4);
+        padding: 12px 18px;
+        border-radius: 8px;
+        border-left: 4px solid var(--accent-yellow);
+        font-family: monospace;
+        color: #e5e7eb;
+        font-size: 14px;
+        margin: 10px 0;
+        word-break: break-word;
+      }
+
+      .tip-box {
+        display: flex;
+        gap: 14px;
+        background: rgba(251, 191, 36, 0.08);
+        border-left: 4px solid var(--accent-yellow);
+        padding: 18px 22px;
+        border-radius: 8px;
+        margin-top: 16px;
+      }
+
+      .tip-box i {
+        color: var(--accent-yellow);
+        font-size: 22px;
+        margin-top: 2px;
+      }
+
+      .tip-box strong {
+        color: #fff;
+      }
+
+      .important-note {
+        background: rgba(220, 38, 38, 0.08);
+        border-left: 4px solid var(--accent-red);
+        padding: 18px 22px;
+        border-radius: 8px;
+        margin-top: 16px;
+      }
+
+      .important-note i {
+        color: var(--accent-red);
+        margin-right: 10px;
+      }
+
+      .download-box {
+        background: var(--card-bg);
+        border: 1px dashed var(--accent-yellow);
+        border-radius: 12px;
+        padding: 30px 35px;
+        text-align: center;
+        margin: 30px 0 10px;
+      }
+
+      .download-box .btn {
+        margin-top: 15px;
+      }
+
+      /* Боковая навигация (фиксированная) */
+      .side-nav {
+        position: fixed;
+        right: 30px;
+        top: 50%;
+        transform: translateY(-50%);
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        z-index: 999;
+        background: rgba(13, 17, 23, 0.85);
+        backdrop-filter: blur(10px);
+        padding: 16px 12px;
+        border-radius: 40px;
+        border: 1px solid var(--border-color);
+      }
+
+      .side-nav a {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: var(--card-bg);
+        color: var(--text-secondary);
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 14px;
+        transition: all 0.25s ease;
+        border: 1px solid transparent;
+      }
+
+      .side-nav a:hover {
+        background: var(--accent-yellow);
+        color: #0d1117;
+        border-color: var(--accent-yellow);
+        transform: scale(1.1);
+      }
+
+      .side-nav a.active {
+        background: var(--accent-yellow);
+        color: #0d1117;
+        border-color: var(--accent-yellow);
+      }
+
+      /* Адаптив для боковой навигации */
+      @media (max-width: 992px) {
+        .side-nav {
+          right: 15px;
+          padding: 12px 8px;
+          gap: 8px;
+        }
+        .side-nav a {
+          width: 32px;
+          height: 32px;
+          font-size: 12px;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .side-nav {
+          display: none;
+        }
+        .step-card {
+          flex-direction: column;
+          padding: 25px;
+          gap: 15px;
+        }
+        .step-number {
+          align-self: flex-start;
+        }
+      }
+
+      /* Переопределение hero для этой страницы */
+      .page-hero {
+        padding: 120px 0 80px;
+        background: linear-gradient(135deg, var(--primary-bg) 0%, #161b22 100%);
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      .page-hero .hero-content {
+        display: block;
+        text-align: center;
+        margin-top: 0;
+      }
+
+      .page-hero h1 {
+        font-size: 42px;
+        font-weight: 700;
+        margin-bottom: 15px;
+      }
+
+      .page-hero .subtitle {
+        font-size: 20px;
+        color: var(--text-secondary);
+        max-width: 700px;
+        margin: 0 auto 20px;
+      }
+
+      .page-hero .hero-buttons {
+        justify-content: center;
+        margin-bottom: 0;
+      }
+
+      @media (max-width: 768px) {
+        .page-hero h1 {
+          font-size: 30px;
+        }
+      }
+
+      /* Блок преимуществ в сетке */
+      .benefits-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 25px;
+        margin-top: 30px;
+      }
+
+      .benefit-card {
+        background: var(--card-bg);
+        border-radius: 12px;
+        padding: 25px 20px;
+        border: 1px solid var(--border-color);
+        text-align: center;
+        transition: border-color 0.3s;
+      }
+
+      .benefit-card:hover {
+        border-color: var(--accent-yellow);
+      }
+
+      .benefit-card i {
+        font-size: 32px;
+        color: var(--accent-yellow);
+        margin-bottom: 12px;
+      }
+
+      .benefit-card h4 {
+        font-size: 18px;
+        margin-bottom: 6px;
+        color: var(--text-primary);
+      }
+
+      .benefit-card p {
+        color: var(--text-secondary);
+        font-size: 14px;
+      }
+
+      .btn-accent {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        color: #fff;
+      }
+
+      .btn-accent:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(245, 158, 11, 0.4);
+      }
+
+      .btn-accent i {
+        color: #fff;
+      }
+
+      .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--text-secondary);
+        text-decoration: none;
+        margin-bottom: 20px;
+        transition: color 0.2s;
+      }
+
+      .back-link:hover {
+        color: var(--accent-yellow);
+      }
+
+      .steps-container {
+        max-width: 900px;
+        margin: 0 auto;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Хедер как на главной (фиксированный) -->
+    <header class="origin-header">
+      <nav class="navbar container">
+        <div class="logo" onclick="window.location = '/'">
+          <img
+            src="../assets/img/clusterbanned.png"
+            alt=""
+            width="30"
+            height="30"
+          />
+          <span>Cluster Banned Manager</span>
+        </div>
+        <ul class="nav-menu">
+          <li><a href="index.html#features">Возможности</a></li>
+          <li><a href="index.html#download">Скачать</a></li>
+          <li><a href="index.html#docs">Документация</a></li>
+          <li><a href="index.html#faq">FAQ</a></li>
+          <li>
+            <a
+              href="https://github.com/SWIRCH/cluster-banned-manager"
+              target="_blank"
+              class="github-btn"
+            >
+              <i class="fab fa-github"></i> GitHub
+            </a>
+          </li>
+        </ul>
+        <button class="menu-toggle">
+          <i class="fas fa-bars"></i>
+        </button>
+      </nav>
+    </header>
+
+    <!-- Hero-блок (как на главной, но адаптированный) -->
+    <div class="hero">
+      <div class="container">
+        <div class="hero-content">
+          <div class="hero-text">
+            <span class="badge-warp"
+              ><i class="fas fa-cloud"></i> Cloudflare WARP</span
+            >
+            <!-- <img src="../assets/img/cloudflare.svg" alt="" width="140" /> -->
+
+            <h1>
+              Фикс пинга и loss в <span class="highlight">WoT Blitz</span>
+            </h1>
+            <p class="subtitle">
+              Пошаговая инструкция по стабилизации соединения и снижению
+              задержек с помощью бесплатного VPN-решения от Cloudflare
+            </p>
+            <div class="hero-buttons">
+              <a href="#steps" class="btn btn-primary"
+                ><i class="fas fa-list-ol"></i> К инструкции</a
+              >
+              <a href="https://1.1.1.1/" target="_blank" class="btn btn-accent"
+                ><i class="fas fa-download"></i> Скачать WARP</a
+              >
+            </div>
+          </div>
+          <div class="hero-image">
+            <img class="i1-image" src="../assets/img/i-warp-fix1.png" alt="" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Основной контент -->
+    <main>
+      <!-- Что такое WARP (блок преимуществ) -->
+      <section class="section">
+        <div class="container">
+          <h2 class="section-title">Что такое Cloudflare WARP?</h2>
+          <p class="section-subtitle">
+            WARP — это бесплатный VPN-сервис от Cloudflare, который оптимизирует
+            маршрут вашего интернет-трафика, снижая пинг и устраняя потери
+            пакетов.
+          </p>
+          <div class="benefits-grid">
+            <div class="benefit-card">
+              <i class="fas fa-tachometer-alt"></i>
+              <h4>Снижение пинга</h4>
+              <p>
+                WARP использует оптимальные маршруты, уменьшая задержку до
+                серверов WoT Blitz.
+              </p>
+            </div>
+            <div class="benefit-card">
+              <i class="fas fa-wifi"></i>
+              <h4>Устранение loss</h4>
+              <p>
+                Технология WARP минимизирует потери пакетов, делая игру более
+                плавной.
+              </p>
+            </div>
+            <div class="benefit-card">
+              <i class="fas fa-shield-alt"></i>
+              <h4>Безопасность</h4>
+              <p>
+                Ваши данные шифруются, а IP-адрес скрывается — дополнительная
+                защита.
+              </p>
+            </div>
+            <div class="benefit-card">
+              <i class="fas fa-infinity"></i>
+              <h4>Совершенно бесплатно</h4>
+              <p>
+                WARP не требует подписки и не ограничивает трафик — идеально для
+                игр.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Инструкция -->
+      <section id="steps" class="section" style="padding-top: 0">
+        <div class="container">
+          <h2 class="section-title">Пошаговая инструкция</h2>
+          <p class="section-subtitle">
+            Выполните шаги ниже, чтобы настроить WARP для WoT Blitz
+          </p>
+
+          <div class="steps-container">
+            <!-- Шаг 1 -->
+            <div class="step-card" id="step1">
+              <div class="step-number">1</div>
+              <div class="step-content">
+                <h3>Скачайте и установите Cloudflare WARP</h3>
+                <p>
+                  Перейдите на официальный сайт 1.1.1.1 и скачайте приложение
+                  для вашей ОС (Windows, macOS, Android, iOS).
+                </p>
+                <div class="code-block">
+                  <i class="fas fa-globe"></i> 1.1.1.1 — официальный сайт
+                </div>
+                <a
+                  href="https://1.1.1.1/"
+                  target="_blank"
+                  class="btn btn-accent btn-small"
+                  style="margin-top: 6px"
+                >
+                  <i class="fas fa-download"></i> Скачать WARP
+                </a>
+                <div class="tip-box">
+                  <i class="fas fa-info-circle"></i>
+                  <div>
+                    <strong>Совет:</strong> Выберите версию для вашего
+                    устройства. Для Windows доступен установщик .exe.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Шаг 2 -->
+            <div class="step-card" id="step2">
+              <div class="step-number">2</div>
+              <div class="step-content">
+                <h3>Установите и запустите приложение</h3>
+                <p>
+                  Запустите установщик и следуйте инструкциям. После установки
+                  откройте WARP.
+                </p>
+                <ul>
+                  <li>На Windows: нажмите «Далее» и дождитесь завершения.</li>
+                  <li>На мобильных: скачайте из Google Play или App Store.</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Шаг 3 (ключевой, с важным примечанием) -->
+            <div
+              class="step-card"
+              id="step3"
+              style="border-color: var(--accent-yellow)"
+            >
+              <div
+                class="step-number"
+                style="background: linear-gradient(135deg, #f59e0b, #b45309)"
+              >
+                3
+              </div>
+              <div class="step-content">
+                <h3>Включите VPN-соединение</h3>
+                <p>
+                  Нажмите кнопку <strong>«Подключиться»</strong> или переведите
+                  тумблер в активное положение. При первом запуске система может
+                  запросить разрешение на создание VPN-подключения — подтвердите
+                  его.
+                </p>
+                <div class="important-note">
+                  <i class="fas fa-exclamation-triangle"></i>
+                  <strong>Важно!</strong> Если при первом запуске WARP не может
+                  установить соединение,
+                  <strong>включите любой другой VPN</strong> (например,
+                  бесплатный браузерный или встроенный) и попробуйте снова
+                  подключить WARP. После успешного первого подключения VPN
+                  больше не понадобится — WARP будет работать самостоятельно.
+                </div>
+                <div class="tip-box">
+                  <i class="fas fa-lightbulb"></i>
+                  <div>
+                    <strong>Совет:</strong> Убедитесь, что интернет-соединение
+                    стабильно. Если WARP не подключается, перезапустите
+                    приложение или компьютер.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Шаг 4 -->
+            <div class="step-card" id="step4">
+              <div class="step-number">4</div>
+              <div class="step-content">
+                <h3>Проверьте подключение</h3>
+                <p>
+                  После активации WARP вы увидите статус
+                  <span style="color: var(--accent-green); font-weight: 600"
+                    >«Подключено»</span
+                  >. Теперь ваш трафик идёт через оптимизированную сеть
+                  Cloudflare.
+                </p>
+                <div class="important-note">
+                  <i class="fas fa-exclamation-triangle"></i>
+                  <strong>Важно!</strong> Если при запуске WARP не может
+                  установить соединение,
+                  <strong>включите любой другой VPN</strong> или воспользуйтесь
+                  zapret-discord-youtube.
+                </div>
+                <div class="code-block">
+                  <i
+                    class="fas fa-check-circle"
+                    style="color: var(--accent-green)"
+                  ></i>
+                  Статус: Подключено
+                </div>
+                <p>
+                  Для проверки можно зайти на сайт
+                  <a
+                    href="https://1.1.1.1/help"
+                    target="_blank"
+                    style="color: var(--accent-yellow)"
+                    >1.1.1.1/help</a
+                  >
+                  и убедиться, что используется WARP.
+                </p>
+              </div>
+            </div>
+
+            <!-- Шаг 5 -->
+            <div class="step-card" id="step5">
+              <div class="step-number">5</div>
+              <div class="step-content">
+                <h3>Запустите WoT Blitz и играйте</h3>
+                <p>
+                  Запустите World of Tanks Blitz обычным способом. WARP
+                  автоматически оптимизирует соединение с игровыми серверами.
+                </p>
+                <ul>
+                  <li>
+                    Обратите внимание на пинг — он должен снизиться на 10-30%.
+                  </li>
+                  <li>
+                    Потери пакетов (loss) должны исчезнуть или значительно
+                    уменьшиться.
+                  </li>
+                </ul>
+                <div class="tip-box">
+                  <i class="fas fa-gamepad"></i>
+                  <div>
+                    <strong>Совет:</strong> Если пинг не изменился, попробуйте
+                    перезапустить WARP.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Шаг 6 -->
+            <div class="step-card" id="step6">
+              <div class="step-number">6</div>
+              <div class="step-content">
+                <h3>Настройка автозапуска (опционально)</h3>
+                <p>
+                  Чтобы WARP включался автоматически при старте системы,
+                  откройте настройки приложения и активируйте опцию
+                  <strong>«Запускать при старте»</strong> (на Windows — в
+                  настройках или через автозагрузку).
+                </p>
+                <div class="code-block">
+                  <i class="fas fa-cog"></i> Настройки → Автозапуск
+                </div>
+                <p>
+                  Вы можете оставить WARP включённым постоянно — он не влияет на
+                  скорость в других приложениях.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Блок скачивания -->
+          <div class="download-box">
+            <i
+              class="fas fa-cloud-upload-alt"
+              style="font-size: 40px; color: var(--accent-yellow)"
+            ></i>
+            <h3 style="margin: 10px 0; font-weight: 700">
+              Готово! Осталось скачать WARP
+            </h3>
+            <p
+              style="
+                color: var(--text-secondary);
+                max-width: 500px;
+                margin: 0 auto 10px;
+              "
+            >
+              Нажмите кнопку ниже, чтобы перейти на официальный сайт и
+              установить WARP.
+            </p>
+            <a href="https://1.1.1.1/" target="_blank" class="btn btn-accent">
+              <i class="fas fa-download"></i> Скачать Cloudflare WARP
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Футер как на главной -->
+    <footer class="site-footer">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-section">
+            <div class="footer-logo">
+              <img
+                src="../assets/img/clusterbanned.png"
+                alt=""
+                width="32"
+                height="32"
+              />
+              <span>Cluster Banned Manager</span>
+            </div>
+            <p>
+              Бесплатное приложение для оптимизации соединения с серверами World
+              of Tanks Blitz.
+            </p>
+            <div class="footer-social">
+              <a
+                href="https://github.com/SWIRCH/cluster-banned-manager"
+                target="_blank"
+                aria-label="GitHub"
+              >
+                <i class="fab fa-github"></i>
+              </a>
+              <a href="#" aria-label="Discord">
+                <i class="fab fa-discord"></i>
+              </a>
+              <a href="https://t.me/clusterbanned" aria-label="Telegram">
+                <i class="fab fa-telegram"></i>
+              </a>
+            </div>
+          </div>
+
+          <div class="footer-section">
+            <h4>Навигация</h4>
+            <ul>
+              <li><a href="/#features">Возможности</a></li>
+              <li><a href="/#download">Скачать</a></li>
+              <li><a href="/#docs">Документация</a></li>
+              <li><a href="/#faq">FAQ</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-section">
+            <h4>Ресурсы</h4>
+            <ul>
+              <li>
+                <a href="https://github.com" target="_blank">Исходный код</a>
+              </li>
+              <li>
+                <a
+                  href="https://github.com/SWIRCH/cluster-banned-manager/releases"
+                  >История версий</a
+                >
+              </li>
+              <li>
+                <a
+                  href="https://github.com/SWIRCH/cluster-banned-manager/issues"
+                  >Багрепорты</a
+                >
+              </li>
+              <li><a href="/#docs">Поддержка</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-section">
+            <h4>Скачать</h4>
+            <a href="/#download" class="download-btn-small">
+              <i class="fab fa-windows"></i> Скачать для Windows
+            </a>
+            <p class="footer-note">Требуется .NET Framework 4.8 и выше</p>
+          </div>
+        </div>
+
+        <div class="footer-bottom">
+          <p>
+            &copy; 2026
+            <a class="not-link-format" href="https://github.com/SWIRCH/"
+              >ClusterBanned. Исходный код доступен на GitHub.</a
+            >
+          </p>
+          <p class="disclaimer">
+            Это неофициальное приложение, не связанное с Wargaming.net.
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Фиксированная навигация по шагам (справа) -->
+    <nav class="side-nav" aria-label="Навигация по шагам">
+      <a href="#step1" data-step="1" title="Шаг 1">1</a>
+      <a href="#step2" data-step="2" title="Шаг 2">2</a>
+      <a href="#step3" data-step="3" title="Шаг 3">3</a>
+      <a href="#step4" data-step="4" title="Шаг 4">4</a>
+      <a href="#step5" data-step="5" title="Шаг 5">5</a>
+      <a href="#step6" data-step="6" title="Шаг 6">6</a>
+    </nav>
+
+    <!-- Скрипты -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Меню-гамбургер как на главной
+        const menuToggle = document.querySelector(".menu-toggle");
+        const navMenu = document.querySelector(".nav-menu");
+
+        if (menuToggle) {
+          menuToggle.addEventListener("click", () => {
+            navMenu.classList.toggle("active");
+            menuToggle.innerHTML = navMenu.classList.contains("active")
+              ? '<i class="fas fa-times"></i>'
+              : '<i class="fas fa-bars"></i>';
+          });
+        }
+
+        // Закрытие меню при клике на ссылку
+        document.querySelectorAll(".nav-menu a").forEach((link) => {
+          link.addEventListener("click", () => {
+            navMenu.classList.remove("active");
+            if (menuToggle) {
+              menuToggle.innerHTML = '<i class="fas fa-bars"></i>';
+            }
+          });
+        });
+
+        // Плавное появление карточек
+        const observerOptions = {
+          threshold: 0.1,
+          rootMargin: "0px 0px -30px 0px",
+        };
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.style.opacity = "1";
+              entry.target.style.transform = "translateY(0)";
+            }
+          });
+        }, observerOptions);
+
+        document.querySelectorAll(".step-card, .benefit-card").forEach((el) => {
+          el.style.opacity = "0";
+          el.style.transform = "translateY(20px)";
+          el.style.transition = "opacity 0.5s ease, transform 0.5s ease";
+          observer.observe(el);
+        });
+
+        // Подсветка активного шага в боковой навигации
+        const navLinks = document.querySelectorAll(".side-nav a");
+        const sections = document.querySelectorAll(".step-card");
+
+        function updateActiveLink() {
+          let current = "";
+          sections.forEach((section) => {
+            const rect = section.getBoundingClientRect();
+            if (rect.top <= 150) {
+              current = section.id;
+            }
+          });
+
+          navLinks.forEach((link) => {
+            link.classList.toggle(
+              "active",
+              link.getAttribute("href") === "#" + current,
+            );
+          });
+        }
+
+        window.addEventListener("scroll", updateActiveLink);
+        updateActiveLink();
+
+        // Плавный скролл для боковой навигации
+        navLinks.forEach((link) => {
+          link.addEventListener("click", function (e) {
+            e.preventDefault();
+            const targetId = this.getAttribute("href");
+            const target = document.querySelector(targetId);
+            if (target) {
+              const offset = 80;
+              const targetPosition =
+                target.getBoundingClientRect().top +
+                window.pageYOffset -
+                offset;
+              window.scrollTo({
+                top: targetPosition,
+                behavior: "smooth",
+              });
+            }
+          });
+        });
+
+        // Подсветка шага 3 при загрузке
+        setTimeout(() => {
+          const step3 = document.querySelector("#step3");
+          if (step3) {
+            step3.style.transition =
+              "border-color 0.5s ease, box-shadow 0.5s ease";
+            step3.style.boxShadow = "0 0 20px rgba(251, 191, 36, 0.15)";
+          }
+        }, 500);
+      });
+    </script>
+  </body>
+</html>

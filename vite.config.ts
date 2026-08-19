@@ -2,7 +2,6 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 
-// @ts-expect-error process is a nodejs global
 // process.env.TAURI_DEV_HOST
 const host = "127.0.0.1";
 
@@ -31,4 +30,20 @@ export default defineConfig(async () => ({
       ignored: ["**/src-tauri/**"],
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          "tauri-api": ["@tauri-apps/api"],
+          "tauri-plugins": [
+            "@tauri-apps/plugin-opener",
+            "@tauri-apps/plugin-process",
+            "@tauri-apps/plugin-updater",
+          ],
+          vendor: ["react", "react-dom", "framer-motion"],
+        },
+      },
+    },
+  },
+  chunkSizeWarningLimit: 800,
 }));

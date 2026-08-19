@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import { AnimatePresence } from "framer-motion";
-import clustersDataLocal from "../data/servers.json";
 import ClusterMenu from "./components/ClusterMenu";
-import Navbar from "./components/Navbar";
 import GamePoster from "./components/GamePoster";
 import SelectiveBlocking from "./components/SelectiveBlocking";
 import LoadingScreen from "./components/LoadingScreen";
@@ -21,66 +19,42 @@ import { useHostsActions } from "../hooks/useHostsActions";
 import { safeInvoke, launchGame, diagnoseTauri } from "../utils/tauriInvoke";
 import { getSavedRegionId, saveRegionId } from "../utils/regionStorage";
 import type { Game } from "../types/cluster";
+import Sidebar from "./components/Sidebar";
+import { openWarpFixPingLoss } from "../utils/opener";
+import { useClustersLoader } from "../hooks/useClustersLoader";
 
-export default function App() {
-  const [clustersData, setClustersData] = useState(clustersDataLocal);
-
-  useEffect(() => {
-    async function loadClusters() {
-      try {
-        const response = await fetch(
-          "https://raw.githubusercontent.com/SWIRCH/cluster-banned-manager/main/src/data/servers.json"
-        );
-        const data = await response.json();
-        setClustersData(data);
-      } catch (error) {
-        console.error("Ошибка загрузки кластеров:", error);
-        import("../data/servers.json").then((module) => {
-          setClustersData(module.default);
-        });
-      }
-    }
-
-    loadClusters();
-  }, []);
-
+function AppContent() {
+  const { clustersData, isLoading: clustersLoading } = useClustersLoader();
+  const [isLoadingScreen, setIsLoadingScreen] = useState(clustersLoading);
   const game = clustersData as Game;
-  const [isLoading, setIsLoading] = useState(true);
 
-  // Получаем сохраненный регион или используем EU по умолчанию
   const getInitialRegionId = (): string => {
     const savedRegionId = getSavedRegionId();
     if (savedRegionId) {
-      // Проверяем, что сохраненный регион существует в списке
       const regionExists = game.clusters.some((c) => c.id === savedRegionId);
       if (regionExists) {
         return savedRegionId;
       }
     }
-    // По умолчанию EU, если есть, иначе первый регион
     const defaultRegion =
       game.clusters.find((c) => c.id === "wot_eu") ?? game.clusters[0];
     return defaultRegion?.id ?? "";
   };
 
-  const [selectedRegionId, setSelectedRegionId] = useState<string>(
-    getInitialRegionId()
-  );
+  const [selectedRegionId, setSelectedRegionId] =
+    useState<string>(getInitialRegionId());
 
-  // Сохраняем регион при изменении
   const handleRegionChange = (regionId: string) => {
     setSelectedRegionId(regionId);
     saveRegionId(regionId);
   };
 
-  // Получаем текущий регион или EU по умолчанию
   const defaultRegion =
     game.clusters.find((c) => c.id === "wot_eu") ?? game.clusters[0];
   const selectedRegion =
     game.clusters.find((c) => c.id === selectedRegionId) ?? defaultRegion;
   const clusters = selectedRegion?.clusters ?? [];
 
-  // Hooks
   const { settings, updateSetting, loading: settingsLoading } = useSettings();
   const { selections, updateSelection, selectCluster, clearAllSelections } =
     useSelections(game);
@@ -97,14 +71,13 @@ export default function App() {
     selectedRegionId,
     selections,
     clusters,
-    settings
+    settings,
   );
 
-  // Poster selection
   const [posterUrl, setPosterUrl] = useState<string>(
     game.posters && game.posters.length > 0
       ? game.posters[0]
-      : "/Games/444200/coaav5.jpg"
+      : "/Games/444200/coaav5.jpg",
   );
 
   useEffect(() => {
@@ -122,14 +95,14 @@ export default function App() {
   useEffect(() => {
     if (!settingsLoading && Object.keys(selections).length > 0) {
       console.log(
-        "Данные приложения загружены, ожидаем завершения проверки обновлений"
+        "Данные приложения загружены, ожидаем завершения проверки обновлений",
       );
     }
   }, [settingsLoading, selections]);
 
   const handleLoadingComplete = () => {
     console.log("LoadingScreen разрешил закрытие");
-    setIsLoading(false);
+    setIsLoadingScreen(false);
   };
 
   // Check elevation on mount
@@ -255,21 +228,28 @@ export default function App() {
   return (
     <>
       <AnimatePresence mode="wait">
-        {isLoading && (
+        {isLoadingScreen && (
           <LoadingScreen
             key="loading"
-            visible={isLoading}
+            visible={isLoadingScreen}
             onLoadingComplete={handleLoadingComplete}
           />
         )}
       </AnimatePresence>
       <AnimatePresence>
-        {!isLoading && (
-          <main className="" id="layer-ingame" key="main">
-            <Navbar
+        {!isLoadingScreen && (
+          <main id="layer-ingame" key="main">
+            <Sidebar
               game={game}
               selectedRegion={selectedRegion}
               onRegionChange={handleRegionChange}
+              onCheckHosts={checkHostsConsistency}
+              onSettingsClick={() => setSettingsModalOpen(true)}
+              onClearClick={() => setClearConfirmOpen(true)}
+              onRefreshClick={async () => {
+                await pingClusters(selectedRegionId);
+                await checkGameRunning();
+              }}
             />
             <div className="inGameContainer">
               <GamePoster
@@ -294,6 +274,15 @@ export default function App() {
                 <div className="whilecard">
                   <div className="flex justify-between items-center space-y-1 rounded-xl bg-white/5 p-1 sm:p-2">
                     <h3>Выбрать сервер</h3>
+                    <p className="pe-2 text-[14px]">
+                      <a
+                        onClick={() => openWarpFixPingLoss()}
+                        target="_blank"
+                        className="link"
+                      >
+                        Высокий пинг или loss?
+                      </a>
+                    </p>
                   </div>
                   <div className="content">
                     <div className="ban-clusters-1 mt-1">
@@ -372,7 +361,7 @@ export default function App() {
                 setAdminModalOpen(false);
                 setInfoTitle("Как запустить с правами администратора");
                 setInfoMessage(
-                  "Запустите приложение от имени администратора (ПКМ → Запуск от имени администратора) или создайте ярлык, в котором в свойствах выберите запуск от имени администратора. После этого нажмите 'Повторить'."
+                  "Запустите приложение от имени администратора (ПКМ → Запуск от имени администратора) или создайте ярлык, в котором в свойствах выберите запуск от имени администратора. После этого нажмите 'Повторить'.",
                 );
                 setInfoIsError(false);
                 setInfoOpen(true);
@@ -383,4 +372,8 @@ export default function App() {
       </AnimatePresence>
     </>
   );
+}
+
+export default function App() {
+  return <AppContent />;
 }

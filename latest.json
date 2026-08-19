@@ -1,15 +1,15 @@
-{
+﻿{
   "platforms": {
-    "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSRE5DUW96dGtFeGxJd2d2THphbFN0QWpqaWxSQWd0UW43TVQ1ZFBpZVJONWVhMnZzbDJESFVCbSt2SEVrcmh6dDhxYVN6NjBqZEdNd1BKT1I1T2ZROUp1MFlYWEpyRUFBPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzY4MTEyMTMzCWZpbGU6Q2x1c3RlckJhbm5lZE1hbmFnZXJfMC4xLjRfeDY0LXNldHVwLmV4ZQpyMGQrSGd2NHI2b0MySDVreGZPaFVXRkVFRjVnUkc4c3lvTXdVRWxjc3l5VEQ4OXpMcDVqMVZRaUo5WVhualVYY0dGcnFjbXhLaHM3ajRKbGNUNWpDdz09Cg==",
-      "url": "https://github.com/SWIRCH/cluster-banned-manager/releases/download/v0.1.4/ClusterBannedManager_0.1.4_x64-setup.exe"
-    },
     "windows-x86_64-msi": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSRE5DUW96dGtFeHFQeVF0WW1GdTFBRDg4bS9jRHhvR25HeXgyQ0NPSHZ6ZDk5SVQwOGlnUDJqRzhSY0I1S3VvbmtHUEtRcUFRQmp5QTVaRHNwSHNudTVmT1lXVTJ3aWdnPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzY4MTEyMTMzCWZpbGU6Q2x1c3RlckJhbm5lZE1hbmFnZXJfMC4xLjRfeDY0X2VuLVVTLm1zaQpFU1lOUWVybnJXNm9DQlNVVDkwVEVwWVNjWnN5NHpCdktDUWNnZTZwWmZNNDFEbDBuUlhTdThVOVpVQkVMcm1BQ1IzTmNJcW01M2x5bk1qZW96WUJEdz09Cg==",
-      "url": "https://github.com/SWIRCH/cluster-banned-manager/releases/download/v0.1.4/ClusterBannedManager_0.1.4_x64_en-US.msi"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSRE5DUW96dGtFeGtIV214OWVRZ0pDZThXWlg3K3d3S3MwU1lxUVF0K0hacWhUcE1JRE5nZHNNU205dWVpT3JzakNwcWFZYkFTdzg1NGx1cU1wbUJmNm1PWFZCM0N3c1FRPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg3MTc1ODMzCWZpbGU6Q2x1c3RlckJhbm5lZE1hbmFnZXJfMC4xLjVfeDY0X2VuLVVTLm1zaQpDV0loUnUvRWFTbXFJYitybktWWURDQ09GMTBwUTI4N3g0eGlNQlJTSXNZQThhZHUwckdrWklrR2V5RkVJellCalJMWG14bDRQSjJaQlFZTFRxRjZCQT09Cg==",
+      "url": "https://github.com/SWIRCH/cluster-banned-manager/releases/download/v0.1.5/ClusterBannedManager_0.1.5_x64_en-US.msi"
+    },
+    "windows-x86_64": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSRE5DUW96dGtFeGtuN3lxLzh4NXZXRTNZV0c2MFNwVlNFZGZzRHB0Y2RsQnpUVXpSZmlWY2xXWHNPV0J2QStYY0NlTGNOMU9Vdjk1OUNBU0trWDBZNWhEQUVPdFJvSGdBPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg3MTc1ODMzCWZpbGU6Q2x1c3RlckJhbm5lZE1hbmFnZXJfMC4xLjVfeDY0LXNldHVwLmV4ZQpRdmNwU3c0MWtaRHdMRVVwZ1MrbTlrU2ZnOXZQMkpsaWZaUmpzVUxCaUpqdURlYmhvZ3lSQmlxKzRzc2daRGhrMUF2OHc2RTRNMGlXaG12UjhlZTlBdz09Cg==",
+      "url": "https://github.com/SWIRCH/cluster-banned-manager/releases/download/v0.1.5/ClusterBannedManager_0.1.5_x64-setup.exe"
     }
   },
-  "pub_date": "2026-01-11T09:15:33Z",
-  "version": "v0.1.4",
-  "notes": "Auto-generated update for version 0.1.4"
+  "pub_date": "2026-08-20T00:43:54Z",
+  "version": "v0.1.5",
+  "notes": "Auto-generated update for version 0.1.5"
 }

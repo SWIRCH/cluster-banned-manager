@@ -4,3 +4,4 @@ export { useHosts } from "./useHosts";
 export { usePing } from "./usePing";
 export { useGameStatus } from "./useGameStatus";
 export { useHostsActions } from "./useHostsActions";
+export { useClustersLoader } from "./useClustersLoader";
