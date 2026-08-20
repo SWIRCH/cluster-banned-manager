@@ -18,7 +18,7 @@ export function useSelections(game: Game) {
         const defaults: Selections = {};
         for (const region of game.clusters) {
           defaults[region.id] = Object.fromEntries(
-            (region.clusters ?? []).map((c) => [c.domain, true])
+            (region.clusters ?? []).map((c) => [c.domain, true]),
           );
         }
         await saveSelections(defaults);
@@ -33,7 +33,7 @@ export function useSelections(game: Game) {
   const updateSelection = (
     regionId: string,
     domain: string,
-    checked: boolean
+    checked: boolean,
   ) => {
     setSelections((prev) => {
       const prevRegion = prev[regionId] ?? {};
@@ -47,7 +47,7 @@ export function useSelections(game: Game) {
   const selectCluster = (regionId: string, domain: string, clusters: any[]) => {
     setSelections((prev) => {
       const newRegion = Object.fromEntries(
-        clusters.map((c) => [c.domain, c.domain === domain])
+        clusters.map((c) => [c.domain, c.domain === domain]),
       );
       const next = { ...prev, [regionId]: newRegion };
       saveSelections(next);
@@ -60,7 +60,7 @@ export function useSelections(game: Game) {
     const defaults: Selections = {};
     for (const region of game.clusters) {
       defaults[region.id] = Object.fromEntries(
-        (region.clusters ?? []).map((c) => [c.domain, true])
+        (region.clusters ?? []).map((c) => [c.domain, true]),
       );
     }
     setSelections(defaults);

@@ -15,6 +15,7 @@ export type Region = {
 };
 
 export type Game = {
+  appId: number;
   name: string;
   icon: string;
   posters?: string[];

@@ -108,7 +108,7 @@ export function usePing(selectedRegion: Region | null) {
 
       const finalAvg = successes ? Math.round(totalMs / successes) : null;
       const finalLoss = Math.round(
-        ((PING_ATTEMPTS - successes) / PING_ATTEMPTS) * 100
+        ((PING_ATTEMPTS - successes) / PING_ATTEMPTS) * 100,
       );
       updateStats(domain, {
         avg: finalAvg,
@@ -119,7 +119,7 @@ export function usePing(selectedRegion: Region | null) {
 
     let idx = 0;
     const workers: Promise<void>[] = new Array(
-      Math.min(PING_CONCURRENCY, tasks.length)
+      Math.min(PING_CONCURRENCY, tasks.length),
     )
       .fill(null)
       .map(async () => {

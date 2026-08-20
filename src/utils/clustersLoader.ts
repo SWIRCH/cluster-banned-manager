@@ -1,5 +1,6 @@
 import clustersDataLocal from "../data/servers.json";
 import { showGlobalError } from "./globalError";
+import { config } from "../utils/config";
 
 export const LOCAL_CLUSTERS = clustersDataLocal;
 
@@ -8,6 +9,8 @@ const GITHUB_URL =
 
 export async function loadClustersFromGitHub() {
   try {
+    if (config.DEBUG_MODE === true) return null;
+
     const response = await fetch(GITHUB_URL);
 
     if (!response.ok) {

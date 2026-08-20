@@ -56,10 +56,10 @@ export default function ClusterList({
                       avg === null || avg === undefined
                         ? "text-white/50"
                         : avg <= 50
-                        ? "text-green-400"
-                        : avg >= 105
-                        ? "text-red-400"
-                        : "text-yellow-400";
+                          ? "text-green-400"
+                          : avg >= 105
+                            ? "text-red-400"
+                            : "text-yellow-400";
                     return (
                       <span>
                         <span className={cls}>{display}</span>{" "}

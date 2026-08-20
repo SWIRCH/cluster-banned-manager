@@ -1,6 +1,6 @@
 export async function safeInvoke<T = any>(
   cmd: string,
-  args?: Record<string, any>
+  args?: Record<string, any>,
 ): Promise<T> {
   if (typeof window === "undefined") throw new Error("Window is not defined");
 
@@ -25,7 +25,7 @@ export async function safeInvoke<T = any>(
   } catch (err) {
     console.warn(
       "[TAURI] core import/invoke failed, falling back to __TAURI_INTERNALS__:",
-      err
+      err,
     );
 
     const internals = (window as any).__TAURI_INTERNALS__;
@@ -50,7 +50,7 @@ export async function safeInvoke<T = any>(
 
 export async function directInvoke<T = any>(
   cmd: string,
-  args?: Record<string, any>
+  args?: Record<string, any>,
 ): Promise<T> {
   const core = await import("@tauri-apps/api/core");
   const { invoke } = core as any;
@@ -85,8 +85,8 @@ export async function diagnoseTauri() {
   return result;
 }
 
-export async function launchGame(appid: string) {
-  return safeInvoke("launch_game", { appid });
+export async function launchGame(appid: string | number) {
+  return safeInvoke("launch_game", { appid: appid.toString() });
 }
 
 export async function isProcessRunning(name: string) {
@@ -100,7 +100,7 @@ export async function killProcess(name: string) {
 export async function updateFirewallRules(
   regionId: string,
   blockedDomains: string[],
-  enable: boolean
+  enable: boolean,
 ) {
   console.log("[updateFirewallRules] Function called with:", {
     regionId,
@@ -132,7 +132,7 @@ export async function updateClusterRules(
   blockedDomains: string[],
   enable: boolean,
   useHosts: boolean,
-  useFirewall: boolean
+  useFirewall: boolean,
 ) {
   return await directInvoke("update_cluster_rules", {
     region_id: regionId,

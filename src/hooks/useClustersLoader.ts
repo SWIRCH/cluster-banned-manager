@@ -1,4 +1,3 @@
-// src/hooks/useClustersLoader.ts
 import { useState, useEffect } from "react";
 import {
   LOCAL_CLUSTERS,

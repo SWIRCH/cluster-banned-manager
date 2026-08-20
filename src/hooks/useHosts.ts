@@ -6,7 +6,7 @@ import type { Cluster } from "../types/cluster";
 export function useHosts(
   selectedRegionId: string,
   selections: Selections,
-  clusters: Cluster[]
+  clusters: Cluster[],
 ) {
   const [hostsMismatch, setHostsMismatch] = useState(false);
   const [mismatchDomains, setMismatchDomains] = useState<string[]>([]);
@@ -28,7 +28,7 @@ export function useHosts(
       setTauriAvailable(true);
       setLastTauriError(null);
       const blockedSet = new Set(
-        (res?.blocked || []).map((s: string) => s.toLowerCase())
+        (res?.blocked || []).map((s: string) => s.toLowerCase()),
       );
       const mismatches: string[] = [];
       for (const c of clusters) {

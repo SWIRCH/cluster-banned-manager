@@ -34,7 +34,9 @@ export default function Navbar({
                   src={selectedRegion?.icon ?? game.icon}
                 />
                 <h3>
-                  {selectedRegion?.alias_name ?? selectedRegion?.name ?? ""}{" "}
+                  {selectedRegion?.alias_name ??
+                    selectedRegion?.name ??
+                    ""}{" "}
                 </h3>
                 <ChevronDown size={20} strokeWidth={1.5} absoluteStrokeWidth />
               </MenuButton>

@@ -16,4 +16,5 @@ export const config = {
   TAURI_VERSION: await getTauriVersion(),
   BREACH: "clusterbannedmanager",
   WARP_FIX_LINK: "https://swirch.github.io/cluster-banned-manager/warp-fix/",
+  DEBUG_MODE: true, // Set to true for development mode, false for production
 };

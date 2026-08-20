@@ -1,14 +1,14 @@
 {
-  "id": "444200",
+  "appId": 444200,
   "alias_name": "wot_blitz",
   "name": "World of Tanks Blitz",
   "icon": "/Games/444200/mini.png",
   "posters": [
-    "/Games/444200/coaav1.jpg",
-    "/Games/444200/coaav2.jpg",
-    "/Games/444200/coaav3.jpg",
-    "/Games/444200/coaav4.jpg",
-    "/Games/444200/coaav5.jpg"
+    "/Games/444200/posters/0.jpg",
+    "/Games/444200/posters/1.jpg",
+    "/Games/444200/posters/2.jpg",
+    "/Games/444200/posters/3.jpg",
+    "/Games/444200/posters/4.jpg"
   ],
   "clusters": [
     {

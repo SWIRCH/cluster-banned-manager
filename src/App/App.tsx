@@ -16,28 +16,36 @@ import { useHosts } from "../hooks/useHosts";
 import { usePing } from "../hooks/usePing";
 import { useGameStatus } from "../hooks/useGameStatus";
 import { useHostsActions } from "../hooks/useHostsActions";
-import { safeInvoke, launchGame, diagnoseTauri } from "../utils/tauriInvoke";
+import { safeInvoke, diagnoseTauri } from "../utils/tauriInvoke";
 import { getSavedRegionId, saveRegionId } from "../utils/regionStorage";
 import type { Game } from "../types/cluster";
 import Sidebar from "./components/Sidebar";
 import { openWarpFixPingLoss } from "../utils/opener";
 import { useClustersLoader } from "../hooks/useClustersLoader";
+import { useGamePoster } from "../hooks/useGamePoster";
+import { useGameLauncher } from "../hooks/useGameLauncher";
+import { useInfoModal } from "../hooks/useInfoModal";
+import { config } from "../utils/config";
 
 function AppContent() {
   const { clustersData, isLoading: clustersLoading } = useClustersLoader();
   const [isLoadingScreen, setIsLoadingScreen] = useState(clustersLoading);
   const game = clustersData as Game;
 
+  const infoModal = useInfoModal();
+
   const getInitialRegionId = (): string => {
     const savedRegionId = getSavedRegionId();
-    if (savedRegionId) {
+    if (savedRegionId && game?.clusters) {
       const regionExists = game.clusters.some((c) => c.id === savedRegionId);
       if (regionExists) {
         return savedRegionId;
       }
     }
+
     const defaultRegion =
-      game.clusters.find((c) => c.id === "wot_eu") ?? game.clusters[0];
+      game?.clusters?.find((c) => c.id === "wot_eu") ?? game?.clusters?.[0];
+
     return defaultRegion?.id ?? "";
   };
 
@@ -50,9 +58,9 @@ function AppContent() {
   };
 
   const defaultRegion =
-    game.clusters.find((c) => c.id === "wot_eu") ?? game.clusters[0];
+    game?.clusters?.find((c) => c.id === "wot_eu") ?? game?.clusters?.[0];
   const selectedRegion =
-    game.clusters.find((c) => c.id === selectedRegionId) ?? defaultRegion;
+    game?.clusters?.find((c) => c.id === selectedRegionId) ?? defaultRegion;
   const clusters = selectedRegion?.clusters ?? [];
 
   const { settings, updateSetting, loading: settingsLoading } = useSettings();
@@ -73,26 +81,17 @@ function AppContent() {
     clusters,
     settings,
   );
+  const posterUrl = useGamePoster(game);
 
-  const [posterUrl, setPosterUrl] = useState<string>(
-    game.posters && game.posters.length > 0
-      ? game.posters[0]
-      : "/Games/444200/coaav5.jpg",
-  );
-
-  useEffect(() => {
-    try {
-      const posters = game.posters;
-      if (Array.isArray(posters) && posters.length > 0) {
-        const idx = Math.floor(Math.random() * posters.length);
-        setPosterUrl(posters[idx]);
-      }
-    } catch (err) {
-      // ignore
+  const handleLoadingComplete = () => {
+    if (config.DEBUG_MODE) {
+      console.log("LoadingScreen разрешил закрытие");
     }
-  }, []);
+    setIsLoadingScreen(false);
+  };
 
   useEffect(() => {
+    if (!config.DEBUG_MODE) return undefined;
     if (!settingsLoading && Object.keys(selections).length > 0) {
       console.log(
         "Данные приложения загружены, ожидаем завершения проверки обновлений",
@@ -100,12 +99,7 @@ function AppContent() {
     }
   }, [settingsLoading, selections]);
 
-  const handleLoadingComplete = () => {
-    console.log("LoadingScreen разрешил закрытие");
-    setIsLoadingScreen(false);
-  };
-
-  // Check elevation on mount
+  // Check for admin rights on mount
   useEffect(() => {
     (async () => {
       try {
@@ -128,10 +122,6 @@ function AppContent() {
   const [confirmDomains, setConfirmDomains] = useState<string[]>([]);
   const [clearConfirmOpen, setClearConfirmOpen] = useState(false);
   const [blockingAllConfirmOpen, setBlockingAllConfirmOpen] = useState(false);
-  const [infoOpen, setInfoOpen] = useState(false);
-  const [infoTitle, setInfoTitle] = useState("");
-  const [infoMessage, setInfoMessage] = useState("");
-  const [infoIsError, setInfoIsError] = useState(false);
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
   const [adminModalOpen, setAdminModalOpen] = useState(false);
   const [diagnosticInfo, setDiagnosticInfo] = useState<string | null>(null);
@@ -146,10 +136,7 @@ function AppContent() {
 
   const handleApplyHosts = async (domains?: string[]) => {
     const result = await applyHostsUpdate(domains);
-    setInfoTitle(result.title);
-    setInfoMessage(result.message);
-    setInfoIsError(!result.success);
-    setInfoOpen(true);
+    infoModal.showInfo(result.title, result.message, !result.success);
     setConfirmOpen(false);
     if (result.success) {
       await checkHostsConsistency();
@@ -158,10 +145,7 @@ function AppContent() {
 
   const handleClearCluster = async () => {
     const result = await clearCluster();
-    setInfoTitle(result.title);
-    setInfoMessage(result.message);
-    setInfoIsError(!result.success);
-    setInfoOpen(true);
+    infoModal.showInfo(result.title, result.message, !result.success);
     setClearConfirmOpen(false);
 
     if (result.success) {
@@ -172,36 +156,13 @@ function AppContent() {
     }
   };
 
-  const handlePlayClick = async () => {
-    try {
-      if (gameRunning) {
-        await killGame();
-        setInfoTitle("Закрытие игры");
-        setInfoMessage("Попытка закрыть процесс игры (если он был запущен)");
-        setInfoIsError(false);
-        setInfoOpen(true);
-      } else {
-        try {
-          await launchGame("444200");
-          setInfoTitle("Запуск...");
-          setInfoMessage("Запрос на запуск отправлен: Steam будет открыт.");
-          setInfoIsError(false);
-          setInfoOpen(true);
-          setTimeout(() => checkGameRunning(), 10000);
-        } catch (e) {
-          setInfoTitle("Не удалось запустить игру");
-          setInfoMessage(String(e));
-          setInfoIsError(true);
-          setInfoOpen(true);
-        }
-      }
-    } catch (err) {
-      setInfoTitle("Ошибка");
-      setInfoMessage(String(err));
-      setInfoIsError(true);
-      setInfoOpen(true);
-    }
-  };
+  const { handlePlayClick } = useGameLauncher(
+    game,
+    gameRunning,
+    killGame,
+    checkGameRunning,
+    infoModal,
+  );
 
   const handleUpdateClick = () => {
     const rmap =
@@ -338,12 +299,13 @@ function AppContent() {
               loading={loading}
             />
 
+            {/* Использование методов из useInfoModal */}
             <InfoModal
-              open={infoOpen}
-              onClose={() => setInfoOpen(false)}
-              title={infoTitle}
-              message={infoMessage}
-              isError={infoIsError}
+              open={infoModal.open}
+              onClose={infoModal.closeInfo}
+              title={infoModal.title}
+              message={infoModal.message}
+              isError={infoModal.isError}
             />
 
             <SettingsModal
@@ -359,12 +321,11 @@ function AppContent() {
               open={adminModalOpen}
               onShowInstructions={() => {
                 setAdminModalOpen(false);
-                setInfoTitle("Как запустить с правами администратора");
-                setInfoMessage(
+                infoModal.showInfo(
+                  "Как запустить с правами администратора",
                   "Запустите приложение от имени администратора (ПКМ → Запуск от имени администратора) или создайте ярлык, в котором в свойствах выберите запуск от имени администратора. После этого нажмите 'Повторить'.",
+                  false,
                 );
-                setInfoIsError(false);
-                setInfoOpen(true);
               }}
             />
           </main>

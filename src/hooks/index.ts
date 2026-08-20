@@ -5,3 +5,6 @@ export { usePing } from "./usePing";
 export { useGameStatus } from "./useGameStatus";
 export { useHostsActions } from "./useHostsActions";
 export { useClustersLoader } from "./useClustersLoader";
+export { useGameLauncher } from "./useGameLauncher";
+export { useGamePoster } from "./useGamePoster";
+export { useInfoModal } from "./useInfoModal";

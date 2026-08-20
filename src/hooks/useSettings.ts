@@ -22,7 +22,7 @@ export function useSettings() {
 
   const updateSetting = <K extends keyof AppSettings>(
     key: K,
-    value: AppSettings[K]
+    value: AppSettings[K],
   ) => {
     setSettings((prev) => {
       const updated = { ...prev, [key]: value };

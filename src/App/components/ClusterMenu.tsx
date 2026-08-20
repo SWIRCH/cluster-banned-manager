@@ -33,15 +33,15 @@ export default function ClusterMenu({
               const display =
                 avg !== null && avg !== undefined
                   ? `${avg} ms`
-                  : selected?.latency ?? "5000 ms";
+                  : (selected?.latency ?? "5000 ms");
               const cls =
                 avg === null || avg === undefined
                   ? "text-white/60"
                   : avg <= 50
-                  ? "text-green-400"
-                  : avg >= 105
-                  ? "text-red-400"
-                  : "text-yellow-400";
+                    ? "text-green-400"
+                    : avg >= 105
+                      ? "text-red-400"
+                      : "text-yellow-400";
               return <span className={cls}>{display}</span>;
             })()}
           </div>
@@ -85,15 +85,15 @@ export default function ClusterMenu({
                       const display =
                         avg !== null && avg !== undefined
                           ? `${avg} ms`
-                          : c.latency ?? "5000 ms";
+                          : (c.latency ?? "5000 ms");
                       const cls =
                         avg === null || avg === undefined
                           ? "text-white/60"
                           : avg <= 50
-                          ? "text-green-400"
-                          : avg >= 105
-                          ? "text-red-400"
-                          : "text-yellow-400";
+                            ? "text-green-400"
+                            : avg >= 105
+                              ? "text-red-400"
+                              : "text-yellow-400";
                       return <span className={cls}>{display}</span>;
                     })()}
                   </div>

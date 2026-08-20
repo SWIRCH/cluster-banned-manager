@@ -9,7 +9,7 @@ export function useHostsActions(
   selectedRegionId: string,
   selections: Selections,
   clusters: Cluster[],
-  settings: AppSettings
+  settings: AppSettings,
 ) {
   const [loading, setLoading] = useState(false);
 
@@ -20,9 +20,7 @@ export function useHostsActions(
         const rmap =
           selections[selectedRegionId] ??
           Object.fromEntries(clusters.map((c) => [c.domain, true]));
-        return clusters
-          .filter((c) => !rmap[c.domain])
-          .map((c) => c.domain);
+        return clusters.filter((c) => !rmap[c.domain]).map((c) => c.domain);
       })();
 
     let isRemoval = false;
@@ -30,7 +28,7 @@ export function useHostsActions(
       try {
         const allBlocked: any = await safeInvoke("read_blocked_domains");
         const blockedSet = new Set(
-          (allBlocked || []).map((s: string) => s.toLowerCase())
+          (allBlocked || []).map((s: string) => s.toLowerCase()),
         );
         const toRemove = clusters
           .filter((c) => blockedSet.has(c.domain.toLowerCase()))
@@ -75,7 +73,7 @@ export function useHostsActions(
           firewallRes = await updateFirewallRules(
             selectedRegionId,
             domains,
-            !isRemoval
+            !isRemoval,
           );
         } catch (firewallError) {
           console.error("Firewall update failed:", firewallError);

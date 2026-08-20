@@ -19,7 +19,8 @@
         "minHeight": 580,
         "maxWidth": 1200,
         "maxHeight": 580,
-        "resizable": true
+        "resizable": true,
+        "fullscreen": false
       }
     ],
     "security": {
