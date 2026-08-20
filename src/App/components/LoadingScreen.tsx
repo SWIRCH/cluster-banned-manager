@@ -55,7 +55,7 @@ export default function LoadingScreen({
         return;
       } else {
         console.log("Обновлений нет");
-        (setAppStatus("ready"), 2500000);
+        (setAppStatus("ready"), 2500);
         // Задержка перед закрытием, чтобы показать сообщение
         setTimeout(() => {
           if (onLoadingComplete) {
