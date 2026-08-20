@@ -173,6 +173,7 @@ body {
   font-size: 20px;
   font-weight: 700;
   color: white;
+  cursor: pointer;
 }
 
 .logo i {
@@ -335,6 +336,19 @@ body {
 
 .app-window-content {
   padding: 20px;
+}
+
+
+.d-flex{
+  display: flex;
+}
+
+.flex-column{
+  flex-direction: column;
+}
+
+.w-fit{
+  width: fit-content;
 }
 
 .preview-region-select {

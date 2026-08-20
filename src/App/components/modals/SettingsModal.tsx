@@ -1,5 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import type { AppSettings } from "../../../utils/settingsStorage";
+import { Checkbox } from "@headlessui/react";
+import { useState } from "react";
 
 type SettingsModalProps = {
   open: boolean;
@@ -7,7 +9,7 @@ type SettingsModalProps = {
   settings: AppSettings;
   onUpdateSetting: <K extends keyof AppSettings>(
     key: K,
-    value: AppSettings[K]
+    value: AppSettings[K],
   ) => void;
   onDiagnose: () => void;
   diagnosticInfo: string | null;
@@ -21,6 +23,9 @@ export default function SettingsModal({
   onDiagnose,
   diagnosticInfo,
 }: SettingsModalProps) {
+  const [enabledFirewall, setEnabledFirewall] = useState(settings.useFirewall);
+  const [enabledBackup, setEnabledBackup] = useState(settings.useBackup);
+
   return (
     <AnimatePresence>
       {open && (
@@ -52,14 +57,36 @@ export default function SettingsModal({
               <div className="text-sm font-medium mb-2">Методы блокировки:</div>
 
               <label className="flex items-center gap-2 text-sm">
-                <input
+                {/* <input
                   type="checkbox"
                   checked={settings.useFirewall}
                   onChange={(e) =>
                     onUpdateSetting("useFirewall", e.target.checked)
                   }
                   className="rounded"
-                />
+                /> */}
+
+                <Checkbox
+                  checked={enabledFirewall}
+                  onChange={(e) => {
+                    setEnabledFirewall(e);
+                    onUpdateSetting("useFirewall", e);
+                  }}
+                  className="group block size-4 rounded border bg-white data-checked:bg-blue-500"
+                >
+                  <svg
+                    className="stroke-white opacity-0 group-data-checked:opacity-100"
+                    viewBox="0 0 14 14"
+                    fill="none"
+                  >
+                    <path
+                      d="M3 8L6 11L11 3.5"
+                      strokeWidth={2}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </Checkbox>
                 <span>Использовать брандмауэр Windows</span>
                 <span className="text-green-400 text-xs">(рекомендуется)</span>
               </label>
@@ -77,14 +104,35 @@ export default function SettingsModal({
 
               <div className="">
                 <label className="flex items-center gap-2 text-sm">
-                  <input
+                  {/* <input
                     type="checkbox"
                     checked={settings.useBackup}
                     onChange={(e) =>
                       onUpdateSetting("useBackup", e.target.checked)
                     }
                     className="rounded"
-                  />
+                  /> */}
+                  <Checkbox
+                    checked={enabledBackup}
+                    onChange={(e) => {
+                      setEnabledBackup(e);
+                      onUpdateSetting("useBackup", e);
+                    }}
+                    className="group block size-4 rounded border bg-white data-checked:bg-blue-500"
+                  >
+                    <svg
+                      className="stroke-white opacity-0 group-data-checked:opacity-100"
+                      viewBox="0 0 14 14"
+                      fill="none"
+                    >
+                      <path
+                        d="M3 8L6 11L11 3.5"
+                        strokeWidth={2}
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </Checkbox>
                   <span>Создавать бекапы hosts</span>
                   <span className="text-green-400 text-xs">
                     (рекомендуется)
@@ -108,7 +156,7 @@ export default function SettingsModal({
                       onClick={() =>
                         onUpdateSetting(
                           "backupCount",
-                          Math.max(1, settings.backupCount) - 1
+                          Math.max(1, settings.backupCount) - 1,
                         )
                       }
                     >
@@ -144,7 +192,7 @@ export default function SettingsModal({
                       onClick={() =>
                         onUpdateSetting(
                           "backupCount",
-                          Math.min(29, settings.backupCount) + 1
+                          Math.min(29, settings.backupCount) + 1,
                         )
                       }
                     >

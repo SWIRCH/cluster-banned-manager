@@ -24,6 +24,8 @@ body {
   font-weight: 400;
   background: #0d1117;
   color: #fff;
+  padding-left: 4em;
+  overflow: hidden;
 }
 
 button {
@@ -94,6 +96,132 @@ small {
   }
 }
 
+.link {
+  cursor: pointer;
+  color: #79a3ff;
+}
+
+.sidebar-tooltip {
+  background: rgb(22 26 30 / 53%);
+  color: #fff;
+}
+
+.sidebar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  padding-left: 0;
+  padding-right: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  background: rgb(22 26 30 / 53%);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10000;
+
+  .hr-bordered-top {
+    width: 30px;
+    color: #364153;
+    outline: none;
+  }
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: -1px; /* Высота декоративного угла */
+    right: -30px;
+    width: 30px; /* Ширина декоративного угла */
+    height: 30px;
+    background-color: rgb(22 26 30 / 53%); /* Цвет сайдбара */
+    transform: rotate(180deg);
+    clip-path: path("M 30 30 L 30 0 C 30 22, 18 28, 8 28 C 3 28, 0 30, 0 30 Z");
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: -1px; /* Высота декоративного угла */
+    right: -30px;
+    width: 30px; /* Ширина декоративного угла */
+    height: 30px;
+    background-color: rgb(22 26 30 / 53%); /* Цвет сайдбара */
+    rotate: 180deg;
+    transform: scaleY(-1);
+    clip-path: path("M 30 30 L 30 0 C 30 22, 18 28, 8 28 C 3 28, 0 30, 0 30 Z");
+  }
+
+  h3 {
+    font-weight: 400;
+  }
+
+  .link-items {
+    display: flex;
+    flex-direction: column;
+
+    gap: 14px;
+
+    .link-item {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      transition: 0.2s;
+
+      .flag-icon {
+        width: 30px;
+        height: 30px;
+        transition: 0.35s;
+      }
+
+      &:hover {
+        .flag-icon {
+          width: 18px;
+          height: 18px;
+          transition: 0.35s;
+        }
+      }
+
+      img {
+        border-radius: 100%;
+      }
+
+      &::before {
+        content: "";
+        background: transparent;
+        transition: 0.2s;
+      }
+
+      &:hover {
+        border-radius: 100%;
+        box-shadow: 0 0 0 2px #9fb0d6;
+      }
+
+      .active {
+        border-radius: 100%;
+        box-shadow: 0 0 0 2px #3c7aff;
+
+        .flag-icon {
+          width: 18px;
+          height: 18px;
+          transition: 0.35s;
+        }
+      }
+    }
+  }
+
+  .game-select {
+    padding: 2px 5px;
+    border-radius: 0px;
+    width: fit-content;
+
+    & > h3 {
+      font-weight: 400;
+    }
+  }
+}
+
 .navbar {
   padding-left: 1.2em;
   padding-right: 1.2em;
@@ -142,7 +270,7 @@ small {
   position: absolute;
   width: 100%;
   left: 0;
-  bottom: 0;
+  bottom: -2px;
   //   background: #00000041;
   //   backdrop-filter: blur(2px);
   overflow: hidden;
@@ -153,13 +281,14 @@ small {
   .inGameContainer {
     display: flex;
     margin: 1em 1em;
+    margin-bottom: 0;
     gap: 1.2em;
   }
 
   .inGamePoster {
     min-width: 300px;
     max-width: 300px;
-    height: 500px;
+    height: 545px;
 
     .status {
       position: absolute;
@@ -207,7 +336,7 @@ small {
   }
 
   .scrollbarYAuto {
-    max-height: 345px;
+    max-height: 385px;
     overflow-y: auto;
     scrollbar-width: thin; /* Firefox: thin */
     scrollbar-color: rgba(43, 48, 55, 0.6) transparent; /* Firefox: thumb track */

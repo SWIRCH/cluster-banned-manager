@@ -10,6 +10,7 @@ export type Region = {
   name: string;
   alias_name?: string;
   icon: string;
+  flag_icon: string;
   clusters: Cluster[];
 };
 

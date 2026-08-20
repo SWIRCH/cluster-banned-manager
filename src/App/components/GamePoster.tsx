@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Check } from "lucide-react";
 import type { Region } from "../../types/cluster";
+import { config } from "../../utils/config";
 
 type GamePosterProps = {
   posterUrl: string;
@@ -25,10 +26,10 @@ export default function GamePoster({
   gameRunning,
   onPlayClick,
   onUpdateClick,
-  onCheckHosts,
-  onSettingsClick,
-  onRefreshClick,
-  onClearClick,
+  // onCheckHosts,
+  // onSettingsClick,
+  // onRefreshClick,
+  // onClearClick,
   selectedRegion,
   lastTauriError,
   mismatchDomains,
@@ -61,18 +62,15 @@ export default function GamePoster({
               </AnimatePresence>
             </div>
           </div>
-          <div className="statusE">
+          {/* <div className="statusE">
             <div className="text-[12px] cursor-pointer">
               <div className="flex items-center gap-1">
-                <button
-                  className="text-red-400 text-xs"
-                  onClick={onClearClick}
-                >
+                <button className="text-red-400 text-xs" onClick={onClearClick}>
                   Очистить блокировки
                 </button>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
         <div className="gameButtons rounded-xl bg-white/5 backdrop-blur-2xl p-4 sm:p-4 relative w-full">
           <AnimatePresence mode="wait">
@@ -138,7 +136,7 @@ export default function GamePoster({
               )}
 
               <div className="mt-2 flex flex-wrap justify-between items-center gap-3">
-                <button className="text-xs underline" onClick={onCheckHosts}>
+                {/* <button className="text-xs underline" onClick={onCheckHosts}>
                   Проверить статус
                 </button>
 
@@ -148,14 +146,17 @@ export default function GamePoster({
 
                 <button className="text-xs underline" onClick={onRefreshClick}>
                   Обновить
-                </button>
+                </button> */}
+                {(lastTauriError && (
+                  <div className="mt-2 text-xs whitespace-pre-wrap">
+                    {lastTauriError}
+                  </div>
+                )) ?? (
+                  <div className="text-center text-xs whitespace-pre-wrap w-100">
+                    GitHub — ClusterBannedManager {config.VERSION}
+                  </div>
+                )}
               </div>
-
-              {lastTauriError && (
-                <div className="mt-2 text-xs whitespace-pre-wrap">
-                  {lastTauriError}
-                </div>
-              )}
             </div>
           </AnimatePresence>
         </div>

@@ -55,7 +55,7 @@ export default function LoadingScreen({
         return;
       } else {
         console.log("Обновлений нет");
-        setAppStatus("ready");
+        (setAppStatus("ready"), 2500);
         // Задержка перед закрытием, чтобы показать сообщение
         setTimeout(() => {
           if (onLoadingComplete) {
@@ -69,7 +69,7 @@ export default function LoadingScreen({
       setErrorMessage(
         error instanceof Error
           ? error.message
-          : "Ошибка при проверке обновлений"
+          : "Ошибка при проверке обновлений",
       );
 
       return;
@@ -105,7 +105,7 @@ export default function LoadingScreen({
           setErrorMessage(
             installError instanceof Error
               ? installError.message
-              : "Ошибка установки обновления"
+              : "Ошибка установки обновления",
           );
         }
       }, 500);
@@ -115,7 +115,7 @@ export default function LoadingScreen({
       setErrorMessage(
         downloadError instanceof Error
           ? downloadError.message
-          : "Ошибка скачивания обновления"
+          : "Ошибка скачивания обновления",
       );
     }
   }
@@ -289,6 +289,17 @@ export default function LoadingScreen({
             className="h-full bg-linear-to-r from-blue-400 to-blue-500"
           />
         </div>
+
+        {appStatus === "checking_updates" && (
+          <motion.div>
+            <button
+              onClick={skipUpdate}
+              className="px-6 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-medium transition-colors"
+            >
+              Пропустить
+            </button>
+          </motion.div>
+        )}
 
         {/* Кнопки действий */}
         {status.showButtons && (

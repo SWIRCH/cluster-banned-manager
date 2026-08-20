@@ -4,3 +4,7 @@ import { config } from "./config";
 export async function openAuthorLink() {
   await openUrl(config.AUTHOR_LINK);
 }
+
+export async function openWarpFixPingLoss() {
+  await openUrl(config.WARP_FIX_LINK);
+}
