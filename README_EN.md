@@ -23,6 +23,9 @@
 >
 > Recommendation: Ensure that **Windows Firewall is enabled** to utilize both protection levels.
 
+> [!IMPORTANT]
+> If you are experiencing ping issues or high packet loss, please read the article [WARP FIX](https://swirch.github.io/cluster-banned-manager/warp-fix/)
+
 ## 🌎 Translations
 
 - [Russian](/README.md)
@@ -76,7 +79,7 @@
 1. Download the installer from the [latest release page](https://github.com/SWIRCH/cluster-banned-manager/releases)
 2. Go through the application installation process
 3. Run the application as administrator to access system files
-4. Select a game region in the top menu
+4. Select a game region in the left menu
 5. Configure the desired servers for blocking
 > [!IMPORTANT]
 > A white indicator in the server list means it is enabled and available for connection.
@@ -116,7 +119,7 @@ bun tauri build
 
 ### 🗺 Frontend (TypeScript/React)
 
-1. **React 18** - library for building user interfaces
+1. **React 19** - library for building user interfaces
 2. **TypeScript** - typed JavaScript
 3. **Tailwind CSS** - utility-first CSS framework
 4. **Framer Motion** - animation library

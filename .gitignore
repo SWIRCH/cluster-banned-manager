@@ -29,3 +29,5 @@ base.txt
 *.crt
 *.key.pub
 # build.ps1
+
+me.txt
