@@ -38,6 +38,7 @@ export function useHostsActions(
             success: false,
             title: "Нет доменов для обновления",
             message: "В текущем регионе нет доменов для обновления.",
+            details: undefined,
           };
         }
         domains = toRemove;
@@ -46,7 +47,9 @@ export function useHostsActions(
         return {
           success: false,
           title: "Не удалось проверить hosts",
-          message: String(e),
+          message:
+            "Не удалось прочитать текущие заблокированные домены из hosts файла.",
+          details: String(e),
         };
       }
     }
@@ -110,6 +113,7 @@ ${
         success: true,
         title: isRemoval ? "Разблокировано" : "Заблокировано",
         message: successMessage.trim(),
+        details: undefined,
       };
     } catch (e) {
       let errorMessage = String(e);
@@ -130,7 +134,8 @@ ${
       return {
         success: false,
         title: errorTitle,
-        message: errorMessage.trim(),
+        message: "Не удалось применить изменения в hosts файле.",
+        details: errorMessage.trim(),
       };
     } finally {
       setLoading(false);
@@ -158,12 +163,14 @@ ${
         success: true,
         title: "Всё очищено",
         message: messages.join("\n\n"),
+        details: undefined,
       };
     } catch (e) {
       return {
         success: false,
         title: "Ошибка очистки",
-        message: String(e),
+        message: "Не удалось очистить блокировки.",
+        details: String(e),
       };
     } finally {
       setLoading(false);

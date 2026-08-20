@@ -130,11 +130,11 @@ small {
   &::before {
     content: "";
     position: absolute;
-    top: -1px; /* Высота декоративного угла */
+    top: -1px;
     right: -30px;
-    width: 30px; /* Ширина декоративного угла */
+    width: 30px;
     height: 30px;
-    background-color: rgb(22 26 30 / 53%); /* Цвет сайдбара */
+    background-color: rgb(22 26 30 / 53%);
     transform: rotate(180deg);
     clip-path: path("M 30 30 L 30 0 C 30 22, 18 28, 8 28 C 3 28, 0 30, 0 30 Z");
   }
@@ -142,11 +142,11 @@ small {
   &::after {
     content: "";
     position: absolute;
-    bottom: -1px; /* Высота декоративного угла */
+    bottom: -1px;
     right: -30px;
-    width: 30px; /* Ширина декоративного угла */
+    width: 30px;
     height: 30px;
-    background-color: rgb(22 26 30 / 53%); /* Цвет сайдбара */
+    background-color: rgb(22 26 30 / 53%);
     rotate: 180deg;
     transform: scaleY(-1);
     clip-path: path("M 30 30 L 30 0 C 30 22, 18 28, 8 28 C 3 28, 0 30, 0 30 Z");
@@ -338,23 +338,22 @@ small {
   .scrollbarYAuto {
     max-height: 385px;
     overflow-y: auto;
-    scrollbar-width: thin; /* Firefox: thin */
-    scrollbar-color: rgba(43, 48, 55, 0.6) transparent; /* Firefox: thumb track */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(43, 48, 55, 0.6) transparent;
     scrollbar-gutter: stable;
 
-    /* WebKit (Edge/Chrome) */
     &::-webkit-scrollbar {
-      width: 2px; /* точная ширина */
+      width: 2px;
       height: 8px;
     }
     &::-webkit-scrollbar-track {
-      background: transparent; /* либо цвет трека */
+      background: transparent;
       border-radius: 999px;
     }
     &::-webkit-scrollbar-thumb {
       background: rgba(43, 48, 55, 0.6);
       border-radius: 999px;
-      border: 1px solid rgba(0, 0, 0, 0); /* создаёт внутренний отступ */
+      border: 1px solid rgba(0, 0, 0, 0);
       background-clip: padding-box;
     }
     &::-webkit-scrollbar-thumb:hover {
@@ -380,6 +379,11 @@ small {
   }
 }
 
+.checkbox {
+  outline: none;
+  transition: 0.15s;
+}
+
 hr.vertical {
   width: 1px;
   height: 20px;
@@ -392,12 +396,10 @@ hr.vertical {
   width: fit-content;
 }
 
-/* Прячем стандартный кружок */
 .SelectInteractRadio input[type="radio"] {
   display: none;
 }
 
-/* Базовый стиль квадрата (label) */
 .SelectInteractRadio label {
   width: 100%;
   display: flex;
@@ -409,14 +411,12 @@ hr.vertical {
   color: #ffffff;
 }
 
-/* Рисуем сам квадрат (обводка #333 с прозрачностью 80%) */
 .SelectInteractRadio label::before {
   content: "";
   position: relative;
   width: 2px;
   height: 16px;
-  //   border: 2px solid rgba(51, 51, 51, 0.8); /* #333 / 80% */
-  border-radius: 4px; /* Скругление углов квадрата */
+  border-radius: 4px;
   background: rgba(42, 44, 42, 0.993);
   transition: all 0.2s ease;
 }
@@ -431,9 +431,8 @@ hr.vertical {
   }
 }
 
-/* Рисуем галочку (скрыта по умолчанию) */
 .SelectInteractRadio label::after {
-  content: "вкл."; /* Можно использовать SVG фоном для идеальной четкости */
+  content: "вкл.";
   position: absolute;
   right: 0;
   top: -1px;
@@ -442,12 +441,10 @@ hr.vertical {
   display: none;
 }
 
-/* Состояние, когда радиокнопка выбрана */
 .SelectInteractRadio input[type="radio"]:checked + label::after {
   display: block; /* Показываем галочку */
 }
 
-/* Опционально: меняем цвет рамки при выборе */
 .SelectInteractRadio input[type="radio"]:checked + label::before {
   background: rgba(48, 255, 82, 0.993);
   animation: SelectOptionAnim1 normal 1s;

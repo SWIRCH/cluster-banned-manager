@@ -1,31 +1,41 @@
 import { useState, useEffect } from "react";
 import { AnimatePresence } from "framer-motion";
+
 import ClusterMenu from "./components/ClusterMenu";
 import GamePoster from "./components/GamePoster";
 import SelectiveBlocking from "./components/SelectiveBlocking";
 import LoadingScreen from "./components/LoadingScreen";
-import ConfirmModal from "./components/modals/ConfirmModal";
-import BlockingAllConfirmModal from "./components/modals/BlockingAllConfirmModal";
-import ClearConfirmModal from "./components/modals/ClearConfirmModal";
-import InfoModal from "./components/modals/InfoModal";
-import SettingsModal from "./components/modals/SettingsModal";
-import AdminModal from "./components/modals/AdminModal";
-import { useSettings } from "../hooks/useSettings";
-import { useSelections } from "../hooks/useSelections";
-import { useHosts } from "../hooks/useHosts";
-import { usePing } from "../hooks/usePing";
-import { useGameStatus } from "../hooks/useGameStatus";
-import { useHostsActions } from "../hooks/useHostsActions";
+import Sidebar from "./components/Sidebar";
+
+import {
+  ConfirmModal,
+  BlockingAllConfirmModal,
+  ClearConfirmModal,
+  InfoModal,
+  SettingsModal,
+  AdminModal,
+} from "./components/Modals";
+
+import {
+  useSettings,
+  useSelections,
+  useHosts,
+  usePing,
+  useGameStatus,
+  useHostsActions,
+  useGamePoster,
+  useGameLauncher,
+  useInfoModal,
+  useClustersLoader,
+} from "../hooks";
+
 import { safeInvoke, diagnoseTauri } from "../utils/tauriInvoke";
 import { getSavedRegionId, saveRegionId } from "../utils/regionStorage";
-import type { Game } from "../types/cluster";
-import Sidebar from "./components/Sidebar";
 import { openWarpFixPingLoss } from "../utils/opener";
-import { useClustersLoader } from "../hooks/useClustersLoader";
-import { useGamePoster } from "../hooks/useGamePoster";
-import { useGameLauncher } from "../hooks/useGameLauncher";
-import { useInfoModal } from "../hooks/useInfoModal";
 import { config } from "../utils/config";
+
+import type { Game } from "../types/cluster";
+import { showGlobalError } from "../utils/globalError";
 
 function AppContent() {
   const { clustersData, isLoading: clustersLoading } = useClustersLoader();
@@ -56,6 +66,8 @@ function AppContent() {
     setSelectedRegionId(regionId);
     saveRegionId(regionId);
   };
+
+  const [adminMounts, setAdminMounts] = useState<boolean>(false);
 
   const defaultRegion =
     game?.clusters?.find((c) => c.id === "wot_eu") ?? game?.clusters?.[0];
@@ -105,8 +117,11 @@ function AppContent() {
       try {
         const ev: any = await safeInvoke("check_elevation");
         if (ev && ev.isAdmin === false) {
+          setAdminMounts(false);
           setAdminModalOpen(true);
+          return;
         }
+        setAdminMounts(true);
       } catch (e) {
         console.debug("check_elevation failed", e);
       }
@@ -136,7 +151,7 @@ function AppContent() {
 
   const handleApplyHosts = async (domains?: string[]) => {
     const result = await applyHostsUpdate(domains);
-    infoModal.showInfo(result.title, result.message, !result.success);
+    showGlobalError(result.title, result.message, result.details);
     setConfirmOpen(false);
     if (result.success) {
       await checkHostsConsistency();
@@ -144,8 +159,16 @@ function AppContent() {
   };
 
   const handleClearCluster = async () => {
+    if (!adminMounts) {
+      showGlobalError(
+        "Ошибка прав администратора",
+        "Для очистки блокировок требуется запуск приложения с правами администратора.",
+        "Пожалуйста, закройте приложение и запустите его от имени администратора.",
+      );
+      return;
+    }
+
     const result = await clearCluster();
-    infoModal.showInfo(result.title, result.message, !result.success);
     setClearConfirmOpen(false);
 
     if (result.success) {
@@ -220,13 +243,6 @@ function AppContent() {
                 gameRunning={gameRunning}
                 onPlayClick={handlePlayClick}
                 onUpdateClick={handleUpdateClick}
-                onCheckHosts={checkHostsConsistency}
-                onSettingsClick={() => setSettingsModalOpen(true)}
-                onRefreshClick={async () => {
-                  await pingClusters(selectedRegionId);
-                  await checkGameRunning();
-                }}
-                onClearClick={() => setClearConfirmOpen(true)}
                 selectedRegion={selectedRegion}
                 lastTauriError={lastTauriError}
                 mismatchDomains={mismatchDomains}
@@ -299,7 +315,6 @@ function AppContent() {
               loading={loading}
             />
 
-            {/* Использование методов из useInfoModal */}
             <InfoModal
               open={infoModal.open}
               onClose={infoModal.closeInfo}
