@@ -5,7 +5,7 @@
   "identifier": "com.aysi.clusterbanned",
   "build": {
     "beforeDevCommand": "bun run dev",
-    "devUrl": "http://localhost:1420",
+    "devUrl": "http://192.168.0.100:1420",
     "beforeBuildCommand": "bun run build",
     "frontendDist": "../dist"
   },
@@ -23,6 +23,7 @@
         "fullscreen": false
       }
     ],
+    "withGlobalTauri": true,
     "security": {
       "csp": null
     }

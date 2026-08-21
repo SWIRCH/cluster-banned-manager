@@ -29,13 +29,16 @@ import {
   useClustersLoader,
 } from "../hooks";
 
-import { safeInvoke, diagnoseTauri } from "../utils/tauriInvoke";
+import { safeInvoke, diagnoseTauri } from "../lib/tauri";
 import { getSavedRegionId, saveRegionId } from "../utils/regionStorage";
 import { openWarpFixPingLoss } from "../utils/opener";
 import { config } from "../utils/config";
 
 import type { Game } from "../types/cluster";
 import { showGlobalError } from "../utils/globalError";
+import { useIsMobile } from "../hooks/useIsMobile";
+import MobileBottomBar from "./components/MobileBottomBar";
+import MobileTopBar from "./components/MobileTopBar";
 
 function AppContent() {
   const { clustersData, isLoading: clustersLoading } = useClustersLoader();
@@ -43,6 +46,17 @@ function AppContent() {
   const game = clustersData as Game;
 
   const infoModal = useInfoModal();
+  const isMobile = useIsMobile();
+
+  document.body.classList.add(
+    isMobile ? "platform-mobile" : "platform-desktop",
+  );
+
+  if (isMobile) {
+    import("../Styles/mobile.scss");
+  } else {
+    import("../Styles/desktop.scss");
+  }
 
   const getInitialRegionId = (): string => {
     const savedRegionId = getSavedRegionId();
@@ -209,6 +223,19 @@ function AppContent() {
     }
   };
 
+  const sidebarProps = {
+    game,
+    selectedRegion,
+    onRegionChange: handleRegionChange,
+    onCheckHosts: checkHostsConsistency,
+    onSettingsClick: () => setSettingsModalOpen(true),
+    onClearClick: () => setClearConfirmOpen(true),
+    onRefreshClick: async () => {
+      await pingClusters(selectedRegionId);
+      await checkGameRunning();
+    },
+  };
+
   return (
     <>
       <AnimatePresence mode="wait">
@@ -223,35 +250,37 @@ function AppContent() {
       <AnimatePresence>
         {!isLoadingScreen && (
           <main id="layer-ingame" key="main">
-            <Sidebar
-              game={game}
-              selectedRegion={selectedRegion}
-              onRegionChange={handleRegionChange}
-              onCheckHosts={checkHostsConsistency}
-              onSettingsClick={() => setSettingsModalOpen(true)}
-              onClearClick={() => setClearConfirmOpen(true)}
-              onRefreshClick={async () => {
-                await pingClusters(selectedRegionId);
-                await checkGameRunning();
-              }}
-            />
+            {isMobile ? (
+              <>
+                <MobileTopBar {...sidebarProps} />
+                <MobileBottomBar
+                  game={game}
+                  selectedRegion={selectedRegion}
+                  onRegionChange={handleRegionChange}
+                />
+              </>
+            ) : (
+              <Sidebar {...sidebarProps} />
+            )}
             <div className="inGameContainer">
-              <GamePoster
-                posterUrl={posterUrl}
-                tauriAvailable={tauriAvailable}
-                hostsMismatch={hostsMismatch}
-                gameRunning={gameRunning}
-                onPlayClick={handlePlayClick}
-                onUpdateClick={handleUpdateClick}
-                selectedRegion={selectedRegion}
-                lastTauriError={lastTauriError}
-                mismatchDomains={mismatchDomains}
-              />
+              {!isMobile && (
+                <GamePoster
+                  posterUrl={posterUrl}
+                  tauriAvailable={tauriAvailable}
+                  hostsMismatch={hostsMismatch}
+                  gameRunning={gameRunning}
+                  onPlayClick={handlePlayClick}
+                  onUpdateClick={handleUpdateClick}
+                  selectedRegion={selectedRegion}
+                  lastTauriError={lastTauriError}
+                  mismatchDomains={mismatchDomains}
+                />
+              )}
               <div className="inGameOption">
                 <div className="whilecard">
-                  <div className="flex justify-between items-center space-y-1 rounded-xl bg-white/5 p-1 sm:p-2">
+                  <div className="whilecard-title flex justify-between items-center space-y-1 rounded-xl bg-white/5 p-1 sm:p-2">
                     <h3>Выбрать сервер</h3>
-                    <p className="pe-2 text-[14px]">
+                    <p className="pe-2 text-[14px] warp-fix-link">
                       <a
                         onClick={() => openWarpFixPingLoss()}
                         target="_blank"

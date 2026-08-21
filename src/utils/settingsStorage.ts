@@ -1,4 +1,4 @@
-import { safeInvoke } from "./tauriInvoke";
+import { safeInvoke } from "../lib/tauri";
 
 export interface AppSettings {
   useFirewall: boolean;
@@ -37,7 +37,7 @@ export async function saveSettings(settings: AppSettings): Promise<void> {
 
 export async function saveSingleSetting<K extends keyof AppSettings>(
   key: K,
-  value: AppSettings[K]
+  value: AppSettings[K],
 ): Promise<void> {
   const current = await loadSettings();
   const updated = { ...current, [key]: value };

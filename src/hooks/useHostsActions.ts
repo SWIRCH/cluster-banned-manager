@@ -1,6 +1,9 @@
 import { useState } from "react";
-import { safeInvoke } from "../utils/tauriInvoke";
-import { updateFirewallRules, clearFirewallRules } from "../utils/tauriInvoke";
+import {
+  updateFirewallRules,
+  clearFirewallRules,
+  safeInvoke,
+} from "../lib/tauri";
 import type { AppSettings } from "../utils/settingsStorage";
 import type { Cluster } from "../types/cluster";
 import type { Selections } from "../types/selections";

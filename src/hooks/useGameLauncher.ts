@@ -1,4 +1,4 @@
-import { launchGame } from "../utils/tauriInvoke";
+import { launchGame } from "../lib/tauri";
 import type { Game } from "../types/cluster";
 
 interface ModalState {

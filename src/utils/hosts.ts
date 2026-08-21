@@ -1,4 +1,4 @@
-import { safeInvoke } from "./tauriInvoke";
+import { safeInvoke } from "../lib/tauri";
 
 export async function readHostsFile(): Promise<string | null> {
   try {
@@ -42,7 +42,7 @@ export async function getBlockedDomains(): Promise<Set<string>> {
 
 export async function updateHostsBlock(
   blockedDomains: string[],
-  region?: string
+  region?: string,
 ): Promise<{ success: boolean; message?: string }> {
   try {
     await safeInvoke("update_hosts_block", {

@@ -1,20 +1,29 @@
-import {
-  getVersion,
-  getTauriVersion,
-  getName,
-  getBundleType,
-} from "@tauri-apps/api/app";
+import { isTauri } from "../lib/tauri"; // Наша функция проверки из предыдущего шага
 
 export const config = {
   AUTHOR: "aysi",
   AUTHOR_LINK:
     "https://github.com/SWIRCH/https://swirch.github.io/cluster-banned-manager/",
   BUILD: "release",
-  NAME: await getName(),
-  BUNDLE_TYPE: await getBundleType(),
-  VERSION: await getVersion(),
-  TAURI_VERSION: await getTauriVersion(),
+  NAME: "Cluster Banned Manager",
+  BUNDLE_TYPE: "app",
+  VERSION: "1.0.0",
+  TAURI_VERSION: "2.0.0",
   BREACH: "clusterbannedmanager",
   WARP_FIX_LINK: "https://swirch.github.io/cluster-banned-manager/warp-fix/",
-  DEBUG_MODE: true, // Set to true for development mode, false for production
+  DEBUG_MODE: true,
 };
+
+if (isTauri()) {
+  import("@tauri-apps/api/app")
+    .then(async (app) => {
+      config.NAME = await app.getName();
+      config.BUNDLE_TYPE = await app.getBundleType();
+      config.VERSION = await app.getVersion();
+      config.TAURI_VERSION = await app.getTauriVersion();
+      console.debug("[CONFIG] Updated from Tauri:", config);
+    })
+    .catch((err) => {
+      console.error("[CONFIG] Failed to load Tauri app metadata:", err);
+    });
+}

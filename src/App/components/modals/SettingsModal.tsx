@@ -3,7 +3,6 @@ import { Checkbox } from "@headlessui/react";
 import { useState } from "react";
 import Modal from "./Modal";
 import { Check } from "lucide-react";
-import { AnimatePresence } from "framer-motion";
 
 type SettingsModalProps = {
   open: boolean;

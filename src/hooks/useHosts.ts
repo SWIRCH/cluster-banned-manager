@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { safeInvoke } from "../utils/tauriInvoke";
+import { safeInvoke } from "../lib/tauri";
 import type { Selections } from "../types/selections";
 import type { Cluster } from "../types/cluster";
 

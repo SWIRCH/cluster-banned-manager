@@ -5,17 +5,17 @@ export async function safeInvoke<T = any>(
   if (typeof window === "undefined") throw new Error("Window is not defined");
 
   try {
-    const core = await import("@tauri-apps/api/core");
-    const { invoke } = core as any;
+    const core = await import("../lib/tauri");
+    const { safeInvoke } = core as any;
     console.debug(`[TAURI] Invoking (core): ${cmd}`, args);
 
     try {
-      return await invoke(cmd, args);
+      return await safeInvoke(cmd, args);
     } catch (invokeErr) {
       if (typeof args !== "undefined") {
         try {
           console.debug("[TAURI] Retrying invoke with { args }");
-          return await invoke(cmd, { args });
+          return await safeInvoke(cmd, { args });
         } catch (invokeErr2) {
           console.error("[TAURI] core.invoke retry failed:", invokeErr2);
         }
@@ -52,11 +52,11 @@ export async function directInvoke<T = any>(
   cmd: string,
   args?: Record<string, any>,
 ): Promise<T> {
-  const core = await import("@tauri-apps/api/core");
-  const { invoke } = core as any;
+  const core = await import("../lib/tauri");
+  const { safeInvoke } = core as any;
 
   console.debug(`[DIRECT INVOKE] ${cmd}`, args);
-  return await invoke(cmd, args);
+  return await safeInvoke(cmd, args);
 }
 
 export async function diagnoseTauri() {
@@ -109,11 +109,11 @@ export async function updateFirewallRules(
   });
 
   try {
-    const core = await import("@tauri-apps/api/core");
-    const { invoke } = core as any;
+    const core = await import("../lib/tauri");
+    const { safeInvoke } = core as any;
     console.log("[updateFirewallRules] Core imported, calling invoke...");
 
-    const result = await invoke("update_firewall_rules", {
+    const result = await safeInvoke("update_firewall_rules", {
       regionId: regionId,
       blockedDomains: blockedDomains,
       enable: enable,

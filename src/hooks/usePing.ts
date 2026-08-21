@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { safeInvoke } from "../utils/tauriInvoke";
+import { safeInvoke } from "../lib/tauri";
 import type { PingInfo, PingMap } from "../types/ping";
 import type { Region } from "../types/cluster";
 // import type { Cluster, Region } from "../types/cluster";

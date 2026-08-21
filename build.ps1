@@ -1,5 +1,24 @@
 # build.ps1 - Автоматическая сборка Tauri с генерацией latest.json
 
+# 0. Проверяем, отключен ли DEBUG_MODE в файле конфигурации
+$configPath = "src\utils\config.ts"
+
+if (Test-Path $configPath) {
+    $configContent = Get-Content $configPath -Raw
+    
+    if ($configContent -match "DEBUG_MODE\s*:\s*true") {
+        Write-Host ""
+        Write-Host "[ERROR] DEBUG_MODE is set to TRUE in $configPath!" -ForegroundColor Red
+        Write-Host "[ERROR] Please set DEBUG_MODE: false before building release." -ForegroundColor Red
+        Write-Host ""
+        exit 1
+    } else {
+        Write-Host "[OK] DEBUG_MODE is disabled." -ForegroundColor Green
+    }
+} else {
+    Write-Host "[WARNING] Config file not found at $configPath" -ForegroundColor Yellow
+}
+
 # 1. Читаем версию из tauri.conf.json
 $tauriConfigPath = "src-tauri\tauri.conf.json"
 $tauriConfig = Get-Content $tauriConfigPath -Raw | ConvertFrom-Json
