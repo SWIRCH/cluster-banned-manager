@@ -1,5 +1,3 @@
-import { invoke as tauriInvoke } from "@tauri-apps/api/core";
-
 // 1. Проверяем, запущено ли приложение внутри WebView Tauri
 export const isTauri = (): boolean => {
   return typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
@@ -33,8 +31,52 @@ export async function safeInvoke<T = any>(
 // Псевдоним для совместимости
 export const directInvoke = safeInvoke;
 
+export type VpnState =
+  | "off"
+  | "starting"
+  | "on"
+  | "stopping"
+  | "error"
+  | "needsPermission"
+  | "unsupported";
+
+export type VpnStatus = {
+  state: VpnState;
+  domains: string[];
+};
+
+function normalizeVpnStatus(status: VpnStatus): VpnStatus {
+  let domains = status.domains;
+  if (typeof domains === "string") {
+    try {
+      const parsed = JSON.parse(domains);
+      domains = Array.isArray(parsed) ? parsed : [];
+    } catch {
+      domains = [];
+    }
+  }
+  return { ...status, domains };
+}
+
+export async function vpnStart(domains: string[]) {
+  const status = await safeInvoke<VpnStatus>("plugin:cluster-vpn|start", {
+    payload: { domains },
+  });
+  return normalizeVpnStatus(status);
+}
+
+export async function vpnStop() {
+  const status = await safeInvoke<VpnStatus>("plugin:cluster-vpn|stop");
+  return normalizeVpnStatus(status);
+}
+
+export async function vpnStatus() {
+  const status = await safeInvoke<VpnStatus>("plugin:cluster-vpn|status");
+  return normalizeVpnStatus(status);
+}
+
 // 3. Таблица заглушек для браузерной верстки
-function getMockResponse<T>(cmd: string, args?: Record<string, any>): T {
+function getMockResponse<T>(cmd: string, _args?: Record<string, any>): T {
   switch (cmd) {
     case "test_tauri":
       return "OK (Browser Mock)" as T;
@@ -48,6 +90,10 @@ function getMockResponse<T>(cmd: string, args?: Record<string, any>): T {
     case "launch_game":
     case "kill_process":
       return true as T;
+    case "plugin:cluster-vpn|start":
+    case "plugin:cluster-vpn|stop":
+    case "plugin:cluster-vpn|status":
+      return { state: "unsupported", domains: [] } as T;
     default:
       return null as T;
   }

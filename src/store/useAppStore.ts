@@ -10,6 +10,9 @@ interface AppState {
 
   // Mobile & Vpn
   vpnStatus: "On" | "Off" | "Loading" | "Error" | "NeedsApply";
+  vpnDomains: string[];
+  vpnBaselineDomains: string[] | null;
+  vpnDirty: boolean;
 
   // Modals state
   confirmOpen: boolean;
@@ -29,6 +32,9 @@ interface AppState {
   setVpnStatus: (
     status: "On" | "Off" | "Loading" | "Error" | "NeedsApply",
   ) => void;
+  setVpnDomains: (domains: string[]) => void;
+  setVpnBaselineDomains: (domains: string[]) => void;
+  setVpnDirty: (dirty: boolean) => void;
 
   // Modal actions
   setConfirmOpen: (open: boolean, domains?: string[]) => void;
@@ -46,6 +52,9 @@ export const useAppStore = create<AppState>((set) => ({
   diagnosticInfo: null,
 
   vpnStatus: "Off",
+  vpnDomains: [],
+  vpnBaselineDomains: null,
+  vpnDirty: false,
 
   confirmOpen: false,
   confirmDomains: [],
@@ -61,6 +70,9 @@ export const useAppStore = create<AppState>((set) => ({
   setDiagnosticInfo: (info) => set({ diagnosticInfo: info }),
 
   setVpnStatus: (status) => set({ vpnStatus: status }),
+  setVpnDomains: (domains) => set({ vpnDomains: domains }),
+  setVpnBaselineDomains: (domains) => set({ vpnBaselineDomains: domains }),
+  setVpnDirty: (dirty) => set({ vpnDirty: dirty }),
 
   setConfirmOpen: (open, domains = []) =>
     set({ confirmOpen: open, confirmDomains: domains }),

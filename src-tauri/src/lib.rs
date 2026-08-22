@@ -1,5 +1,7 @@
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 use serde_json::json;
+use std::net::{TcpStream, ToSocketAddrs};
+use std::time::Instant;
 
 const START_MARKER: &str = "# clusterbanned start";
 const END_MARKER: &str = "# clusterbanned end";
@@ -118,11 +120,64 @@ fn update_hosts_block(blocked_domains: Vec<String>) -> Result<(), String> {
     Err("failed to write hosts (permission or file missing)".into())
 }
 
+#[tauri::command]
+async fn ping_server(
+    hostname: String,
+    timeout_ms: Option<u64>,
+    port: Option<u16>,
+) -> Result<serde_json::Value, String> {
+    tauri::async_runtime::spawn_blocking(move || {
+        let timeout = std::time::Duration::from_millis(timeout_ms.unwrap_or(2000));
+        let tcp_timeout = timeout.min(std::time::Duration::from_millis(600));
+        let requested_port = port.unwrap_or(443);
+        let started = Instant::now();
+        let addresses = format!("{hostname}:{requested_port}")
+            .to_socket_addrs()
+            .map_err(|error| format!("DNS resolution failed for {hostname}: {error}"))?;
+        let addresses: Vec<_> = addresses.collect();
+        let dns_elapsed = started.elapsed().as_millis() as u64;
+        let ports = if port.is_some() {
+            vec![requested_port]
+        } else {
+            vec![443, 80, 5222]
+        };
+
+        for port in ports {
+            for address in &addresses {
+                let address = std::net::SocketAddr::new(address.ip(), port);
+                if TcpStream::connect_timeout(&address, tcp_timeout).is_ok() {
+                    return Ok(json!({
+                        "ping": started.elapsed().as_millis() as u64,
+                        "status": "ok",
+                        "method": "tcp",
+                        "port": port
+                    }));
+                }
+            }
+        }
+
+        Ok(json!({
+            "ping": dns_elapsed,
+            "status": "ok_dns",
+            "method": "dns",
+            "port": null,
+            "error": format!("DNS resolved {hostname}, but TCP ports are unavailable")
+        }))
+    })
+    .await
+    .map_err(|error| format!("ping worker failed: {error}"))?
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_fs::init())
+        .plugin(tauri_plugin_cluster_vpn::init())
         .invoke_handler(tauri::generate_handler![
             greet,
+            ping_server,
             read_blocked_domains,
             check_hosts_consistency,
             update_hosts_block

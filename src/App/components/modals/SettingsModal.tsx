@@ -14,6 +14,7 @@ type SettingsModalProps = {
   ) => void;
   onDiagnose: () => void;
   diagnosticInfo: string | null;
+  isMobile?: boolean;
 };
 
 export default function SettingsModal({
@@ -23,12 +24,20 @@ export default function SettingsModal({
   onUpdateSetting,
   onDiagnose,
   diagnosticInfo,
+  isMobile,
 }: SettingsModalProps) {
   const [enabledFirewall, setEnabledFirewall] = useState(settings.useFirewall);
   const [enabledBackup, setEnabledBackup] = useState(settings.useBackup);
 
   return (
-    <Modal open={open} onClose={onClose} zIndex="z-[1000]">
+    <Modal
+      open={open}
+      onClose={onClose}
+      zIndex="z-[1000]"
+      classNames={{
+        body: `${isMobile ? "w-full h-full p-6 sm:p-4 !rounded-none !pt-4 !px-4" : undefined}`,
+      }}
+    >
       <h3 className="text-lg font-semibold mb-2">Настройки приложения</h3>
 
       <p className="text-sm text-white/60 mb-4">

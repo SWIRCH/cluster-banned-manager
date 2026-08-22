@@ -1,11 +1,15 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+mod vpn;
+use vpn::vpn_prepare_policy;
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 fn main() {
     tauri::Builder::default()
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_fs::init())
+        .plugin(tauri_plugin_cluster_vpn::init())
         .invoke_handler(tauri::generate_handler![
             ping_server,
             check_hosts_consistency,
@@ -25,6 +29,7 @@ fn main() {
             update_cluster_rules,
             get_settings,
             save_settings,
+            vpn_prepare_policy,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -16,7 +16,7 @@ export function useSelections(game: Game) {
       if (Object.keys(initial).length === 0) {
         // First run — default all clusters to enabled (true)
         const defaults: Selections = {};
-        for (const region of game.clusters) {
+        for (const region of game.regions) {
           defaults[region.id] = Object.fromEntries(
             (region.clusters ?? []).map((c) => [c.domain, true]),
           );
@@ -58,7 +58,7 @@ export function useSelections(game: Game) {
   const clearAllSelections = async () => {
     await clearSelections();
     const defaults: Selections = {};
-    for (const region of game.clusters) {
+    for (const region of game.regions) {
       defaults[region.id] = Object.fromEntries(
         (region.clusters ?? []).map((c) => [c.domain, true]),
       );

@@ -31,15 +31,19 @@ import {
   useIsMobile,
 } from "../hooks";
 
-import { safeInvoke, diagnoseTauri } from "../lib/tauri";
+import {
+  safeInvoke,
+  diagnoseTauri,
+  vpnStatus as getVpnStatus,
+} from "../lib/tauri";
 import { getSavedRegionId, saveRegionId } from "../utils/regionStorage";
 import { openWarpFixPingLoss } from "../utils/opener";
 import { config } from "../utils/config";
 
 import type { Game } from "../types/cluster";
-import { showGlobalError } from "../utils/globalError";
-import MobileBottomBar from "./components/Mobile/MobileBottomBar";
-import MobileTopBar from "./components/Mobile/MobileTopBar";
+import { hideGlobalError, showGlobalError } from "../utils/globalError";
+import MobileBottomBar from "./components/Mobile/BottomBar";
+import MobileTopBar from "./components/Mobile/TopBar";
 import TurnVpnButton from "./components/Mobile/TurnVpnButton";
 
 function AppContent() {
@@ -70,6 +74,13 @@ function AppContent() {
     setSettingsModalOpen,
     adminModalOpen,
     setAdminModalOpen,
+    setVpnStatus,
+    setVpnDomains,
+    vpnStatus: currentVpnStatus,
+    vpnBaselineDomains,
+    setVpnBaselineDomains,
+    vpnDirty,
+    setVpnDirty,
   } = useAppStore();
 
   // setGame(game);
@@ -129,13 +140,27 @@ function AppContent() {
   } = useHosts(selectedRegionId, selections, selectedRegionClusters);
   const { pings, pingClusters } = usePing(selectedRegion);
   const { gameRunning, checkGameRunning, killGame } = useGameStatus();
-  const { applyHostsUpdate, clearCluster, loading } = useHostsActions(
+  const { applyHostsUpdate, clearCluster, stopVpn, loading } = useHostsActions(
     selectedRegionId,
     selections,
     selectedRegionClusters,
     settings,
+    isMobile,
   );
   const posterUrl = useGamePoster(game);
+
+  useEffect(() => {
+    if (!isMobile) return;
+    getVpnStatus()
+      .then((status) => {
+        setVpnStatus(status.state === "on" ? "On" : "Off");
+        setVpnDomains(status.domains);
+      })
+      .catch(() => {
+        setVpnStatus("Off");
+        setVpnDomains([]);
+      });
+  }, [isMobile, setVpnDomains, setVpnStatus]);
 
   const handleLoadingComplete = () => {
     if (config.DEBUG_MODE) {
@@ -171,6 +196,34 @@ function AppContent() {
   }, [setAdminMounts, setAdminModalOpen]);
 
   const regionMap = selections[selectedRegionId] ?? {};
+  const selectedBlockedDomains = selectedRegionClusters
+    .filter((cluster) => regionMap[cluster.domain] === false)
+    .map((cluster) => cluster.domain)
+    .sort();
+  const selectedBlockedDomainsKey = JSON.stringify(selectedBlockedDomains);
+
+  useEffect(() => {
+    if (!isMobile || !selections[selectedRegionId] || vpnBaselineDomains) {
+      return;
+    }
+    setVpnBaselineDomains(JSON.parse(selectedBlockedDomainsKey));
+  }, [
+    isMobile,
+    selectedBlockedDomainsKey,
+    selectedRegionId,
+    selections,
+    setVpnBaselineDomains,
+    vpnBaselineDomains,
+  ]);
+
+  useEffect(() => {
+    if (!isMobile || !vpnBaselineDomains) return;
+    setVpnDirty(
+      selectedBlockedDomainsKey !== JSON.stringify(vpnBaselineDomains),
+    );
+  }, [isMobile, selectedBlockedDomainsKey, setVpnDirty, vpnBaselineDomains]);
+
+  const vpnNeedsApply = isMobile && vpnDirty;
   const selectedDomain =
     Object.keys(regionMap).find((k) => regionMap[k]) ??
     selectedRegionClusters[0]?.domain;
@@ -184,16 +237,34 @@ function AppContent() {
   };
 
   const handleApplyHosts = async (domains?: string[]) => {
-    const result = await applyHostsUpdate(domains);
-    showGlobalError(result.title, result.message, result.details);
+    const result = await applyHostsUpdate(domains, currentVpnStatus === "On");
+    if (!isMobile || !result.success) {
+      showGlobalError(result.title, result.message, result.details);
+      if (isMobile) {
+        window.setTimeout(hideGlobalError, 3000);
+      }
+    }
     setConfirmOpen(false);
     if (result.success) {
       await checkHostsConsistency();
     }
   };
 
+  const handleToggleVpn = async () => {
+    if (currentVpnStatus === "On") {
+      await stopVpn();
+      return;
+    }
+
+    const result = await applyHostsUpdate(selectedBlockedDomains, true);
+    if (!result.success) {
+      showGlobalError(result.title, result.message, result.details);
+      window.setTimeout(hideGlobalError, 3000);
+    }
+  };
+
   const handleClearCluster = async () => {
-    if (!adminMounts) {
+    if (!isMobile && !adminMounts) {
       showGlobalError(
         "Ошибка прав администратора",
         "Для очистки блокировок требуется запуск приложения с правами администратора.",
@@ -229,7 +300,11 @@ function AppContent() {
       .filter((c) => !rmap[c.domain])
       .map((c) => c.domain);
 
-    setConfirmOpen(true, blockedDomains);
+    if (!isMobile) {
+      setConfirmOpen(true, blockedDomains);
+    } else {
+      handleApplyHosts(blockedDomains);
+    }
   };
 
   const handleDiagnose = async () => {
@@ -269,20 +344,16 @@ function AppContent() {
       </AnimatePresence>
       <AnimatePresence>
         {!isLoadingScreen && (
-          <main id="layer-ingame" key="main">
-            {isMobile ? (
-              <>
-                <MobileTopBar />
-                <MobileBottomBar
-                  game={game}
-                  selectedRegion={selectedRegion}
-                  onRegionChange={handleRegionChange}
-                />
-              </>
-            ) : (
-              <Sidebar {...sidebarProps} />
-            )}
-            <div className="inGameContainer">
+          <main
+            id="layer-ingame"
+            key="main"
+            className={`${isMobile ? "h-dvh flex flex-col" : undefined}`}
+          >
+            {isMobile ? <MobileTopBar /> : <Sidebar {...sidebarProps} />}
+
+            <div
+              className={`inGameContainer ${isMobile ? "flex flex-1 min-h-0 flex-col pb-16" : undefined}`}
+            >
               {!isMobile && (
                 <GamePoster
                   posterUrl={posterUrl}
@@ -297,7 +368,9 @@ function AppContent() {
                 />
               )}
 
-              <div className="inGameOption">
+              <div
+                className={`inGameOption ${isMobile ? "flex-1 min-h-0" : undefined}`}
+              >
                 {!isMobile && (
                   <div className="whilecard">
                     <div className="whilecard-title flex justify-between items-center space-y-1 rounded-xl bg-white/5 p-1 sm:p-2">
@@ -325,7 +398,13 @@ function AppContent() {
                   </div>
                 )}
 
-                {isMobile && <TurnVpnButton />}
+                {isMobile && (
+                  <TurnVpnButton
+                    hostsMismatch={isMobile ? vpnNeedsApply : hostsMismatch}
+                    onToggle={isMobile ? handleToggleVpn : undefined}
+                    onUpdateClick={handleUpdateClick}
+                  />
+                )}
 
                 <SelectiveBlocking
                   clusters={selectedRegionClusters}
@@ -336,6 +415,8 @@ function AppContent() {
                 />
               </div>
             </div>
+
+            {isMobile ? <MobileBottomBar {...sidebarProps} /> : undefined}
 
             {/* Modals */}
             <ConfirmModal
@@ -386,6 +467,7 @@ function AppContent() {
               onUpdateSetting={updateSetting}
               onDiagnose={handleDiagnose}
               diagnosticInfo={diagnosticInfo}
+              isMobile={isMobile}
             />
 
             <AdminModal

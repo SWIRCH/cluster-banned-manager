@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import React from "react";
+import { useIsMobile } from "../../../hooks";
 
 type ModalProps = {
   open: boolean;
@@ -18,15 +19,17 @@ export default function Modal({
   zIndex = "z-50",
   classNames = {},
 }: ModalProps) {
+  const isMobile = useIsMobile();
+
   return (
     <AnimatePresence>
       {open && (
         <div
-          className={`fixed inset-0 ${zIndex} flex items-center justify-center ${classNames.main}`}
+          className={`fixed inset-0 ${zIndex} flex items-center justify-center ${classNames.main} ${isMobile ? "mobile-modal" : undefined}`}
         >
           {/* Бэкдроп */}
           <motion.div
-            className={`absolute inset-0 bg-black/60 ${classNames.backdrop}`}
+            className={`backdrop-container absolute inset-0 bg-black/60 ${classNames.backdrop}`}
             initial={{ opacity: 0 }}
             animate={{ opacity: 0.8 }}
             exit={{ opacity: 0 }}
@@ -35,7 +38,7 @@ export default function Modal({
 
           {/* Тело модалки с общей анимацией */}
           <motion.div
-            className={`backdrop-blur-2xl rounded-xl bg-white/5 p-6 sm:p-4 relative ${classNames.body} ${maxWidthClass}`}
+            className={`body-container backdrop-blur-2xl rounded-xl bg-white/5 p-6 sm:p-4 relative ${classNames.body} ${maxWidthClass}`}
             initial={{ opacity: 0, y: 8, scale: 0.995 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.995 }}

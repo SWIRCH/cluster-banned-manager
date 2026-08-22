@@ -71,7 +71,6 @@ export default function LoadingScreen({
           ? error.message
           : "Ошибка при проверке обновлений",
       );
-
       return;
     }
   }

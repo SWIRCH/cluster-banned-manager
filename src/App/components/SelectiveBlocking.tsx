@@ -31,7 +31,9 @@ export default function SelectiveBlocking({
   const total = clusters.length;
 
   return (
-    <div className={`whilecard ${!isMobile ? "mt-5" : "mt-0"}`}>
+    <div
+      className={`whilecard ${isMobile ? "mt-0 flex-1 min-h-0 flex flex-col" : "mt-5"}  `}
+    >
       {!isMobile && (
         <div className="whilecard-title flex sticky top-0 justify-between items-center space-y-1 rounded-xl bg-white/5 p-1 sm:p-2">
           <h3>Выборочная блокировка</h3>
@@ -45,13 +47,18 @@ export default function SelectiveBlocking({
           )}
         </div>
       )}
-      <div className="content p-0 relative">
-        <div className="ban-clusters-2 mt-1 scrollbarYAuto">
+      <div
+        className={`content p-0 relative ${isMobile ? "flex-1 min-h-0 flex flex-col" : undefined}`}
+      >
+        <div
+          className={`ban-clusters-2 mt-1 scrollbarYAuto ${isMobile ? "flex-1 min-h-0" : undefined}`}
+        >
           <ClusterList
             clusters={clusters}
             checkedMap={checkedMap}
             onToggle={onToggle}
             pings={pings}
+            isMobile={isMobile}
           />
         </div>
       </div>

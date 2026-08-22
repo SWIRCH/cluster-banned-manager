@@ -7,10 +7,11 @@ export type VpnStatus = "On" | "Off" | "Loading" | "NeedsApply" | "Error";
 type TurnVpnButtonProps = {
   status?: VpnStatus;
   errorMessage?: string;
-  onToggle?: () => void;
+  hostsMismatch: boolean;
+  onToggle?: () => void | Promise<void>;
+  onUpdateClick: () => void;
 };
 
-// Конфигурация сообщений и иконок для статусов
 const STATUS_CONFIG: Record<VpnStatus, { label: string; className: string }> = {
   Off: {
     label: "Блокировка выключена",
@@ -37,31 +38,34 @@ const STATUS_CONFIG: Record<VpnStatus, { label: string; className: string }> = {
 export default function TurnVpnButton({
   status: propStatus,
   errorMessage,
+  hostsMismatch,
   onToggle,
+  onUpdateClick,
 }: TurnVpnButtonProps) {
   const { vpnStatus, setVpnStatus } = useAppStore();
-  const currentStatus = propStatus ?? vpnStatus ?? "Off";
+  const baseStatus = propStatus ?? vpnStatus ?? "Off";
+  const currentStatus = hostsMismatch ? "NeedsApply" : baseStatus;
 
-  const handleToggle = () => {
+  const handleToggle = async () => {
     if (currentStatus === "Loading") return;
 
-    if (onToggle) {
-      onToggle();
+    if (hostsMismatch || currentStatus === "Error") {
+      setVpnStatus("Loading");
+      try {
+        await onUpdateClick();
+      } catch (err) {
+        setVpnStatus("Error");
+      }
       return;
     }
 
-    // Тестовая цикличность с учетом несохраненных изменений
-    if (currentStatus === "Off") {
+    if (onToggle) {
       setVpnStatus("Loading");
-      setTimeout(() => setVpnStatus("On"), 2500);
-    } else if (currentStatus === "On") {
-      setVpnStatus("Loading");
-      setTimeout(() => setVpnStatus("NeedsApply"), 2500);
-    } else if (currentStatus === "NeedsApply") {
-      setVpnStatus("Loading");
-      setTimeout(() => setVpnStatus("Error"), 2500);
-    } else if (currentStatus === "Error") {
-      setVpnStatus("Off");
+      try {
+        await onToggle();
+      } catch {
+        setVpnStatus("Error");
+      }
     }
   };
 

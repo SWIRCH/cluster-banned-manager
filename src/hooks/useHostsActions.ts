@@ -3,7 +3,10 @@ import {
   updateFirewallRules,
   clearFirewallRules,
   safeInvoke,
+  vpnStart,
+  vpnStop,
 } from "../lib/tauri";
+import { useAppStore } from "../store/useAppStore";
 import type { AppSettings } from "../utils/settingsStorage";
 import type { Cluster } from "../types/cluster";
 import type { Selections } from "../types/selections";
@@ -13,10 +16,26 @@ export function useHostsActions(
   selections: Selections,
   clusters: Cluster[],
   settings: AppSettings,
+  isMobile = false,
 ) {
   const [loading, setLoading] = useState(false);
+  const { setVpnStatus, setVpnDomains, setVpnBaselineDomains, setVpnDirty } =
+    useAppStore();
 
-  const applyHostsUpdate = async (blockedDomains?: string[]) => {
+  const getBlockedDomains = () => {
+    const regionMap =
+      selections[selectedRegionId] ??
+      Object.fromEntries(clusters.map((cluster) => [cluster.domain, true]));
+    return clusters
+      .filter((cluster) => regionMap[cluster.domain] === false)
+      .map((cluster) => cluster.domain)
+      .sort();
+  };
+
+  const applyHostsUpdate = async (
+    blockedDomains?: string[],
+    keepVpnRunning = true,
+  ) => {
     let domains =
       blockedDomains ??
       (() => {
@@ -27,6 +46,66 @@ export function useHostsActions(
       })();
 
     let isRemoval = false;
+
+    if (isMobile) {
+      if (domains.length === 0) {
+        setVpnStatus("Off");
+        setVpnDirty(false);
+        return {
+          success: false,
+          title: "VPN не включён",
+          message: "У вас нет ни одной блокировки кластеров.",
+          details: undefined,
+        };
+      }
+
+      setLoading(true);
+      try {
+        const response =
+          domains.length && keepVpnRunning
+            ? await vpnStart(domains)
+            : await vpnStop();
+
+        if (response.state === "needsPermission") {
+          setVpnStatus("NeedsApply");
+          return {
+            success: false,
+            title: "Требуется разрешение VPN",
+            message: "Разрешите VPN-доступ Android и повторите применение.",
+            details: undefined,
+          };
+        }
+
+        if (response.state !== "on" && response.state !== "off") {
+          throw new Error(`VPN returned state: ${response.state}`);
+        }
+
+        setVpnStatus(response.state === "on" ? "On" : "Off");
+        setVpnDomains(response.domains);
+        setVpnBaselineDomains(getBlockedDomains());
+        setVpnDirty(false);
+        return {
+          success: true,
+          title: response.state === "on" ? "VPN включён" : "VPN выключен",
+          message:
+            response.state === "on"
+              ? `DNS-блокировка применена для ${response.domains.length} доменов.`
+              : "DNS-блокировка остановлена.",
+          details: undefined,
+        };
+      } catch (error) {
+        setVpnStatus("Error");
+        return {
+          success: false,
+          title: "Ошибка VPN",
+          message: "Не удалось применить DNS-блокировку Android.",
+          details: String(error),
+        };
+      } finally {
+        setLoading(false);
+      }
+    }
+
     if (domains.length === 0) {
       try {
         const allBlocked: any = await safeInvoke("read_blocked_domains");
@@ -148,6 +227,21 @@ ${
   const clearCluster = async () => {
     try {
       setLoading(true);
+
+      if (isMobile) {
+        const response = await vpnStop();
+        setVpnStatus("Off");
+        setVpnDomains(response.domains);
+        setVpnBaselineDomains(getBlockedDomains());
+        setVpnDirty(false);
+        return {
+          success: true,
+          title: "VPN выключен",
+          message: "DNS-блокировка очищена.",
+          details: undefined,
+        };
+      }
+
       let messages = [];
 
       const hostsRes: any = await safeInvoke("clear_cluster_blocks");
@@ -161,7 +255,6 @@ ${
           messages.push(`Ошибка очистки брандмауэра: ${fwError}`);
         }
       }
-
       return {
         success: true,
         title: "Всё очищено",
@@ -180,5 +273,20 @@ ${
     }
   };
 
-  return { applyHostsUpdate, clearCluster, loading };
+  const stopVpn = async () => {
+    if (!isMobile) return;
+    try {
+      setVpnStatus("Loading");
+      const response = await vpnStop();
+      setVpnStatus("Off");
+      setVpnDomains(response.domains);
+      setVpnBaselineDomains(getBlockedDomains());
+      setVpnDirty(false);
+    } catch (error) {
+      setVpnStatus("Error");
+      throw error;
+    }
+  };
+
+  return { applyHostsUpdate, clearCluster, stopVpn, loading };
 }
