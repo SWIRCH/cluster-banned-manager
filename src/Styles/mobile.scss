@@ -1,7 +1,27 @@
+@font-face {
+  src: url("/Fonts/Inter/Inter_24pt-Regular.ttf");
+  font-family: "Inter-Regular";
+  font-weight: 600;
+  font-style: bold;
+}
+
+.font-semibold {
+  font-family: "Play";
+}
+
+.ban-clusters-2-container {
+  font-family: "Play";
+}
+
+.cluster-menu {
+  font-family: "Play";
+}
+
 body.platform-mobile {
   padding-left: 0px;
   padding-top: env(safe-area-inset-top);
   padding-bottom: env(safe-area-inset-bottom);
+  font-family: "Inter-Regular";
 }
 
 #layer-ingame .scrollbarYAuto {
@@ -98,5 +118,204 @@ body.platform-mobile {
     height: 22px;
     border-radius: 9999px;
     border: 1px solid #101015;
+  }
+}
+
+.mobile-top-bar-container {
+  padding-top: calc(15px + env(safe-area-inset-top, 48px));
+
+  .region-named {
+    line-height: 21px;
+  }
+}
+
+.btn {
+  width: fit-content;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: #242830;
+  padding: 3px 10px;
+  border-radius: 1000px;
+
+  &.back {
+    padding: 5px 15px 5px 7px;
+  }
+}
+
+.turn-vpn-button {
+  margin-top: 1.5em;
+  margin-bottom: 1.4em;
+
+  .container {
+    position: relative;
+
+    .blum-epilis {
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      background: rgba(182, 182, 182, 0.15);
+      border-radius: 99999px;
+      filter: blur(100px);
+      z-index: -1;
+      transition: 0.25s;
+    }
+
+    &[data-state="On"] {
+      .blum-epilis {
+        background: rgba(149, 242, 155, 0.15);
+      }
+    }
+
+    &[data-state="Loading"] {
+      .blum-epilis {
+        background: rgba(149, 158, 242, 0.15);
+      }
+    }
+
+    &[data-state="Error"] {
+      .blum-epilis {
+        background: rgba(255, 74, 74, 0.15);
+      }
+    }
+
+    &[data-state="NeedsApply"] {
+      .blum-epilis {
+        background: rgba(242, 186, 149, 0.15);
+      }
+    }
+  }
+
+  .button-wrapper {
+    position: relative;
+    width: 116px;
+    height: 116px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .loading-ring-container {
+    position: absolute;
+    inset: 0;
+    width: 116px;
+    height: 116px;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  .loading-ring-svg {
+    width: 100%;
+    height: 100%;
+    animation: rotateSvg 2s linear infinite;
+    transform-origin: center center;
+
+    .ring-path {
+      stroke: #3b82f6;
+      stroke-linecap: round;
+      stroke-dasharray: 339;
+      stroke-dashoffset: 0;
+      transform-origin: center center;
+      animation: playMarketDash 1.5s ease-in-out infinite;
+    }
+  }
+
+  .button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    background: #333338;
+    color: #a1a1aa;
+    transition:
+      background 0.3s ease,
+      color 0.3s ease,
+      box-shadow 0.3s ease;
+    cursor: pointer;
+    border: none;
+    outline: none;
+
+    &[data-state="Off"] {
+      background: #27272a;
+      color: #71717a;
+      box-shadow: 0 0 0 1px #3f3f46;
+
+      // &:hover {
+      //   background: #3f3f46;
+      //   color: #f4f4f5;
+      //   box-shadow: 0 0 0 1px #52525b;
+      // }
+    }
+
+    &[data-state="On"] {
+      background: #107e38;
+      color: #ffffff;
+      box-shadow:
+        0 0 24px rgba(34, 197, 94, 0.45),
+        0 0 0 2px #4ade80;
+
+      // &:hover {
+      //   background: #16a34a;
+      //   box-shadow:
+      //     0 0 30px rgba(34, 197, 94, 0.65),
+      //     0 0 0 2px #86efac;
+      // }
+    }
+
+    &[data-state="Loading"] {
+      background: #18181b;
+      color: #3b82f6;
+      box-shadow: 0 0 0 1px #27272a;
+      cursor: wait;
+    }
+
+    &[data-state="Error"] {
+      background: #450a0a;
+      color: #fda4af;
+      box-shadow:
+        0 0 20px rgba(244, 63, 94, 0.3),
+        0 0 0 1.5px #f43f5e;
+
+      // &:hover {
+      //   background: #7f1d1d;
+      //   color: #fda4af;
+      // }
+    }
+
+    &[data-state="NeedsApply"] {
+      background: #92400e;
+      color: #fef3c7;
+      box-shadow:
+        0 0 20px rgba(251, 191, 36, 0.35),
+        0 0 0 2px #f59e0b;
+
+      &:hover {
+        background: #92400e;
+        color: #fef3c7;
+        box-shadow:
+          0 0 25px rgba(251, 191, 36, 0.5),
+          0 0 0 2px #fbbf24;
+      }
+    }
+  }
+}
+
+@keyframes rotateSvg {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes playMarketDash {
+  0% {
+    stroke-dashoffset: 310;
+  }
+  50% {
+    stroke-dashoffset: 80;
+  }
+  100% {
+    stroke-dashoffset: 310;
   }
 }

@@ -27,7 +27,8 @@
     "lucide-react": "^0.562.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "react-tooltip": "^6.0.8"
+    "react-tooltip": "^6.0.8",
+    "zustand": "^5.0.15"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2",

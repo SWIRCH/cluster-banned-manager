@@ -8,6 +8,7 @@ type SelectiveBlockingProps = {
   checkedMap: Record<string, boolean>;
   onToggle: (domain: string, checked: boolean) => void;
   pings: PingMap;
+  isMobile: boolean;
 };
 
 export default function SelectiveBlocking({
@@ -15,6 +16,7 @@ export default function SelectiveBlocking({
   checkedMap,
   onToggle,
   pings,
+  isMobile,
 }: SelectiveBlockingProps) {
   const domainSet = new Set(clusters.map((c) => c.domain));
   const regionPings = Object.entries(pings)
@@ -29,18 +31,20 @@ export default function SelectiveBlocking({
   const total = clusters.length;
 
   return (
-    <div className="whilecard mt-5">
-      <div className="whilecard-title flex sticky top-0 justify-between items-center space-y-1 rounded-xl bg-white/5 p-1 sm:p-2">
-        <h3>Выборочная блокировка</h3>
+    <div className={`whilecard ${!isMobile ? "mt-5" : "mt-0"}`}>
+      {!isMobile && (
+        <div className="whilecard-title flex sticky top-0 justify-between items-center space-y-1 rounded-xl bg-white/5 p-1 sm:p-2">
+          <h3>Выборочная блокировка</h3>
 
-        {clusters.length > 0 && (
-          <div className="text-xs text-white/60 avg-ping">
-            <span>
-              Avg Ping: {avg ? `${avg} ms` : "—"} ({ok}/{total} ok)
-            </span>
-          </div>
-        )}
-      </div>
+          {clusters.length > 0 && (
+            <div className="text-xs text-white/60 avg-ping">
+              <span>
+                Avg Ping: {avg ? `${avg} ms` : "—"} ({ok}/{total} ok)
+              </span>
+            </div>
+          )}
+        </div>
+      )}
       <div className="content p-0 relative">
         <div className="ban-clusters-2 mt-1 scrollbarYAuto">
           <ClusterList

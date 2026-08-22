@@ -19,5 +19,5 @@ export type Game = {
   name: string;
   icon: string;
   posters?: string[];
-  clusters: Region[];
+  regions: Region[];
 };

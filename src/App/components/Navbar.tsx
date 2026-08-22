@@ -47,7 +47,7 @@ export default function Navbar({
                   "dropdown_items origin-top transition duration-200 ease-out data-closed:scale-95 data-closed:opacity-0 flex justify-between items-center space-y-1 rounded-xl"
                 }
               >
-                {game.clusters.map((region) => (
+                {game.regions.map((region) => (
                   <MenuItem key={region.id}>
                     <div
                       className="dropdownInteractiveItem flex items-center gap-2"

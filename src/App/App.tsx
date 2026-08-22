@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { AnimatePresence } from "framer-motion";
+import { useAppStore } from "../store/useAppStore";
 
 import ClusterMenu from "./components/ClusterMenu";
 import GamePoster from "./components/GamePoster";
@@ -27,6 +28,7 @@ import {
   useGameLauncher,
   useInfoModal,
   useClustersLoader,
+  useIsMobile,
 } from "../hooks";
 
 import { safeInvoke, diagnoseTauri } from "../lib/tauri";
@@ -36,9 +38,9 @@ import { config } from "../utils/config";
 
 import type { Game } from "../types/cluster";
 import { showGlobalError } from "../utils/globalError";
-import { useIsMobile } from "../hooks/useIsMobile";
-import MobileBottomBar from "./components/MobileBottomBar";
-import MobileTopBar from "./components/MobileTopBar";
+import MobileBottomBar from "./components/Mobile/MobileBottomBar";
+import MobileTopBar from "./components/Mobile/MobileTopBar";
+import TurnVpnButton from "./components/Mobile/TurnVpnButton";
 
 function AppContent() {
   const { clustersData, isLoading: clustersLoading } = useClustersLoader();
@@ -47,6 +49,30 @@ function AppContent() {
 
   const infoModal = useInfoModal();
   const isMobile = useIsMobile();
+
+  // Zustand Store
+  const {
+    setGame,
+    selectedRegionId,
+    setSelectedRegionId,
+    adminMounts,
+    setAdminMounts,
+    diagnosticInfo,
+    setDiagnosticInfo,
+    confirmOpen,
+    confirmDomains,
+    setConfirmOpen,
+    clearConfirmOpen,
+    setClearConfirmOpen,
+    blockingAllConfirmOpen,
+    setBlockingAllConfirmOpen,
+    settingsModalOpen,
+    setSettingsModalOpen,
+    adminModalOpen,
+    setAdminModalOpen,
+  } = useAppStore();
+
+  // setGame(game);
 
   document.body.classList.add(
     isMobile ? "platform-mobile" : "platform-desktop",
@@ -58,36 +84,38 @@ function AppContent() {
     import("../Styles/desktop.scss");
   }
 
-  const getInitialRegionId = (): string => {
+  useEffect(() => {
+    setGame(game);
+  }, []);
+
+  // Инициализация выбранного региона при загрузке данных
+  useEffect(() => {
+    if (!game?.regions || selectedRegionId) return;
+
     const savedRegionId = getSavedRegionId();
-    if (savedRegionId && game?.clusters) {
-      const regionExists = game.clusters.some((c) => c.id === savedRegionId);
-      if (regionExists) {
-        return savedRegionId;
+    const regionExists = game.regions.some((c) => c.id === savedRegionId);
+
+    if (savedRegionId && regionExists) {
+      setSelectedRegionId(savedRegionId);
+    } else {
+      const defaultRegion =
+        game.regions.find((c) => c.id === "wot_eu") ?? game.regions[0];
+      if (defaultRegion) {
+        setSelectedRegionId(defaultRegion.id);
       }
     }
-
-    const defaultRegion =
-      game?.clusters?.find((c) => c.id === "wot_eu") ?? game?.clusters?.[0];
-
-    return defaultRegion?.id ?? "";
-  };
-
-  const [selectedRegionId, setSelectedRegionId] =
-    useState<string>(getInitialRegionId());
+  }, [game, selectedRegionId, setSelectedRegionId]);
 
   const handleRegionChange = (regionId: string) => {
     setSelectedRegionId(regionId);
     saveRegionId(regionId);
   };
 
-  const [adminMounts, setAdminMounts] = useState<boolean>(false);
-
   const defaultRegion =
-    game?.clusters?.find((c) => c.id === "wot_eu") ?? game?.clusters?.[0];
+    game?.regions?.find((c) => c.id === "wot_eu") ?? game?.regions?.[0];
   const selectedRegion =
-    game?.clusters?.find((c) => c.id === selectedRegionId) ?? defaultRegion;
-  const clusters = selectedRegion?.clusters ?? [];
+    game?.regions?.find((c) => c.id === selectedRegionId) ?? defaultRegion;
+  const selectedRegionClusters = selectedRegion?.clusters ?? [];
 
   const { settings, updateSetting, loading: settingsLoading } = useSettings();
   const { selections, updateSelection, selectCluster, clearAllSelections } =
@@ -98,13 +126,13 @@ function AppContent() {
     tauriAvailable,
     lastTauriError,
     checkHostsConsistency,
-  } = useHosts(selectedRegionId, selections, clusters);
+  } = useHosts(selectedRegionId, selections, selectedRegionClusters);
   const { pings, pingClusters } = usePing(selectedRegion);
   const { gameRunning, checkGameRunning, killGame } = useGameStatus();
   const { applyHostsUpdate, clearCluster, loading } = useHostsActions(
     selectedRegionId,
     selections,
-    clusters,
+    selectedRegionClusters,
     settings,
   );
   const posterUrl = useGamePoster(game);
@@ -125,7 +153,7 @@ function AppContent() {
     }
   }, [settingsLoading, selections]);
 
-  // Check for admin rights on mount
+  // Проверка прав администратора
   useEffect(() => {
     (async () => {
       try {
@@ -140,23 +168,15 @@ function AppContent() {
         console.debug("check_elevation failed", e);
       }
     })();
-  }, []);
+  }, [setAdminMounts, setAdminModalOpen]);
 
   const regionMap = selections[selectedRegionId] ?? {};
   const selectedDomain =
-    Object.keys(regionMap).find((k) => regionMap[k]) ?? clusters[0]?.domain;
-
-  // Modal states
-  const [confirmOpen, setConfirmOpen] = useState(false);
-  const [confirmDomains, setConfirmDomains] = useState<string[]>([]);
-  const [clearConfirmOpen, setClearConfirmOpen] = useState(false);
-  const [blockingAllConfirmOpen, setBlockingAllConfirmOpen] = useState(false);
-  const [settingsModalOpen, setSettingsModalOpen] = useState(false);
-  const [adminModalOpen, setAdminModalOpen] = useState(false);
-  const [diagnosticInfo, setDiagnosticInfo] = useState<string | null>(null);
+    Object.keys(regionMap).find((k) => regionMap[k]) ??
+    selectedRegionClusters[0]?.domain;
 
   const handleSelectCluster = (domain: string) => {
-    selectCluster(selectedRegionId, domain, clusters);
+    selectCluster(selectedRegionId, domain, selectedRegionClusters);
   };
 
   const handleToggleCluster = (domain: string, checked: boolean) => {
@@ -204,12 +224,12 @@ function AppContent() {
   const handleUpdateClick = () => {
     const rmap =
       selections[selectedRegionId] ??
-      Object.fromEntries(clusters.map((c) => [c.domain, true]));
-    const blockedDomains = clusters
+      Object.fromEntries(selectedRegionClusters.map((c) => [c.domain, true]));
+    const blockedDomains = selectedRegionClusters
       .filter((c) => !rmap[c.domain])
       .map((c) => c.domain);
-    setConfirmDomains(blockedDomains);
-    setConfirmOpen(true);
+
+    setConfirmOpen(true, blockedDomains);
   };
 
   const handleDiagnose = async () => {
@@ -252,7 +272,7 @@ function AppContent() {
           <main id="layer-ingame" key="main">
             {isMobile ? (
               <>
-                <MobileTopBar {...sidebarProps} />
+                <MobileTopBar />
                 <MobileBottomBar
                   game={game}
                   selectedRegion={selectedRegion}
@@ -276,36 +296,43 @@ function AppContent() {
                   mismatchDomains={mismatchDomains}
                 />
               )}
+
               <div className="inGameOption">
-                <div className="whilecard">
-                  <div className="whilecard-title flex justify-between items-center space-y-1 rounded-xl bg-white/5 p-1 sm:p-2">
-                    <h3>Выбрать сервер</h3>
-                    <p className="pe-2 text-[14px] warp-fix-link">
-                      <a
-                        onClick={() => openWarpFixPingLoss()}
-                        target="_blank"
-                        className="link"
-                      >
-                        Высокий пинг или loss?
-                      </a>
-                    </p>
-                  </div>
-                  <div className="content">
-                    <div className="ban-clusters-1 mt-1">
-                      <ClusterMenu
-                        clusters={clusters}
-                        selectedDomain={selectedDomain}
-                        onSelect={handleSelectCluster}
-                        pings={pings}
-                      />
+                {!isMobile && (
+                  <div className="whilecard">
+                    <div className="whilecard-title flex justify-between items-center space-y-1 rounded-xl bg-white/5 p-1 sm:p-2">
+                      <h3>Выбрать сервер</h3>
+                      <p className="pe-2 text-[14px] warp-fix-link">
+                        <a
+                          onClick={() => openWarpFixPingLoss()}
+                          target="_blank"
+                          className="link"
+                        >
+                          Высокий пинг или loss?
+                        </a>
+                      </p>
+                    </div>
+                    <div className="content">
+                      <div className="ban-clusters-1 mt-1">
+                        <ClusterMenu
+                          clusters={selectedRegionClusters}
+                          selectedDomain={selectedDomain}
+                          onSelect={handleSelectCluster}
+                          pings={pings}
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
+
+                {isMobile && <TurnVpnButton />}
+
                 <SelectiveBlocking
-                  clusters={clusters}
+                  clusters={selectedRegionClusters}
                   checkedMap={regionMap}
                   onToggle={handleToggleCluster}
                   pings={pings}
+                  isMobile={isMobile}
                 />
               </div>
             </div>
@@ -316,7 +343,7 @@ function AppContent() {
               onClose={() => setConfirmOpen(false)}
               onConfirm={() => handleApplyHosts(confirmDomains)}
               domains={confirmDomains}
-              clusters={clusters}
+              clusters={selectedRegionClusters}
               regionName={
                 selectedRegion?.alias_name ?? selectedRegion?.name ?? ""
               }

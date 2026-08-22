@@ -1,7 +1,31 @@
 import { Checkbox } from "@headlessui/react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, Variants } from "framer-motion";
 import type { Cluster } from "../../types/cluster";
 import type { PingMap } from "../../types/ping";
+
+const cardVariants: Variants = {
+  hidden: {
+    opacity: 0,
+    y: -12,
+  },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      delay: i * 0.22,
+      duration: 0.35,
+      ease: "easeOut",
+    },
+  }),
+  exit: {
+    opacity: 0,
+    y: 10,
+    transition: {
+      duration: 0.25,
+      ease: "easeIn",
+    },
+  },
+};
 
 export default function ClusterList({
   clusters,
@@ -13,19 +37,22 @@ export default function ClusterList({
   checkedMap?: Record<string, boolean>;
   onToggle?: (domain: string, checked: boolean) => void;
   pings?: PingMap;
+  isMobile?: boolean;
 }) {
   return (
     <div className="ban-clusters-2-container">
-      <AnimatePresence>
-        {clusters.map((c) => (
+      {/* mode="popLayout" предотвращает скачки интерфейса при удалении элементов */}
+      <AnimatePresence mode="popLayout">
+        {clusters.map((c, index) => (
           <motion.div
             layout
-            initial={{ opacity: 0, y: 4 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 4 }}
-            transition={{ duration: 0.15 }}
-            className="w-full mt-2"
             key={c.domain}
+            custom={index} // Передаем индекс карточки для расчета задержки delay
+            variants={cardVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="w-full mt-2"
           >
             <div
               className="rounded-xl p-6 sm:p-4 relative w-full"

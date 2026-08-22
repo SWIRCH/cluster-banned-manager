@@ -42,6 +42,14 @@ h6 {
   margin: 0;
 }
 
+h1 {
+  font-size: large;
+}
+
+h2 {
+  font-size: larger;
+}
+
 small {
   color: #7d8590;
 }
@@ -534,4 +542,8 @@ hr.vertical {
   & font {
     user-select: text;
   }
+}
+
+.text-muted {
+  color: #818181;
 }

@@ -14,6 +14,7 @@ export default function ClusterMenu({
   selectedDomain?: string;
   onSelect?: (domain: string) => void;
   pings?: PingMap;
+  isMobile?: boolean;
 }) {
   const selected =
     clusters.find((c) => c.domain === selectedDomain) ?? clusters[0];
@@ -22,7 +23,7 @@ export default function ClusterMenu({
 
   return (
     <Menu>
-      <MenuButton className="dropdownButton flex items-center gap-2">
+      <MenuButton className="cluster-menu dropdownButton flex items-center gap-2">
         <div className="server-select flex items-center gap-2">
           <img width={25} height={25} src={`Games/444200/mini.png`} />
           <div className="flex items-center">

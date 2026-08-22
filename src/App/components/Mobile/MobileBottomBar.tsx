@@ -1,4 +1,4 @@
-import type { Game, Region } from "../../types/cluster";
+import type { Game, Region } from "../../../types/cluster";
 
 type MobileBottomBarProps = {
   game: Game;
@@ -14,7 +14,7 @@ export default function MobileBottomBar({
   return (
     <div className="mobile-bottom-bar">
       <div className="mobile-bottom-bar__container">
-        {game.clusters.map((region) => {
+        {game.regions.map((region) => {
           const isActive = region.id === selectedRegion?.id;
           return (
             <button

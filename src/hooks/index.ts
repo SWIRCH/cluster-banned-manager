@@ -8,3 +8,4 @@ export { useClustersLoader } from "./useClustersLoader";
 export { useGameLauncher } from "./useGameLauncher";
 export { useGamePoster } from "./useGamePoster";
 export { useInfoModal } from "./useInfoModal";
+export { useIsMobile } from "./useIsMobile";

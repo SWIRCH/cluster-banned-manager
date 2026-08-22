@@ -36,7 +36,7 @@ export default function Sidebar({
           <hr className="hr-bordered-top" />
 
           <div className="link-items mt-4">
-            {game.clusters.map((region) => (
+            {game.regions.map((region) => (
               <a href="#" key={region.id} className="link-item">
                 <div
                   className={`dropdownInteractiveItem flex items-center gap-2 
