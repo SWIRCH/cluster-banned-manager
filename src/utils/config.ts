@@ -9,11 +9,11 @@ export const config = {
   BUILD: "release",
   NAME: "Cluster Banned Manager",
   BUNDLE_TYPE: "app",
-  VERSION: "1.0.5",
+  VERSION: "1.0.6",
   TAURI_VERSION: "2.0.0",
   BREACH: "main",
   WARP_FIX_LINK: "https://swirch.github.io/cluster-banned-manager/warp-fix/",
-  DEBUG_MODE: true,
+  DEBUG_MODE: false,
 };
 
 if (isTauri()) {

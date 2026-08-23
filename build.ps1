@@ -204,9 +204,9 @@ if ($Target -eq "all" -or $Target -eq "android") {
 
     # 3. Формируем URL для APK
     if ($githubRepo) {
-        $apkUrl = "https://github.com/$githubRepo/releases/download/v$version/app-release.apk"
+        $apkUrl = "https://github.com/$githubRepo/releases/download/v$version/app-universal-release.apk"
     } else {
-        $apkUrl = "https://github.com/SWIRCH/cluster-banned-manager/releases/download/v$version/app-release.apk"
+        $apkUrl = "https://github.com/SWIRCH/cluster-banned-manager/releases/download/v$version/app-universal-release.apk"
     }
 
     # 4. Добавляем ключ android
