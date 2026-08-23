@@ -1,16 +1,15 @@
+import { useAppStore } from "../../../store/useAppStore";
 import Modal from "./Modal";
 
 type AdminModalProps = {
-  open: boolean;
   onShowInstructions: () => void;
 };
 
-export default function AdminModal({
-  open,
-  onShowInstructions,
-}: AdminModalProps) {
+export default function AdminModal({ onShowInstructions }: AdminModalProps) {
+  const isOpen = useAppStore((state) => state.adminModalOpen);
+
   return (
-    <Modal open={open} onClose={onShowInstructions} zIndex="z-[1000]">
+    <Modal open={isOpen} onClose={onShowInstructions} zIndex="z-[1000]">
       <h3 className="text-lg font-semibold mb-2">
         Требуются права администратора
       </h3>

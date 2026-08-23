@@ -40,56 +40,51 @@ function isNewerVersion(versionA: string, versionB: string): boolean {
   Проверяет наличие обновлений для Android.
   @returns {Promise<AndroidUpdateInfo | null>} Возвращает данные об обновлении или null, если обновлений нет.
  */
-// export async function checkAndroidUpdate(): Promise<AndroidUpdateInfo | null> {
-//   try {
-//     const currentVersion = await getVersion();
-//     const response = await fetch(config.UPDATER_URL);
-
-//     if (!response.ok) return null;
-
-//     const data: LatestJson = await response.json();
-//     const latestVersion = data.version.replace(/^v/, "");
-
-//     if (!isNewerVersion(latestVersion, currentVersion)) {
-//       return null;
-//     }
-
-//     const androidPlatform =
-//       data.platforms["android"] || data.platforms["android-apk"];
-
-//     if (!androidPlatform || !androidPlatform.url) {
-//       console.log(
-//         `Версия ${data.version} выпущена только для Desktop. Пропускаем.`,
-//       );
-//       return null;
-//     }
-
-//     return {
-//       version: latestVersion,
-//       notes: data.notes,
-//       url: androidPlatform.url,
-//     };
-//   } catch (error) {
-//     console.error("Ошибка проверки обновлений:", error);
-//     return null;
-//   }
-// }
-
 export async function checkAndroidUpdate(): Promise<AndroidUpdateInfo | null> {
-  // 🧪 ТЕСТОВЫЙ РЕЖИМ: Раскомментируй для проверки экрана обновления
-  return {
-    version: "9.9.9",
-    notes:
-      "• Добавлена секретная фича\n• Исправлены вылеты при запуске\n• Улучшена производительность",
-    url: "https://example.com/build.apk",
-  };
-
-  /* Оригинальный код снизу временно не исполняется
   try {
     const currentVersion = await getVersion();
-    ...
-  */
+    const response = await fetch(config.UPDATER_URL);
+
+    if (!response.ok) return null;
+
+    const data: LatestJson = await response.json();
+    const latestVersion = data.version.replace(/^v/, "");
+
+    if (!isNewerVersion(latestVersion, currentVersion)) {
+      return null;
+    }
+
+    const androidPlatform =
+      data.platforms["android"] || data.platforms["android-apk"];
+
+    if (!androidPlatform || !androidPlatform.url) {
+      if (config.DEBUG_MODE) {
+        console.log(
+          `Версия ${data.version} выпущена только для Desktop. Пропускаем.`,
+        );
+      }
+      return null;
+    }
+
+    return {
+      version: latestVersion,
+      notes: data.notes,
+      url: androidPlatform.url,
+    };
+  } catch (error) {
+    console.error("Ошибка проверки обновлений:", error);
+    return null;
+  }
 }
+
+// export async function checkAndroidUpdate(): Promise<AndroidUpdateInfo | null> {
+//   return {
+//     version: "9.9.9",
+//     notes:
+//       "• Добавлена секретная фича\n• Исправлены вылеты при запуске\n• Улучшена производительность",
+//     url: "https://example.com/build.apk",
+//   };
+// }
 
 export async function downloadAndroidUpdate(url: string) {
   await openUrl(url);

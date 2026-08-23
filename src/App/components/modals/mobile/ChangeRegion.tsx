@@ -6,42 +6,28 @@ import { saveRegionId } from "../../../../utils/regionStorage";
 import type { Region, Game } from "../../../../types";
 
 type ChangeRegionProps = {
-  open?: boolean;
-  onClose?: () => void;
   regions?: Region[];
   selectedRegionId?: string;
   onRegionChange?: (regionId: string) => void;
 };
 
 export default function ChangeRegionModal({
-  open: propOpen,
-  onClose: propOnClose,
   regions: propRegions,
   selectedRegionId: propSelectedRegionId,
   onRegionChange: propOnRegionChange,
 }: ChangeRegionProps) {
-  const {
-    regionModalOpen,
-    setRegionModalOpen,
-    selectedRegionId: storeRegionId,
-    setSelectedRegionId,
-  } = useAppStore();
+  const isOpen = useAppStore((state) => state.regionModalOpen);
+  const setIsOpen = useAppStore((state) => state.setRegionModalOpen);
+  const onClose = () => setIsOpen(false);
+
+  const { selectedRegionId: storeRegionId, setSelectedRegionId } =
+    useAppStore();
 
   const { clustersData } = useClustersLoader();
   const game = clustersData as Game;
 
-  // Используем пропсы, если они переданы, иначе берём из Zustand / Loader
-  const isOpen = propOpen ?? regionModalOpen;
   const activeSelectedRegionId = propSelectedRegionId ?? storeRegionId;
   const regionList = propRegions ?? game?.regions ?? [];
-
-  const handleClose = () => {
-    if (propOnClose) {
-      propOnClose();
-    } else {
-      setRegionModalOpen(false);
-    }
-  };
 
   const handleSelect = (regionId: string) => {
     if (propOnRegionChange) {
@@ -50,19 +36,19 @@ export default function ChangeRegionModal({
       setSelectedRegionId(regionId);
       saveRegionId(regionId);
     }
-    handleClose();
+    onClose();
   };
 
   return (
     <Modal
       open={isOpen}
-      onClose={handleClose}
+      onClose={onClose}
       zIndex="z-[1000]"
       classNames={{
         body: "w-full h-full p-6 sm:p-4 !rounded-none !pt-4 !px-4",
       }}
     >
-      <button type="button" className="btn back" onClick={handleClose}>
+      <button type="button" className="btn back" onClick={onClose}>
         <ChevronLeft />
         <span>Назад</span>
       </button>

@@ -1,8 +1,7 @@
+import { useAppStore } from "../../../store/useAppStore";
 import Modal from "./Modal";
 
 type ClearConfirmModalProps = {
-  open: boolean;
-  onClose: () => void;
   onConfirm: () => void;
   useFirewall: boolean;
   useBackup: boolean;
@@ -10,15 +9,17 @@ type ClearConfirmModalProps = {
 };
 
 export default function ClearConfirmModal({
-  open,
-  onClose,
   onConfirm,
   useFirewall,
   useBackup,
   loading,
 }: ClearConfirmModalProps) {
+  const isOpen = useAppStore((state) => state.clearConfirmOpen);
+  const setIsOpen = useAppStore((state) => state.setClearConfirmOpen);
+  const onClose = () => setIsOpen(false);
+
   return (
-    <Modal open={open} onClose={onClose} zIndex="z-[50]">
+    <Modal open={isOpen} onClose={onClose} zIndex="z-[50]">
       <h3 className="text-lg font-semibold mb-2">
         Очистить Hosts {useFirewall ? "& Firewall" : undefined}
       </h3>

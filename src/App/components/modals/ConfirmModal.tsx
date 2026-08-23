@@ -1,10 +1,9 @@
 import { motion, AnimatePresence } from "framer-motion";
 import type { Cluster } from "../../../types/cluster";
 import Modal from "./Modal";
+import { useAppStore } from "../../../store/useAppStore";
 
 type ConfirmModalProps = {
-  open: boolean;
-  onClose: () => void;
   onConfirm: () => void;
   domains: string[];
   clusters: Cluster[];
@@ -13,18 +12,20 @@ type ConfirmModalProps = {
 };
 
 export default function ConfirmModal({
-  open,
-  onClose,
   onConfirm,
   domains,
   clusters,
   regionName,
   onBlockingAllConfirm,
 }: ConfirmModalProps) {
+  const isOpen = useAppStore((state) => state.confirmOpen);
+  const setIsOpen = useAppStore((state) => state.setConfirmOpen);
+  const onClose = () => setIsOpen(false);
+
   const isBlockingAll = domains.length === clusters.length;
 
   return (
-    <Modal open={open} onClose={onClose} zIndex="z-[50]">
+    <Modal open={isOpen} onClose={onClose} zIndex="z-[50]">
       <div id="confirm-modal" style={{ display: "none" }}></div>
 
       <h3 className="text-lg font-semibold mb-2">

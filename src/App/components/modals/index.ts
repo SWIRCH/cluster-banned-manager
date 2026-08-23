@@ -5,3 +5,4 @@ export { default as InfoModal } from "./InfoModal";
 export { default as SettingsModal } from "./SettingsModal";
 export { default as AdminModal } from "./AdminModal";
 export { default as ErrorModal } from "./ErrorModal";
+export { AboutModal } from "./mobile/AboutModal";

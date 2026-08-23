@@ -1,23 +1,24 @@
 import { useState } from "react";
 import Modal from "./Modal";
+import { useAppStore } from "../../../store/useAppStore";
 
 type BlockingAllConfirmModalProps = {
-  open: boolean;
-  onClose: () => void;
   onConfirm: () => void;
   regionName: string;
 };
 
 export default function BlockingAllConfirmModal({
-  open,
-  onClose,
   onConfirm,
   regionName,
 }: BlockingAllConfirmModalProps) {
   const [ack, setAck] = useState(false);
 
+  const isOpen = useAppStore((state) => state.blockingAllConfirmOpen);
+  const setIsOpen = useAppStore((state) => state.setBlockingAllConfirmOpen);
+  const onClose = () => setIsOpen(false);
+
   return (
-    <Modal open={open} onClose={onClose} zIndex="z-[50]">
+    <Modal open={isOpen} onClose={onClose} zIndex="z-[50]">
       <h3 className="text-lg font-semibold mb-2">
         Подтвердите блокировку всех серверов
       </h3>

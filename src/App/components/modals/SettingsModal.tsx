@@ -150,7 +150,7 @@ export default function SettingsModal({
                   </button>
                   <input
                     type="text"
-                    className="shrink-0 text-heading border-0 bg-transparent text-sm font-normal focus:outline-none focus:ring-0 max-w-[2.5rem] text-center"
+                    className="shrink-0 text-heading border-0 bg-transparent text-sm font-normal focus:outline-none focus:ring-0 max-w-10 text-center"
                     placeholder=""
                     value={settings.backupCount}
                     required

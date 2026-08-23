@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { AnimatePresence } from "framer-motion";
 import { useAppStore } from "../store/useAppStore";
 
@@ -15,6 +15,7 @@ import {
   InfoModal,
   SettingsModal,
   AdminModal,
+  AboutModal,
 } from "./components/Modals";
 
 import {
@@ -46,7 +47,6 @@ import { hideGlobalError, showGlobalError } from "../utils/globalError";
 import MobileBottomBar from "./components/Mobile/BottomBar";
 import MobileTopBar from "./components/Mobile/TopBar";
 import TurnVpnButton from "./components/Mobile/TurnVpnButton";
-import AboutModal from "./components/Modals/mobile/AboutModal";
 
 // Styles
 import("../Styles/mobile.scss");
@@ -69,18 +69,12 @@ function AppContent() {
     setAdminMounts,
     diagnosticInfo,
     setDiagnosticInfo,
-    confirmOpen,
     confirmDomains,
     setConfirmOpen,
-    clearConfirmOpen,
     setClearConfirmOpen,
-    blockingAllConfirmOpen,
     setBlockingAllConfirmOpen,
     settingsModalOpen,
     setSettingsModalOpen,
-    adminModalOpen,
-    isAboutModalOpen,
-    setIsAboutModalOpen,
     setAdminModalOpen,
     setVpnStatus,
     setVpnDomains,
@@ -90,8 +84,6 @@ function AppContent() {
     vpnDirty,
     setVpnDirty,
   } = useAppStore();
-
-  // setGame(game);
 
   document.body.classList.add(
     isMobile ? "platform-mobile" : "platform-desktop",
@@ -200,10 +192,6 @@ function AppContent() {
   }, [setAdminMounts, setAdminModalOpen]);
 
   const regionMap = selections[selectedRegionId] ?? {};
-  // const selectedBlockedDomains = selectedRegionClusters
-  //   .filter((cluster) => regionMap[cluster.domain] === false)
-  //   .map((cluster) => cluster.domain)
-  //   .sort();
   const allBlockedDomains = collectBlockedDomains(game, selections);
   const allBlockedDomainsKey = JSON.stringify(allBlockedDomains);
 
@@ -354,6 +342,7 @@ function AppContent() {
             key="loading"
             visible={isLoadingScreen}
             onLoadingComplete={handleLoadingComplete}
+            isMobile={isMobile}
           />
         )}
       </AnimatePresence>
@@ -435,8 +424,6 @@ function AppContent() {
 
             {/* Modals */}
             <ConfirmModal
-              open={confirmOpen}
-              onClose={() => setConfirmOpen(false)}
               onConfirm={() => handleApplyHosts(confirmDomains)}
               domains={confirmDomains}
               clusters={selectedRegionClusters}
@@ -447,8 +434,6 @@ function AppContent() {
             />
 
             <BlockingAllConfirmModal
-              open={blockingAllConfirmOpen}
-              onClose={() => setBlockingAllConfirmOpen(false)}
               onConfirm={async () => {
                 setBlockingAllConfirmOpen(false);
                 await handleApplyHosts(confirmDomains);
@@ -459,8 +444,6 @@ function AppContent() {
             />
 
             <ClearConfirmModal
-              open={clearConfirmOpen}
-              onClose={() => setClearConfirmOpen(false)}
               onConfirm={handleClearCluster}
               useFirewall={settings.useFirewall}
               useBackup={settings.useBackup}
@@ -486,7 +469,6 @@ function AppContent() {
             />
 
             <AdminModal
-              open={adminModalOpen}
               onShowInstructions={() => {
                 setAdminModalOpen(false);
                 infoModal.showInfo(
@@ -497,12 +479,7 @@ function AppContent() {
               }}
             />
 
-            {isMobile && (
-              <AboutModal
-                open={isAboutModalOpen}
-                onClose={() => setIsAboutModalOpen(false)}
-              />
-            )}
+            {isMobile && <AboutModal />}
           </main>
         )}
       </AnimatePresence>

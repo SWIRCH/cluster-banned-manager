@@ -2,7 +2,6 @@ import {
   ChevronLeft,
   Github,
   User,
-  Info,
   ExternalLink,
   Code2,
   GitBranch,
@@ -10,16 +9,17 @@ import {
 import Modal from "../Modal";
 import { config } from "../../../../utils/config";
 import { openAuthorLink, openGithub } from "../../../../utils/opener";
+import { memo } from "react";
+import { useAppStore } from "../../../../store/useAppStore";
 
-type AboutModalProps = {
-  open: boolean;
-  onClose: () => void;
-};
+function AboutModalComponent() {
+  const isOpen = useAppStore((state) => state.isAboutModalOpen);
+  const setIsOpen = useAppStore((state) => state.setIsAboutModalOpen);
+  const onClose = () => setIsOpen(false);
 
-export default function AboutModal({ open, onClose }: AboutModalProps) {
   return (
     <Modal
-      open={open}
+      open={isOpen}
       onClose={onClose}
       zIndex="z-[1000]"
       classNames={{
@@ -76,9 +76,7 @@ export default function AboutModal({ open, onClose }: AboutModalProps) {
           </div>
         </div>
 
-        {/* Внешние ссылки / Кнопки действий */}
         <div className="flex flex-col gap-2">
-          {/* GitHub */}
           <button
             type="button"
             onClick={openGithub}
@@ -91,7 +89,6 @@ export default function AboutModal({ open, onClose }: AboutModalProps) {
             <ExternalLink className="size-4 text-zinc-500 group-hover:text-zinc-300 transition-colors" />
           </button>
 
-          {/* Сайт автора */}
           <button
             type="button"
             onClick={openAuthorLink}
@@ -108,3 +105,5 @@ export default function AboutModal({ open, onClose }: AboutModalProps) {
     </Modal>
   );
 }
+
+export const AboutModal = memo(AboutModalComponent);
