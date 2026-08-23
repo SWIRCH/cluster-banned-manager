@@ -8,3 +8,7 @@ export async function openAuthorLink() {
 export async function openWarpFixPingLoss() {
   await openUrl(config.WARP_FIX_LINK);
 }
+
+export async function openGithub() {
+  await openUrl(config.GITHUB_URL);
+}

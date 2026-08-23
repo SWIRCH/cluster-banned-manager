@@ -15,7 +15,7 @@
         "title": "Cluster Banned Manager",
         "width": 1200,
         "height": 580,
-        "minWidth": 750,
+        "minWidth": 799,
         "minHeight": 580,
         "maxWidth": 1200,
         "maxHeight": 580,
@@ -32,6 +32,7 @@
     "createUpdaterArtifacts": true,
     "active": true,
     "targets": "all",
+    "publisher": "swirch",
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",

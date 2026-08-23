@@ -14,6 +14,7 @@ import org.json.JSONArray
 @InvokeArg
 class StartArgs {
     var domains: List<String> = emptyList()
+    var ips: List<String> = emptyList()
 }
 
 @TauriPlugin
@@ -29,7 +30,7 @@ class ClusterVpnPlugin(private val activity: Activity) : Plugin(activity) {
             return
         }
 
-        ClusterVpnService.start(activity, args.domains)
+        ClusterVpnService.start(activity, args.domains, args.ips)
         invoke.resolve(status("on", args.domains))
     }
 

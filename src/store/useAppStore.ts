@@ -22,6 +22,7 @@ interface AppState {
   settingsModalOpen: boolean;
   adminModalOpen: boolean;
   regionModalOpen: boolean;
+  isAboutModalOpen: boolean;
 
   // Actions
   setGame: (game: Game) => void;
@@ -43,6 +44,7 @@ interface AppState {
   setSettingsModalOpen: (open: boolean) => void;
   setAdminModalOpen: (open: boolean) => void;
   setRegionModalOpen: (open: boolean) => void;
+  setIsAboutModalOpen: (open: boolean) => void;
 }
 
 export const useAppStore = create<AppState>((set) => ({
@@ -63,6 +65,7 @@ export const useAppStore = create<AppState>((set) => ({
   settingsModalOpen: false,
   adminModalOpen: false,
   regionModalOpen: false,
+  isAboutModalOpen: false,
 
   setGame: (game) => set({ game, selectedRegionId: game.regions[0]?.id }),
   setSelectedRegionId: (id) => set({ selectedRegionId: id }),
@@ -81,4 +84,5 @@ export const useAppStore = create<AppState>((set) => ({
   setSettingsModalOpen: (open) => set({ settingsModalOpen: open }),
   setAdminModalOpen: (open) => set({ adminModalOpen: open }),
   setRegionModalOpen: (open) => set({ regionModalOpen: open }),
+  setIsAboutModalOpen: (open) => set({ isAboutModalOpen: open }),
 }));

@@ -1,3 +1,4 @@
+import java.io.FileInputStream
 import java.util.Properties
 
 plugins {
@@ -8,6 +9,13 @@ plugins {
 
 val tauriProperties = Properties().apply {
     val propFile = file("tauri.properties")
+    if (propFile.exists()) {
+        propFile.inputStream().use { load(it) }
+    }
+}
+
+val keystoreProperties = Properties().apply {
+    val propFile = file("keystore.properties")
     if (propFile.exists()) {
         propFile.inputStream().use { load(it) }
     }
@@ -24,6 +32,14 @@ android {
         versionCode = tauriProperties.getProperty("tauri.android.versionCode", "1").toInt()
         versionName = tauriProperties.getProperty("tauri.android.versionName", "1.0")
     }
+    signingConfigs {
+        create("release") {
+            keyAlias = keystoreProperties["keyAlias"] as String? ?: System.getenv("KEY_ALIAS")
+            keyPassword = keystoreProperties["keyPassword"] as String? ?: System.getenv("KEY_PASSWORD")
+            storeFile = file(keystoreProperties["storeFile"] as String? ?: System.getenv("KEYSTORE_PATH") ?: "release.keystore")
+            storePassword = keystoreProperties["storePassword"] as String? ?: System.getenv("STORE_PASSWORD")
+        }
+    }
     buildTypes {
         getByName("debug") {
             manifestPlaceholders["usesCleartextTraffic"] = "true"
@@ -37,6 +53,8 @@ android {
             }
         }
         getByName("release") {
+            signingConfig = signingConfigs.getByName("release")
+
             isMinifyEnabled = true
             proguardFiles(
                 *fileTree(".") { include("**/*.pro") }

@@ -3,6 +3,7 @@ export type Cluster = {
   domain: string;
   location?: string;
   latency?: string;
+  ips?: string[];
 };
 
 export type Region = {

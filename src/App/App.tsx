@@ -39,12 +39,18 @@ import {
 import { getSavedRegionId, saveRegionId } from "../utils/regionStorage";
 import { openWarpFixPingLoss } from "../utils/opener";
 import { config } from "../utils/config";
+import { collectBlockedDomains } from "../utils/blocking";
 
 import type { Game } from "../types/cluster";
 import { hideGlobalError, showGlobalError } from "../utils/globalError";
 import MobileBottomBar from "./components/Mobile/BottomBar";
 import MobileTopBar from "./components/Mobile/TopBar";
 import TurnVpnButton from "./components/Mobile/TurnVpnButton";
+import AboutModal from "./components/Modals/mobile/AboutModal";
+
+// Styles
+import("../Styles/mobile.scss");
+import("../Styles/desktop.scss");
 
 function AppContent() {
   const { clustersData, isLoading: clustersLoading } = useClustersLoader();
@@ -73,6 +79,8 @@ function AppContent() {
     settingsModalOpen,
     setSettingsModalOpen,
     adminModalOpen,
+    isAboutModalOpen,
+    setIsAboutModalOpen,
     setAdminModalOpen,
     setVpnStatus,
     setVpnDomains,
@@ -88,12 +96,6 @@ function AppContent() {
   document.body.classList.add(
     isMobile ? "platform-mobile" : "platform-desktop",
   );
-
-  if (isMobile) {
-    import("../Styles/mobile.scss");
-  } else {
-    import("../Styles/desktop.scss");
-  }
 
   useEffect(() => {
     setGame(game);
@@ -138,7 +140,7 @@ function AppContent() {
     lastTauriError,
     checkHostsConsistency,
   } = useHosts(selectedRegionId, selections, selectedRegionClusters);
-  const { pings, pingClusters } = usePing(selectedRegion);
+  const { pings, pingClusters } = usePing(selectedRegion, isMobile);
   const { gameRunning, checkGameRunning, killGame } = useGameStatus();
   const { applyHostsUpdate, clearCluster, stopVpn, loading } = useHostsActions(
     selectedRegionId,
@@ -146,11 +148,13 @@ function AppContent() {
     selectedRegionClusters,
     settings,
     isMobile,
+    game,
   );
   const posterUrl = useGamePoster(game);
 
   useEffect(() => {
     if (!isMobile) return;
+
     getVpnStatus()
       .then((status) => {
         setVpnStatus(status.state === "on" ? "On" : "Off");
@@ -196,21 +200,25 @@ function AppContent() {
   }, [setAdminMounts, setAdminModalOpen]);
 
   const regionMap = selections[selectedRegionId] ?? {};
-  const selectedBlockedDomains = selectedRegionClusters
-    .filter((cluster) => regionMap[cluster.domain] === false)
-    .map((cluster) => cluster.domain)
-    .sort();
-  const selectedBlockedDomainsKey = JSON.stringify(selectedBlockedDomains);
+  // const selectedBlockedDomains = selectedRegionClusters
+  //   .filter((cluster) => regionMap[cluster.domain] === false)
+  //   .map((cluster) => cluster.domain)
+  //   .sort();
+  const allBlockedDomains = collectBlockedDomains(game, selections);
+  const allBlockedDomainsKey = JSON.stringify(allBlockedDomains);
 
   useEffect(() => {
-    if (!isMobile || !selections[selectedRegionId] || vpnBaselineDomains) {
+    if (
+      !isMobile ||
+      Object.keys(selections).length === 0 ||
+      vpnBaselineDomains
+    ) {
       return;
     }
-    setVpnBaselineDomains(JSON.parse(selectedBlockedDomainsKey));
+    setVpnBaselineDomains(JSON.parse(allBlockedDomainsKey));
   }, [
+    allBlockedDomainsKey,
     isMobile,
-    selectedBlockedDomainsKey,
-    selectedRegionId,
     selections,
     setVpnBaselineDomains,
     vpnBaselineDomains,
@@ -218,10 +226,8 @@ function AppContent() {
 
   useEffect(() => {
     if (!isMobile || !vpnBaselineDomains) return;
-    setVpnDirty(
-      selectedBlockedDomainsKey !== JSON.stringify(vpnBaselineDomains),
-    );
-  }, [isMobile, selectedBlockedDomainsKey, setVpnDirty, vpnBaselineDomains]);
+    setVpnDirty(allBlockedDomainsKey !== JSON.stringify(vpnBaselineDomains));
+  }, [allBlockedDomainsKey, isMobile, setVpnDirty, vpnBaselineDomains]);
 
   const vpnNeedsApply = isMobile && vpnDirty;
   const selectedDomain =
@@ -256,7 +262,16 @@ function AppContent() {
       return;
     }
 
-    const result = await applyHostsUpdate(selectedBlockedDomains, true);
+    if (allBlockedDomains.length === 0) {
+      showGlobalError(
+        "VPN не включён",
+        "У вас нет ни одной блокировки кластеров.",
+      );
+      window.setTimeout(hideGlobalError, 3000);
+      return;
+    }
+
+    const result = await applyHostsUpdate(allBlockedDomains, true);
     if (!result.success) {
       showGlobalError(result.title, result.message, result.details);
       window.setTimeout(hideGlobalError, 3000);
@@ -303,7 +318,7 @@ function AppContent() {
     if (!isMobile) {
       setConfirmOpen(true, blockedDomains);
     } else {
-      handleApplyHosts(blockedDomains);
+      handleApplyHosts();
     }
   };
 
@@ -481,6 +496,13 @@ function AppContent() {
                 );
               }}
             />
+
+            {isMobile && (
+              <AboutModal
+                open={isAboutModalOpen}
+                onClose={() => setIsAboutModalOpen(false)}
+              />
+            )}
           </main>
         )}
       </AnimatePresence>

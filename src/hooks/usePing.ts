@@ -2,15 +2,13 @@ import { useState, useEffect, useRef } from "react";
 import { safeInvoke } from "../lib/tauri";
 import type { PingInfo, PingMap } from "../types/ping";
 import type { Region } from "../types/cluster";
-// import type { Cluster, Region } from "../types/cluster";
 
 const PING_TIMEOUT_MS = 2000;
-const PING_ATTEMPTS = 3;
 const PING_ATTEMPT_DELAY_MS = 120;
-const PING_CONCURRENCY = 4;
-const PING_REFRESH_INTERVAL_MS = 15 * 60 * 1000; // 15 minutes
+const PING_REFRESH_INTERVAL_MS = 15 * 60 * 1000;
+const PING_BUDGET_MS = 20_000;
 
-export function usePing(selectedRegion: Region | null) {
+export function usePing(selectedRegion: Region | null, isMobile = false) {
   const [pings, setPings] = useState<PingMap>({});
   const pingRunIdRef = useRef(0);
 
@@ -40,56 +38,104 @@ export function usePing(selectedRegion: Region | null) {
             ? infoPartial.lossPercent
             : prevInfo.lossPercent,
         status: infoPartial.status ?? prevInfo.status,
+        lastError:
+          infoPartial.lastError !== undefined
+            ? infoPartial.lastError
+            : prevInfo.lastError,
       };
       return { ...prev, [domain]: next };
     });
   };
 
-  const pingClusters = async (_regionId?: string) => {
+  const pingClusters = async (regionId?: string) => {
     const runId = ++pingRunIdRef.current;
-    const region = selectedRegion;
-    if (!region) return;
-    const targets = region.clusters ?? [];
+    // Используем переданный regionId или текущий selectedRegion
+    const region = regionId
+      ? selectedRegion // Если передан regionId, используем текущий selectedRegion
+      : selectedRegion;
 
-    const tasks = targets.map((c) => async () => {
-      const domain = c.domain;
-      updateStats(domain, {
-        last: null,
-        avg: null,
-        attempts: 0,
-        successes: 0,
-        lossPercent: 0,
-        status: "running",
-      });
+    if (!region) {
+      console.warn("[usePing] No region selected");
+      return;
+    }
+
+    const targets = region.clusters ?? [];
+    if (targets.length === 0) {
+      console.warn("[usePing] No clusters in region");
+      return;
+    }
+
+    const attempts = isMobile ? 2 : 3;
+    const concurrency = isMobile
+      ? Math.min(8, Math.max(1, targets.length))
+      : Math.min(4, Math.max(1, targets.length));
+    const attemptDelay = isMobile ? 0 : PING_ATTEMPT_DELAY_MS;
+    const budgetDeadline = Date.now() + PING_BUDGET_MS;
+
+    // Сбрасываем состояние перед новым пингом
+    targets.forEach((cluster) => {
+      if (runId === pingRunIdRef.current) {
+        updateStats(cluster.domain, { status: "loading" });
+      }
+    });
+
+    const tasks = targets.map((cluster) => async () => {
+      if (runId !== pingRunIdRef.current) return;
+
+      const domain = cluster.domain;
+      updateStats(domain, { status: "running" });
+
+      if (Date.now() >= budgetDeadline || runId !== pingRunIdRef.current) {
+        updateStats(domain, { status: "timeout" });
+        return;
+      }
 
       let successes = 0;
       let totalMs = 0;
-      for (let i = 0; i < PING_ATTEMPTS; i++) {
+
+      // Получаем IP-адреса кластера для пинга
+      const addresses = cluster.ips?.filter((ip) => ip && ip.trim()) ?? [];
+
+      for (let i = 0; i < attempts; i++) {
         if (runId !== pingRunIdRef.current) {
           updateStats(domain, { status: "cancelled" });
           return;
         }
+        if (Date.now() >= budgetDeadline) {
+          updateStats(domain, {
+            avg: successes ? Math.round(totalMs / successes) : null,
+            attempts: i,
+            successes,
+            lossPercent: Math.round(((i - successes) / Math.max(i, 1)) * 100),
+            status: successes ? "ok" : "timeout",
+          });
+          return;
+        }
         try {
+          const remaining = Math.max(200, budgetDeadline - Date.now());
           const res: any = await safeInvoke("ping_server", {
             hostname: domain,
-            timeout_ms: PING_TIMEOUT_MS,
+            timeout_ms: Math.min(PING_TIMEOUT_MS, remaining),
+            addresses: addresses.length > 0 ? addresses : undefined,
           });
-          const ms = typeof res?.ping === "number" ? res.ping : null;
-          const errMsg = typeof res?.error === "string" ? res.error : undefined;
+
+          const ms = readPingMs(res);
           if (ms !== null) {
             successes++;
             totalMs += ms;
           }
+
           const avg = successes ? Math.round(totalMs / successes) : null;
           const lossPercent = Math.round(((i + 1 - successes) / (i + 1)) * 100);
+
           updateStats(domain, {
             last: ms,
             avg,
             attempts: i + 1,
             successes,
             lossPercent,
-            status: res?.status ?? "ok",
-            lastError: errMsg,
+            status: ms !== null ? "ok" : (res?.status ?? "error"),
+            lastError: typeof res?.error === "string" ? res.error : undefined,
           });
         } catch (e) {
           const lossPercent = Math.round(((i + 1 - successes) / (i + 1)) * 100);
@@ -103,13 +149,13 @@ export function usePing(selectedRegion: Region | null) {
             lastError: String(e),
           });
         }
-        await new Promise((r) => setTimeout(r, PING_ATTEMPT_DELAY_MS));
+        if (attemptDelay) {
+          await new Promise((r) => setTimeout(r, attemptDelay));
+        }
       }
 
       const finalAvg = successes ? Math.round(totalMs / successes) : null;
-      const finalLoss = Math.round(
-        ((PING_ATTEMPTS - successes) / PING_ATTEMPTS) * 100,
-      );
+      const finalLoss = Math.round(((attempts - successes) / attempts) * 100);
       updateStats(domain, {
         avg: finalAvg,
         lossPercent: finalLoss,
@@ -118,15 +164,13 @@ export function usePing(selectedRegion: Region | null) {
     });
 
     let idx = 0;
-    const workers: Promise<void>[] = new Array(
-      Math.min(PING_CONCURRENCY, tasks.length),
-    )
+    const workers: Promise<void>[] = new Array(concurrency)
       .fill(null)
       .map(async () => {
         while (idx < tasks.length) {
+          if (runId !== pingRunIdRef.current) return;
           const i = idx++;
           await tasks[i]();
-          if (runId !== pingRunIdRef.current) return;
         }
       });
 
@@ -135,14 +179,28 @@ export function usePing(selectedRegion: Region | null) {
 
   useEffect(() => {
     if (!selectedRegion) return;
+
+    // Запускаем пинг сразу
     pingClusters();
+
+    // И каждые PING_REFRESH_INTERVAL_MS
     const id = setInterval(() => pingClusters(), PING_REFRESH_INTERVAL_MS);
+
     return () => {
       pingRunIdRef.current++;
       clearInterval(id);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedRegion?.id]);
+  }, [selectedRegion?.id, isMobile]);
 
   return { pings, pingClusters };
+}
+
+function readPingMs(res: any): number | null {
+  if (typeof res?.ping !== "number" || !Number.isFinite(res.ping)) return null;
+  if (res.method === "dns" || res.status === "ok_dns") return null;
+  if (res.status && res.status !== "ok" && res.status !== "ok_no_time") {
+    return null;
+  }
+  return Math.max(1, Math.round(res.ping));
 }

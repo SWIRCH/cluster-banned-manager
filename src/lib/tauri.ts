@@ -58,9 +58,9 @@ function normalizeVpnStatus(status: VpnStatus): VpnStatus {
   return { ...status, domains };
 }
 
-export async function vpnStart(domains: string[]) {
+export async function vpnStart(domains: string[], ips: string[] = []) {
   const status = await safeInvoke<VpnStatus>("plugin:cluster-vpn|start", {
-    payload: { domains },
+    payload: { domains, ips },
   });
   return normalizeVpnStatus(status);
 }

@@ -291,6 +291,7 @@ async fn ping_server(
     hostname: String,
     timeout_ms: Option<u64>,
     _port: Option<u16>,
+    _addresses: Option<Vec<String>>,
 ) -> Result<serde_json::Value, String> {
     use std::process::Command;
     use std::time::Instant;

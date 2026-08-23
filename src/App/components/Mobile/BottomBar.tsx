@@ -1,6 +1,15 @@
 import { useState } from "react";
-import { CircleEllipsis, RefreshCcw, Settings2 } from "lucide-react";
+import {
+  CircleEllipsis,
+  Code,
+  Github,
+  RefreshCcw,
+  Settings2,
+} from "lucide-react";
 import { motion, Variants } from "framer-motion";
+import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
+import { openGithub } from "../../../utils/opener";
+import { useAppStore } from "../../../store/useAppStore";
 
 type BottomBarProps = {
   onSettingsClick: () => void;
@@ -27,13 +36,12 @@ export default function MobileBottomBar({
   onRefreshClick,
   onOtherClick,
 }: BottomBarProps) {
-  // Трекинг нажатых кнопок для перезапуска анимации
+  const { setIsAboutModalOpen } = useAppStore();
   const [activeKey, setActiveKey] = useState<string | null>(null);
 
   const handleButtonClick = (key: string, callback?: () => void) => {
     setActiveKey(key);
     if (callback) callback();
-    // Сбрасываем активный ключ после завершения анимации
     setTimeout(() => setActiveKey(null), 400);
   };
 
@@ -43,13 +51,13 @@ export default function MobileBottomBar({
         initial={{ y: 80, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ type: "spring", stiffness: 260, damping: 25 }}
-        className="sticky bottom-0 left-0 z-1000 w-full h-16 backdrop-blur-md"
+        className="sticky bottom-0 left-0 z-50 w-full h-16"
       >
         <div className="grid h-full max-w-lg grid-cols-3 mx-auto">
           {/* Кнопка: Настройки */}
           <button
             type="button"
-            className="inline-flex flex-col items-center justify-center font-medium px-5 transition-colors hover:bg-neutral-800/50 group select-none"
+            className="inline-flex flex-col items-center justify-center font-medium px-5 transition-colors group select-none"
             onClick={() => handleButtonClick("settings", onSettingsClick)}
           >
             <motion.div
@@ -66,7 +74,7 @@ export default function MobileBottomBar({
           {/* Кнопка: Обновить */}
           <button
             type="button"
-            className="inline-flex flex-col items-center justify-center font-medium px-5 transition-colors hover:bg-neutral-800/50 group select-none"
+            className="inline-flex flex-col items-center justify-center font-medium px-5 transition-colors group select-none"
             onClick={() => handleButtonClick("refresh", onRefreshClick)}
           >
             <motion.div
@@ -80,22 +88,51 @@ export default function MobileBottomBar({
             </span>
           </button>
 
-          {/* Кнопка: Другое */}
-          <button
-            type="button"
-            className="inline-flex flex-col items-center justify-center font-medium px-5 transition-colors hover:bg-neutral-800/50 group select-none"
-            onClick={() => handleButtonClick("other", onOtherClick)}
-          >
-            <motion.div
-              variants={iconVariants}
-              animate={activeKey === "other" ? "active" : "idle"}
+          {/* Кнопка с Дропдауном: Другое */}
+          <Menu as="div" className="relative flex justify-center h-full">
+            <MenuButton
+              type="button"
+              className="inline-flex flex-col items-center justify-center w-full font-medium px-5 transition-colors  group select-none focus:outline-none"
+              onClick={() => handleButtonClick("other", onOtherClick)}
             >
-              <CircleEllipsis className="mb-1 text-zinc-400 group-hover:text-zinc-100 transition-colors" />
-            </motion.div>
-            <span className="text-xs text-zinc-400 group-hover:text-zinc-100 transition-colors">
-              Другое
-            </span>
-          </button>
+              <motion.div
+                variants={iconVariants}
+                animate={activeKey === "other" ? "active" : "idle"}
+              >
+                <CircleEllipsis className="mb-1 text-zinc-400 group-hover:text-zinc-100 transition-colors" />
+              </motion.div>
+              <span className="text-xs text-zinc-400 group-hover:text-zinc-100 transition-colors">
+                Другое
+              </span>
+            </MenuButton>
+
+            <MenuItems
+              transition
+              anchor="top end"
+              className="w-52 origin-bottom-right rounded-xl border border-white/10 bg-neutral-900/95 p-1 text-sm/6 text-white backdrop-blur-md shadow-2xl transition duration-100 ease-out [--anchor-gap:12px] focus:outline-none data-closed:scale-95 data-closed:opacity-0 z-50"
+            >
+              <MenuItem>
+                <button
+                  className="group flex w-full items-center gap-2 rounded-lg px-3 py-1.5 data-focus:bg-white/10"
+                  onClick={openGithub}
+                >
+                  <Github className="size-4 text-white/30" />
+                  GitHub
+                </button>
+              </MenuItem>
+
+              <div className="my-1 h-px bg-white/10" />
+
+              <MenuItem>
+                <button
+                  className="group flex w-full items-center gap-2 rounded-lg px-3 py-1.5 data-focus:bg-white/10"
+                  onClick={() => setIsAboutModalOpen(true)}
+                >
+                  <Code className="size-4 text-white/30" />О приложении
+                </button>
+              </MenuItem>
+            </MenuItems>
+          </Menu>
         </div>
       </motion.div>
     </div>

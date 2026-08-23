@@ -2,7 +2,7 @@
 name = "cluster-banned-manager"
 version = "0.1.5"
 description = "A Tauri App"
-authors = ["aysi"]
+authors = ["swirch"]
 edition = "2021"
 
 [lib]

@@ -8,8 +8,8 @@ type TurnVpnButtonProps = {
   status?: VpnStatus;
   errorMessage?: string;
   hostsMismatch: boolean;
-  onToggle?: () => void | Promise<void>;
-  onUpdateClick: () => void;
+  onToggle?: () => Promise<void> | void;
+  onUpdateClick?: () => Promise<void> | void;
 };
 
 const STATUS_CONFIG: Record<VpnStatus, { label: string; className: string }> = {
@@ -52,8 +52,12 @@ export default function TurnVpnButton({
     if (hostsMismatch || currentStatus === "Error") {
       setVpnStatus("Loading");
       try {
-        await onUpdateClick();
+        if (onUpdateClick) {
+          await onUpdateClick();
+        }
+        setVpnStatus("Off");
       } catch (err) {
+        console.error("Update failed:", err);
         setVpnStatus("Error");
       }
       return;
@@ -63,7 +67,14 @@ export default function TurnVpnButton({
       setVpnStatus("Loading");
       try {
         await onToggle();
-      } catch {
+        // После успешного toggle - проверяем статус
+        // Если статус не изменился в onToggle, сбрасываем в Off
+        const current = useAppStore.getState().vpnStatus;
+        if (current === "Loading") {
+          setVpnStatus("Off");
+        }
+      } catch (err) {
+        console.error("Toggle failed:", err);
         setVpnStatus("Error");
       }
     }

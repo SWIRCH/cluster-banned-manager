@@ -1,7 +1,9 @@
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 use serde_json::json;
-use std::net::{TcpStream, ToSocketAddrs};
-use std::time::Instant;
+use std::io::ErrorKind;
+use std::net::{IpAddr, SocketAddr, TcpStream, ToSocketAddrs};
+use std::process::Command;
+use std::time::{Duration, Instant};
 
 const START_MARKER: &str = "# clusterbanned start";
 const END_MARKER: &str = "# clusterbanned end";
@@ -125,47 +127,180 @@ async fn ping_server(
     hostname: String,
     timeout_ms: Option<u64>,
     port: Option<u16>,
+    addresses: Option<Vec<String>>,
 ) -> Result<serde_json::Value, String> {
     tauri::async_runtime::spawn_blocking(move || {
-        let timeout = std::time::Duration::from_millis(timeout_ms.unwrap_or(2000));
-        let tcp_timeout = timeout.min(std::time::Duration::from_millis(600));
-        let requested_port = port.unwrap_or(443);
-        let started = Instant::now();
-        let addresses = format!("{hostname}:{requested_port}")
-            .to_socket_addrs()
-            .map_err(|error| format!("DNS resolution failed for {hostname}: {error}"))?;
-        let addresses: Vec<_> = addresses.collect();
-        let dns_elapsed = started.elapsed().as_millis() as u64;
-        let ports = if port.is_some() {
-            vec![requested_port]
-        } else {
-            vec![443, 80, 5222]
-        };
-
-        for port in ports {
-            for address in &addresses {
-                let address = std::net::SocketAddr::new(address.ip(), port);
-                if TcpStream::connect_timeout(&address, tcp_timeout).is_ok() {
-                    return Ok(json!({
-                        "ping": started.elapsed().as_millis() as u64,
-                        "status": "ok",
-                        "method": "tcp",
-                        "port": port
-                    }));
-                }
-            }
-        }
-
-        Ok(json!({
-            "ping": dns_elapsed,
-            "status": "ok_dns",
-            "method": "dns",
-            "port": null,
-            "error": format!("DNS resolved {hostname}, but TCP ports are unavailable")
-        }))
+        ping_host(hostname, timeout_ms, port, addresses)
     })
     .await
     .map_err(|error| format!("ping worker failed: {error}"))?
+}
+
+fn ping_host(
+    hostname: String,
+    timeout_ms: Option<u64>,
+    port: Option<u16>,
+    addresses: Option<Vec<String>>,
+) -> Result<serde_json::Value, String> {
+    let timeout = Duration::from_millis(timeout_ms.unwrap_or(2000).clamp(200, 4000));
+    let ips = resolve_ping_ips(&hostname, addresses)?;
+    if ips.is_empty() {
+        return Ok(json!({
+            "ping": null,
+            "status": "dns_error",
+            "method": "icmp",
+            "error": format!("No IPs to ping for {hostname}")
+        }));
+    }
+
+    for ip in ips.iter().take(2) {
+        if let Some(ms) = icmp_ping(*ip, timeout) {
+            return Ok(json!({
+                "ping": ms,
+                "status": "ok",
+                "method": "icmp",
+                "port": null
+            }));
+        }
+    }
+
+    ping_tcp_rtt(ips, timeout, port)
+}
+
+fn icmp_ping(ip: IpAddr, timeout: Duration) -> Option<u64> {
+    let ip = ip.to_string();
+    let timeout_sec = timeout.as_secs().clamp(1, 5).to_string();
+    let timeout_ms = timeout.as_millis().max(200).to_string();
+    let attempts = [
+        ("ping", vec!["-c".into(), "1".into(), "-W".into(), timeout_sec.clone(), ip.clone()]),
+        ("/system/bin/ping", vec!["-c".into(), "1".into(), "-W".into(), timeout_sec, ip.clone()]),
+        ("ping", vec!["-n".into(), "1".into(), "-w".into(), timeout_ms, ip]),
+    ];
+
+    for (bin, args) in attempts {
+        let output = match Command::new(bin).args(&args).output() {
+            Ok(output) => output,
+            Err(_) => continue,
+        };
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        if let Some(ms) = parse_icmp_ms(&stdout).or_else(|| parse_icmp_ms(&stderr)) {
+            return Some(ms);
+        }
+    }
+    None
+}
+
+fn parse_icmp_ms(output: &str) -> Option<u64> {
+    let lower = output.to_ascii_lowercase();
+    let idx = lower.find("time=").or_else(|| lower.find("time<"))?;
+    let rest = lower.get(idx + 5..)?;
+    let numeric: String = rest
+        .chars()
+        .take_while(|c| c.is_ascii_digit() || *c == '.')
+        .collect();
+    if numeric.is_empty() {
+        return if lower.contains("time<") { Some(1) } else { None };
+    }
+    numeric.parse::<f64>().ok().map(|ms| ms.round().max(1.0) as u64)
+}
+
+fn ping_tcp_rtt(
+    ips: Vec<IpAddr>,
+    timeout: Duration,
+    port: Option<u16>,
+) -> Result<serde_json::Value, String> {
+
+    let ports = if let Some(port) = port {
+        vec![port]
+    } else {
+        vec![443, 80]
+    };
+
+    let deadline = Instant::now() + timeout;
+    let mut last_error = String::from("timeout");
+
+    for ip in ips.iter().take(2) {
+        for port in &ports {
+            let remaining = deadline.saturating_duration_since(Instant::now());
+            if remaining < Duration::from_millis(80) {
+                break;
+            }
+
+            let addr = SocketAddr::new(*ip, *port);
+            let started = Instant::now();
+            match TcpStream::connect_timeout(&addr, remaining) {
+                Ok(_) => {
+                    return Ok(tcp_ping_ok(started, *port, "tcp"));
+                }
+                Err(error) if is_rtt_error(&error) => {
+                    return Ok(tcp_ping_ok(started, *port, "tcp_rst"));
+                }
+                Err(error) => {
+                    last_error = error.to_string();
+                }
+            }
+        }
+    }
+
+    Ok(json!({
+        "ping": null,
+        "status": "timeout",
+        "method": "tcp",
+        "error": last_error
+    }))
+}
+
+fn tcp_ping_ok(started: Instant, port: u16, method: &str) -> serde_json::Value {
+    json!({
+        "ping": started.elapsed().as_millis().max(1) as u64,
+        "status": "ok",
+        "method": method,
+        "port": port
+    })
+}
+
+fn is_rtt_error(error: &std::io::Error) -> bool {
+    matches!(
+        error.kind(),
+        ErrorKind::ConnectionRefused | ErrorKind::ConnectionReset | ErrorKind::BrokenPipe
+    )
+}
+
+fn resolve_ping_ips(
+    hostname: &str,
+    addresses: Option<Vec<String>>,
+) -> Result<Vec<IpAddr>, String> {
+    let mut ips = Vec::new();
+    if let Some(addresses) = addresses {
+        for address in addresses {
+            let trimmed = address.trim();
+            if trimmed.is_empty() {
+                continue;
+            }
+            if let Ok(ip) = trimmed.parse::<IpAddr>() {
+                if !ips.contains(&ip) {
+                    ips.push(ip);
+                }
+            }
+        }
+    }
+    if !ips.is_empty() {
+        return Ok(ips);
+    }
+
+    format!("{hostname}:443")
+        .to_socket_addrs()
+        .map(|iter| {
+            let mut resolved = Vec::new();
+            for addr in iter {
+                if !resolved.contains(&addr.ip()) {
+                    resolved.push(addr.ip());
+                }
+            }
+            resolved
+        })
+        .map_err(|error| format!("DNS resolution failed for {hostname}: {error}"))
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]

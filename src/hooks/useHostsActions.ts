@@ -8,8 +8,13 @@ import {
 } from "../lib/tauri";
 import { useAppStore } from "../store/useAppStore";
 import type { AppSettings } from "../utils/settingsStorage";
-import type { Cluster } from "../types/cluster";
+import type { Cluster, Game } from "../types/cluster";
 import type { Selections } from "../types/selections";
+import {
+  allGameClusters,
+  collectBlockedDomains,
+  collectBlockedIps,
+} from "../utils/blocking";
 
 export function useHostsActions(
   selectedRegionId: string,
@@ -17,12 +22,16 @@ export function useHostsActions(
   clusters: Cluster[],
   settings: AppSettings,
   isMobile = false,
+  game?: Game | null,
 ) {
   const [loading, setLoading] = useState(false);
   const { setVpnStatus, setVpnDomains, setVpnBaselineDomains, setVpnDirty } =
     useAppStore();
 
   const getBlockedDomains = () => {
+    if (isMobile) {
+      return collectBlockedDomains(game, selections);
+    }
     const regionMap =
       selections[selectedRegionId] ??
       Object.fromEntries(clusters.map((cluster) => [cluster.domain, true]));
@@ -32,38 +41,53 @@ export function useHostsActions(
       .sort();
   };
 
+  const getIpsForDomains = (blockedDomains: string[]) =>
+    collectBlockedIps(
+      isMobile ? allGameClusters(game) : clusters,
+      blockedDomains,
+    );
+
   const applyHostsUpdate = async (
     blockedDomains?: string[],
     keepVpnRunning = true,
   ) => {
-    let domains =
-      blockedDomains ??
-      (() => {
-        const rmap =
-          selections[selectedRegionId] ??
-          Object.fromEntries(clusters.map((c) => [c.domain, true]));
-        return clusters.filter((c) => !rmap[c.domain]).map((c) => c.domain);
-      })();
+    let domains = blockedDomains ?? getBlockedDomains();
 
     let isRemoval = false;
 
     if (isMobile) {
       if (domains.length === 0) {
-        setVpnStatus("Off");
-        setVpnDirty(false);
-        return {
-          success: false,
-          title: "VPN не включён",
-          message: "У вас нет ни одной блокировки кластеров.",
-          details: undefined,
-        };
+        setLoading(true);
+        try {
+          const response = await vpnStop();
+          setVpnStatus("Off");
+          setVpnDomains(response.domains);
+          setVpnBaselineDomains([]);
+          setVpnDirty(false);
+          return {
+            success: true,
+            title: "VPN выключен",
+            message: "Нет кластеров для блокировки — VPN остановлен.",
+            details: undefined,
+          };
+        } catch (error) {
+          setVpnStatus("Error");
+          return {
+            success: false,
+            title: "Ошибка VPN",
+            message: "Не удалось остановить VPN.",
+            details: String(error),
+          };
+        } finally {
+          setLoading(false);
+        }
       }
 
       setLoading(true);
       try {
         const response =
           domains.length && keepVpnRunning
-            ? await vpnStart(domains)
+            ? await vpnStart(domains, getIpsForDomains(domains))
             : await vpnStop();
 
         if (response.state === "needsPermission") {

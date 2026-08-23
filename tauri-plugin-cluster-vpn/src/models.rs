@@ -21,6 +21,8 @@ where
 #[serde(rename_all = "camelCase")]
 pub struct VpnStartRequest {
   pub domains: Vec<String>,
+  #[serde(default)]
+  pub ips: Vec<String>,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
