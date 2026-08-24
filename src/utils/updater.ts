@@ -1,17 +1,7 @@
+// updater.ts
+
 import { getVersion } from "@tauri-apps/api/app";
 import { openUrl } from "@tauri-apps/plugin-opener";
-import { config } from "./config";
-
-interface PlatformUpdate {
-  signature?: string;
-  url: string;
-}
-
-interface LatestJson {
-  version: string;
-  notes: string;
-  platforms: Record<string, PlatformUpdate>;
-}
 
 export interface AndroidUpdateInfo {
   version: string;
@@ -19,73 +9,84 @@ export interface AndroidUpdateInfo {
   url: string;
 }
 
+interface LatestJson {
+  version: string;
+  notes: string;
+  pub_date: string;
+  platforms: Record<string, any>;
+  android?: {
+    url: string;
+  };
+}
+
 function isNewerVersion(versionA: string, versionB: string): boolean {
   const partsA = versionA.split(".").map((n) => parseInt(n, 10) || 0);
   const partsB = versionB.split(".").map((n) => parseInt(n, 10) || 0);
-
   const maxLength = Math.max(partsA.length, partsB.length);
 
   for (let i = 0; i < maxLength; i++) {
     const valA = partsA[i] || 0;
     const valB = partsB[i] || 0;
-
     if (valA > valB) return true;
     if (valA < valB) return false;
   }
-
   return false;
 }
 
 /**
-  Проверяет наличие обновлений для Android.
-  @returns {Promise<AndroidUpdateInfo | null>} Возвращает данные об обновлении или null, если обновлений нет.
+ * Проверяет наличие обновлений для Android через latest.json
  */
 export async function checkAndroidUpdate(): Promise<AndroidUpdateInfo | null> {
   try {
     const currentVersion = await getVersion();
-    const response = await fetch(config.UPDATER_URL);
+    console.log("[Updater] Current version:", currentVersion);
 
-    if (!response.ok) return null;
+    const response = await fetch(
+      "https://raw.githubusercontent.com/SWIRCH/cluster-banned-manager/main/latest.json",
+    );
+
+    if (!response.ok) {
+      console.log("[Updater] Failed to fetch latest.json:", response.status);
+      return null;
+    }
 
     const data: LatestJson = await response.json();
+
+    if (!data.android || !data.android.url) {
+      console.log("[Updater] No Android version in this release");
+      return null;
+    }
+
     const latestVersion = data.version.replace(/^v/, "");
 
     if (!isNewerVersion(latestVersion, currentVersion)) {
+      console.log("[Updater] Current version is up to date");
       return null;
     }
 
-    const androidPlatform =
-      data.platforms["android"] || data.platforms["android-apk"];
-
-    if (!androidPlatform || !androidPlatform.url) {
-      if (config.DEBUG_MODE) {
-        console.log(
-          `Версия ${data.version} выпущена только для Desktop. Пропускаем.`,
-        );
-      }
-      return null;
-    }
+    console.log("[Updater] Update available:", latestVersion);
 
     return {
       version: latestVersion,
-      notes: data.notes,
-      url: androidPlatform.url,
+      notes: data.notes || "Новая версия доступна",
+      url: data.android.url,
     };
   } catch (error) {
-    console.error("Ошибка проверки обновлений:", error);
+    console.error("[Updater] Error checking update:", error);
     return null;
   }
 }
 
-// export async function checkAndroidUpdate(): Promise<AndroidUpdateInfo | null> {
-//   return {
-//     version: "9.9.9",
-//     notes:
-//       "• Добавлена секретная фича\n• Исправлены вылеты при запуске\n• Улучшена производительность",
-//     url: "https://example.com/build.apk",
-//   };
-// }
-
+/**
+ * Открывает ссылку для скачивания обновления
+ */
 export async function downloadAndroidUpdate(url: string) {
-  await openUrl(url);
+  try {
+    await openUrl(url);
+  } catch (error) {
+    console.error("[Updater] Failed to open download URL:", error);
+    if (typeof window !== "undefined") {
+      window.open(url, "_blank");
+    }
+  }
 }

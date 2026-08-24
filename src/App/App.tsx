@@ -47,6 +47,7 @@ import { hideGlobalError, showGlobalError } from "../utils/globalError";
 import MobileBottomBar from "./components/Mobile/BottomBar";
 import MobileTopBar from "./components/Mobile/TopBar";
 import TurnVpnButton from "./components/Mobile/TurnVpnButton";
+import "../lib/vpnListener";
 
 // Styles
 import("../Styles/mobile.scss");

@@ -129,11 +129,9 @@ async fn ping_server(
     port: Option<u16>,
     addresses: Option<Vec<String>>,
 ) -> Result<serde_json::Value, String> {
-    tauri::async_runtime::spawn_blocking(move || {
-        ping_host(hostname, timeout_ms, port, addresses)
-    })
-    .await
-    .map_err(|error| format!("ping worker failed: {error}"))?
+    tauri::async_runtime::spawn_blocking(move || ping_host(hostname, timeout_ms, port, addresses))
+        .await
+        .map_err(|error| format!("ping worker failed: {error}"))?
 }
 
 fn ping_host(
@@ -172,9 +170,30 @@ fn icmp_ping(ip: IpAddr, timeout: Duration) -> Option<u64> {
     let timeout_sec = timeout.as_secs().clamp(1, 5).to_string();
     let timeout_ms = timeout.as_millis().max(200).to_string();
     let attempts = [
-        ("ping", vec!["-c".into(), "1".into(), "-W".into(), timeout_sec.clone(), ip.clone()]),
-        ("/system/bin/ping", vec!["-c".into(), "1".into(), "-W".into(), timeout_sec, ip.clone()]),
-        ("ping", vec!["-n".into(), "1".into(), "-w".into(), timeout_ms, ip]),
+        (
+            "ping",
+            vec![
+                "-c".into(),
+                "1".into(),
+                "-W".into(),
+                timeout_sec.clone(),
+                ip.clone(),
+            ],
+        ),
+        (
+            "/system/bin/ping",
+            vec![
+                "-c".into(),
+                "1".into(),
+                "-W".into(),
+                timeout_sec,
+                ip.clone(),
+            ],
+        ),
+        (
+            "ping",
+            vec!["-n".into(), "1".into(), "-w".into(), timeout_ms, ip],
+        ),
     ];
 
     for (bin, args) in attempts {
@@ -200,9 +219,16 @@ fn parse_icmp_ms(output: &str) -> Option<u64> {
         .take_while(|c| c.is_ascii_digit() || *c == '.')
         .collect();
     if numeric.is_empty() {
-        return if lower.contains("time<") { Some(1) } else { None };
+        return if lower.contains("time<") {
+            Some(1)
+        } else {
+            None
+        };
     }
-    numeric.parse::<f64>().ok().map(|ms| ms.round().max(1.0) as u64)
+    numeric
+        .parse::<f64>()
+        .ok()
+        .map(|ms| ms.round().max(1.0) as u64)
 }
 
 fn ping_tcp_rtt(
@@ -210,7 +236,6 @@ fn ping_tcp_rtt(
     timeout: Duration,
     port: Option<u16>,
 ) -> Result<serde_json::Value, String> {
-
     let ports = if let Some(port) = port {
         vec![port]
     } else {
@@ -267,10 +292,7 @@ fn is_rtt_error(error: &std::io::Error) -> bool {
     )
 }
 
-fn resolve_ping_ips(
-    hostname: &str,
-    addresses: Option<Vec<String>>,
-) -> Result<Vec<IpAddr>, String> {
+fn resolve_ping_ips(hostname: &str, addresses: Option<Vec<String>>) -> Result<Vec<IpAddr>, String> {
     let mut ips = Vec::new();
     if let Some(addresses) = addresses {
         for address in addresses {
@@ -310,6 +332,7 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_cluster_vpn::init())
+        .plugin(tauri_plugin_log::Builder::new().build())
         .invoke_handler(tauri::generate_handler![
             greet,
             ping_server,

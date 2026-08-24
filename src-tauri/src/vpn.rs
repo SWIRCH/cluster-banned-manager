@@ -38,8 +38,8 @@ pub fn build_policy(domains: &[String]) -> Result<VpnPolicy, String> {
     let mut normalized = BTreeSet::new();
 
     for domain in domains {
-        let value = normalize_domain(domain)
-            .ok_or_else(|| format!("invalid VPN domain: {domain}"))?;
+        let value =
+            normalize_domain(domain).ok_or_else(|| format!("invalid VPN domain: {domain}"))?;
         normalized.insert(value);
     }
 

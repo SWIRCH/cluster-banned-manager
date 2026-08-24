@@ -54,5 +54,6 @@ class ClusterVpnPlugin(private val activity: Activity) : Plugin(activity) {
 
     companion object {
         private const val PERMISSION_REQUEST_CODE = 7401
+        private const val NOTIFICATION_PERMISSION_REQUEST_CODE = 7403
     }
 }

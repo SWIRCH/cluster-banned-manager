@@ -6,6 +6,16 @@ use vpn::vpn_prepare_policy;
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 fn main() {
     tauri::Builder::default()
+        .plugin(
+            tauri_plugin_log::Builder::new()
+                .level(tauri_plugin_log::log::LevelFilter::Info)
+                .build(),
+        )
+        .plugin(
+            tauri_plugin_log::Builder::new()
+                .level(tauri_plugin_log::log::LevelFilter::Info)
+                .build(),
+        )
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_fs::init())
@@ -36,13 +46,12 @@ fn main() {
 }
 
 // Helpers for hosts management
-use sysinfo::{PidExt, ProcessExt, SystemExt};
 use serde_json::Value;
 use std::fs;
+use sysinfo::{PidExt, ProcessExt, SystemExt};
 
 const START_MARKER: &str = "# clusterbanned start";
 const END_MARKER: &str = "# clusterbanned end";
-
 
 fn hosts_paths() -> [&'static str; 2] {
     ["C:\\Windows\\System32\\drivers\\etc\\hosts", "/etc/hosts"]
@@ -235,19 +244,17 @@ async fn debug_network(hostname: String) -> Result<serde_json::Value, String> {
 async fn get_clusters_with_fallback() -> Value {
     // 1. Пробуем GitHub
     let github_url = "https://raw.githubusercontent.com/SWIRCH/cluster-banned-manager/main/src/data/servers.json";
-    
+
     match reqwest::get(github_url).await {
-        Ok(response) if response.status().is_success() => {
-            match response.json::<Value>().await {
-                Ok(data) => {
-                    println!("✅ Данные загружены с GitHub");
-                    return data;
-                }
-                Err(e) => {
-                    println!("⚠️ Ошибка парсинга GitHub: {}", e);
-                }
+        Ok(response) if response.status().is_success() => match response.json::<Value>().await {
+            Ok(data) => {
+                println!("✅ Данные загружены с GitHub");
+                return data;
             }
-        }
+            Err(e) => {
+                println!("⚠️ Ошибка парсинга GitHub: {}", e);
+            }
+        },
         Ok(response) => {
             println!("⚠️ GitHub статус: {}", response.status());
         }
@@ -255,31 +262,27 @@ async fn get_clusters_with_fallback() -> Value {
             println!("⚠️ Не подключиться к GitHub: {}", e);
         }
     }
-    
+
     // 2. Fallback: локальный файл
     let local_path = "../../src/data/servers.json";
     match fs::read_to_string(local_path) {
-        Ok(content) => {
-            match serde_json::from_str(&content) {
-                Ok(data) => {
-                    println!("✅ Используем локальный файл");
-                    return data;
-                }
-                Err(e) => {
-                    println!("⚠️ Ошибка парсинга локального файла: {}", e);
-                }
+        Ok(content) => match serde_json::from_str(&content) {
+            Ok(data) => {
+                println!("✅ Используем локальный файл");
+                return data;
             }
-        }
+            Err(e) => {
+                println!("⚠️ Ошибка парсинга локального файла: {}", e);
+            }
+        },
         Err(e) => {
             println!("⚠️ Не прочитать локальный файл: {}", e);
         }
     }
-    
+
     // 3. Fallback: встроенный файл
     println!("⚠️ Используем встроенный servers.json");
-    serde_json::from_str(
-        include_str!("../../src/data/servers.json")
-    ).unwrap_or_else(|_| {
+    serde_json::from_str(include_str!("../../src/data/servers.json")).unwrap_or_else(|_| {
         println!("⛔ Все источники недоступны!");
         serde_json::json!({})
     })
@@ -664,7 +667,7 @@ fn update_hosts_block(
         while content.contains("\n\n\n") {
             content = content.replace("\n\n\n", "\n\n");
         }
-        
+
         if backup_saved {
             // Backup original
             let ts = std::time::SystemTime::now()
@@ -753,7 +756,7 @@ fn update_hosts_block(
         ));
     } else if had_block {
         // We removed the existing block; this means we've unblocked everything for clusterbanned (for this region)
-        
+
         if backup_saved {
             // Backup original
             let ts = std::time::SystemTime::now()
@@ -779,8 +782,6 @@ fn update_hosts_block(
         return Ok("No cluster entries to update".to_string());
     }
 }
-
-
 
 #[tauri::command]
 async fn update_firewall_rules(
@@ -1242,7 +1243,7 @@ fn block_with_firewall(domain: String, ips: Vec<String>, enable: bool) -> Result
 
         use std::os::windows::process::CommandExt;
         const CREATE_NO_WINDOW: u32 = 0x08000000;
-        
+
         if enable {
             // Сначала удаляем существующее правило, если есть
             let _ = Command::new("netsh")
@@ -1373,8 +1374,8 @@ fn block_with_firewall(domain: String, ips: Vec<String>, enable: bool) -> Result
 async fn clear_firewall_rules() -> Result<String, String> {
     #[cfg(windows)]
     {
-        use std::process::Command;
         use std::os::windows::process::CommandExt;
+        use std::process::Command;
         const CREATE_NO_WINDOW: u32 = 0x08000000;
 
         let mut results = Vec::new();
@@ -1392,12 +1393,12 @@ async fn clear_firewall_rules() -> Result<String, String> {
 
         let stdout = String::from_utf8_lossy(&output.stdout);
         let mut current_rule_name: Option<String> = None;
-        
+
         // Парсим вывод netsh построчно
         // Формат: Rule Name: <name>
         for line in stdout.lines() {
             let line = line.trim();
-            
+
             // Ищем строку с именем правила (может быть "Rule Name:" или "Rule Name :")
             if line.contains("Rule Name") {
                 // Извлекаем имя правила после "Rule Name:" или "Rule Name :"
@@ -1409,7 +1410,7 @@ async fn clear_firewall_rules() -> Result<String, String> {
                     }
                 }
             }
-            
+
             // Если у нас есть имя правила и оно содержит нужный префикс
             if let Some(ref rule_name) = current_rule_name {
                 for prefix in &prefixes {
@@ -1431,11 +1432,17 @@ async fn clear_firewall_rules() -> Result<String, String> {
                                 if del_out.status.success() {
                                     deleted_rules.insert(rule_name.clone());
                                     results.push(format!("Deleted rule: {}", rule_name));
-                                    println!("[TAURI] Successfully deleted firewall rule: {}", rule_name);
+                                    println!(
+                                        "[TAURI] Successfully deleted firewall rule: {}",
+                                        rule_name
+                                    );
                                 } else {
                                     let stderr = String::from_utf8_lossy(&del_out.stderr);
                                     let stdout_msg = String::from_utf8_lossy(&del_out.stdout);
-                                    println!("[TAURI] Failed to delete rule {}: stderr={}, stdout={}", rule_name, stderr, stdout_msg);
+                                    println!(
+                                        "[TAURI] Failed to delete rule {}: stderr={}, stdout={}",
+                                        rule_name, stderr, stdout_msg
+                                    );
                                 }
                             }
                             Err(e) => {
@@ -1446,7 +1453,7 @@ async fn clear_firewall_rules() -> Result<String, String> {
                     }
                 }
             }
-            
+
             // Сбрасываем имя правила при переходе к следующему блоку правил
             // (пустая строка или разделитель)
             if line.is_empty() || line.starts_with("---") || line.starts_with("=") {
@@ -1457,14 +1464,14 @@ async fn clear_firewall_rules() -> Result<String, String> {
         // Также пробуем удалить правила напрямую по известным доменам из servers.json
         // Это нужно на случай, если парсинг не сработал
         let clusters_data: serde_json::Value = get_clusters_with_fallback().await;
-        
+
         if let serde_json::Value::Array(regions) = &clusters_data["clusters"] {
             for region_data in regions {
                 if let serde_json::Value::Array(clusters) = &region_data["clusters"] {
                     for cluster in clusters {
                         if let Some(domain) = cluster["domain"].as_str() {
                             let rule_name = format!("WoT_Blitz_Block_{}", domain.replace(".", "_"));
-                            
+
                             if !deleted_rules.contains(&rule_name) {
                                 let delete_output = Command::new("netsh")
                                     .args(&[
@@ -1484,13 +1491,14 @@ async fn clear_firewall_rules() -> Result<String, String> {
                                         println!("[TAURI] Successfully deleted firewall rule (direct): {}", rule_name);
                                     }
                                 }
-                                
+
                                 // Также пробуем удалить правила для отдельных IP
                                 if let serde_json::Value::Array(ips_array) = &cluster["ips"] {
                                     for ip_val in ips_array {
                                         if let Some(ip) = ip_val.as_str() {
-                                            let ip_rule_name = format!("{}_{}", rule_name, ip.replace(".", "_"));
-                                            
+                                            let ip_rule_name =
+                                                format!("{}_{}", rule_name, ip.replace(".", "_"));
+
                                             if !deleted_rules.contains(&ip_rule_name) {
                                                 let _ = Command::new("netsh")
                                                     .args(&[
@@ -1530,8 +1538,8 @@ async fn clear_firewall_rules() -> Result<String, String> {
 fn get_firewall_rules() -> Result<Vec<String>, String> {
     #[cfg(windows)]
     {
-        use std::process::Command;
         use std::os::windows::process::CommandExt;
+        use std::process::Command;
         const CREATE_NO_WINDOW: u32 = 0x08000000;
 
         let output = Command::new("netsh")
@@ -1572,22 +1580,22 @@ fn get_settings_path() -> Result<std::path::PathBuf, String> {
             .join("clusterbanned")
             .join("settings.json"))
     }
-    
+
     #[cfg(target_os = "macos")]
     {
-        let home = std::env::var("HOME")
-            .map_err(|_| "HOME environment variable not found".to_string())?;
+        let home =
+            std::env::var("HOME").map_err(|_| "HOME environment variable not found".to_string())?;
         Ok(std::path::PathBuf::from(home)
             .join("Library")
             .join("Application Support")
             .join("clusterbanned")
             .join("settings.json"))
     }
-    
+
     #[cfg(all(unix, not(target_os = "macos")))]
     {
-        let home = std::env::var("HOME")
-            .map_err(|_| "HOME environment variable not found".to_string())?;
+        let home =
+            std::env::var("HOME").map_err(|_| "HOME environment variable not found".to_string())?;
         Ok(std::path::PathBuf::from(home)
             .join(".config")
             .join("clusterbanned")
@@ -1598,7 +1606,7 @@ fn get_settings_path() -> Result<std::path::PathBuf, String> {
 #[tauri::command]
 fn get_settings() -> Result<serde_json::Value, String> {
     let settings_path = get_settings_path()?;
-    
+
     // Если файл не существует, возвращаем дефолтные настройки
     if !settings_path.exists() {
         return Ok(serde_json::json!({
@@ -1607,48 +1615,48 @@ fn get_settings() -> Result<serde_json::Value, String> {
             "backupCount": 5
         }));
     }
-    
+
     // Читаем файл
     let content = std::fs::read_to_string(&settings_path)
         .map_err(|e| format!("Failed to read settings file: {}", e))?;
-    
+
     // Парсим JSON
     let settings: serde_json::Value = serde_json::from_str(&content)
         .map_err(|e| format!("Failed to parse settings JSON: {}", e))?;
-    
+
     // Убеждаемся, что все поля присутствуют (слияние с дефолтами)
     let mut result = serde_json::json!({
         "useFirewall": true,
         "useBackup": false,
         "backupCount": 5
     });
-    
+
     if let serde_json::Value::Object(map) = settings {
         for (key, value) in map {
             result[key] = value;
         }
     }
-    
+
     Ok(result)
 }
 
 #[tauri::command]
 fn save_settings(settings: serde_json::Value) -> Result<(), String> {
     let settings_path = get_settings_path()?;
-    
+
     // Создаем директорию, если её нет
     if let Some(parent) = settings_path.parent() {
         std::fs::create_dir_all(parent)
             .map_err(|e| format!("Failed to create settings directory: {}", e))?;
     }
-    
+
     // Записываем настройки в файл
     let json_string = serde_json::to_string_pretty(&settings)
         .map_err(|e| format!("Failed to serialize settings: {}", e))?;
-    
+
     std::fs::write(&settings_path, json_string)
         .map_err(|e| format!("Failed to write settings file: {}", e))?;
-    
+
     Ok(())
 }
 
@@ -1659,24 +1667,27 @@ fn read_settings_from_file() -> (bool, bool, u32) {
             if !settings_path.exists() {
                 return (true, false, 5); // Дефолтные значения
             }
-            
+
             match std::fs::read_to_string(&settings_path) {
                 Ok(content) => {
                     match serde_json::from_str::<serde_json::Value>(&content) {
                         Ok(settings) => {
-                            let use_firewall = settings.get("useFirewall")
+                            let use_firewall = settings
+                                .get("useFirewall")
                                 .and_then(|v| v.as_bool())
                                 .unwrap_or(true);
-                            
-                            let use_backup = settings.get("useBackup")
+
+                            let use_backup = settings
+                                .get("useBackup")
                                 .and_then(|v| v.as_bool())
                                 .unwrap_or(false);
-                            
-                            let backup_count = settings.get("backupCount")
+
+                            let backup_count = settings
+                                .get("backupCount")
                                 .and_then(|v| v.as_u64())
                                 .map(|v| v as u32)
                                 .unwrap_or(5);
-                            
+
                             (use_firewall, use_backup, backup_count)
                         }
                         Err(_) => (true, false, 5), // Дефолты при ошибке парсинга

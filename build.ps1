@@ -173,7 +173,7 @@ if ($Target -eq "all" -or $Target -eq "android") {
     Write-Host ">>> STARTING ANDROID BUILD <<<" -ForegroundColor Green
     
     # Собираем APK
-    bun tauri android build --apk true
+    bun tauri android build --apk
 
     if ($LASTEXITCODE -ne 0) {
         Write-Host "[ERROR] Android build failed." -ForegroundColor Red

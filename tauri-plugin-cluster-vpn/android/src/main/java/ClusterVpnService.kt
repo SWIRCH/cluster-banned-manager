@@ -446,12 +446,27 @@ class ClusterVpnService : VpnService() {
             )
         }
 
+        val stopIntent = Intent(this, ClusterVpnService::class.java).apply {
+            action = ACTION_STOP
+        }
+        val stopPendingIntent = PendingIntent.getService(
+            this,
+            1,
+            stopIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("Cluster Banned Manager")
             .setContentText("Блокировка кластеров включена")
             .setSmallIcon(android.R.drawable.ic_lock_lock)
             .setOngoing(true)
             .setContentIntent(pendingIntent)
+            .addAction(
+                android.R.drawable.ic_menu_close_clear_cancel,
+                "Отключить",
+                stopPendingIntent
+            )
             .build()
     }
 
