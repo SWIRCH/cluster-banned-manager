@@ -9,14 +9,13 @@ export interface AndroidUpdateInfo {
   url: string;
 }
 
-interface LatestJson {
-  version: string;
-  notes: string;
-  pub_date: string;
-  platforms: Record<string, any>;
-  android?: {
-    url: string;
-  };
+interface GitHubRelease {
+  tag_name: string;
+  body: string;
+  assets: Array<{
+    name: string;
+    browser_download_url: string;
+  }>;
 }
 
 function isNewerVersion(versionA: string, versionB: string): boolean {
@@ -34,33 +33,36 @@ function isNewerVersion(versionA: string, versionB: string): boolean {
 }
 
 /**
- * Проверяет наличие обновлений для Android через latest.json
+ * Проверяет наличие обновлений для Android через GitHub API
  */
 export async function checkAndroidUpdate(): Promise<AndroidUpdateInfo | null> {
   try {
     const currentVersion = await getVersion();
     console.log("[Updater] Current version:", currentVersion);
 
-    const response = await fetch(
-      "https://raw.githubusercontent.com/SWIRCH/cluster-banned-manager/main/latest.json",
+    const releaseResponse = await fetch(
+      "https://api.github.com/repos/SWIRCH/cluster-banned-manager/releases/latest",
     );
 
-    if (!response.ok) {
-      console.log("[Updater] Failed to fetch latest.json:", response.status);
+    if (!releaseResponse.ok) {
+      console.log("[Updater] GitHub API error:", releaseResponse.status);
       return null;
     }
 
-    const data: LatestJson = await response.json();
-
-    if (!data.android || !data.android.url) {
-      console.log("[Updater] No Android version in this release");
-      return null;
-    }
-
-    const latestVersion = data.version.replace(/^v/, "");
+    const release: GitHubRelease = await releaseResponse.json();
+    const latestVersion = release.tag_name.replace(/^v/, "");
 
     if (!isNewerVersion(latestVersion, currentVersion)) {
       console.log("[Updater] Current version is up to date");
+      return null;
+    }
+
+    const apkAsset = release.assets.find((asset) =>
+      asset.name.endsWith(".apk"),
+    );
+
+    if (!apkAsset) {
+      console.log("[Updater] No APK found in latest release");
       return null;
     }
 
@@ -68,8 +70,8 @@ export async function checkAndroidUpdate(): Promise<AndroidUpdateInfo | null> {
 
     return {
       version: latestVersion,
-      notes: data.notes || "Новая версия доступна",
-      url: data.android.url,
+      notes: release.body || "Новая версия доступна",
+      url: apkAsset.browser_download_url,
     };
   } catch (error) {
     console.error("[Updater] Error checking update:", error);
