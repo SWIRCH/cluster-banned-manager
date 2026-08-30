@@ -1,0 +1,14 @@
+<svg width="1920" height="1165" viewBox="0 0 1920 1165" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<rect x="-11" y="-12" width="1942" height="1093" fill="url(#pattern0_131_2)"/>
+<rect width="1920" height="1165" fill="url(#paint0_radial_131_2)"/>
+<defs>
+<pattern id="pattern0_131_2" patternContentUnits="objectBoundingBox" width="1" height="1">
+<use xlink:href="#image0_131_2" transform="matrix(0.000954198 0 0 0.00169538 0.00641392 -0.000137935)"/>
+</pattern>
+<radialGradient id="paint0_radial_131_2" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1219.5 266) rotate(104.1) scale(761.441 1254.91)">
+<stop stop-opacity="0.8"/>
+<stop offset="1" stop-color="#06070b"/>
+</radialGradient>
+<image id="image0_131_2" width="1048" height="590" preserveAspectRatio="none" xlink:href="./wrapper-bg.png" />
+</defs>
+</svg>

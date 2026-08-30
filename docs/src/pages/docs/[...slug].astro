@@ -1,0 +1,129 @@
+---
+import { getCollection, render } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("docs");
+  const slugs = [...new Set(posts.map((post) => post.id.replace(/^(ru|en)\//, "")))];
+
+  return slugs.map((slug) => ({
+    params: { slug },
+  }));
+}
+
+const { slug } = Astro.params;
+const posts = await getCollection("docs");
+const baseUrl = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+const languages = [
+  { lang: "ru", locale: "ru-RU", notFound: "Документ не доступен на русском языке." },
+  { lang: "en", locale: "en-US", notFound: "Document is not available in English." },
+];
+
+const docData = await Promise.all(
+  languages.map(async ({ lang, locale, notFound }) => {
+    const post = posts.find((p) => p.id === `${lang}/${slug}`);
+    const Content = post ? (await render(post)).Content : null;
+    const docs = posts.filter((p) => p.id.startsWith(`${lang}/`));
+
+    return { lang, post, Content, docs, locale, notFound };
+  }),
+);
+
+const sidebarLangs = docData.map(({ lang, docs }) => ({
+  lang,
+  items: docs.map((doc) => {
+    const docSlug = doc.id.replace(new RegExp(`^${lang}/`), "");
+    return {
+      title: doc.data.title,
+      href: `${baseUrl}/docs/${docSlug}`,
+      isActive: docSlug === slug,
+    };
+  }),
+}));
+
+const activePost = docData.find((d) => d.post)?.post;
+const defaultTitle = activePost?.data.title || "Docs";
+---
+
+<Layout title={defaultTitle}>
+  <div class="container max-w-7xl mx-auto px-4 py-8">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      <!-- Сайдбар -->
+      <aside class="lg:col-span-1 border-b lg:border-b-0 lg:border-r border-white/10 pb-6 lg:pb-0 lg:pr-6">
+        <nav class="sticky top-20 space-y-6">
+          <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3" data-t="common.docs">
+            Документация
+          </h2>
+
+          {
+            sidebarLangs.map(({ lang, items }) => (
+              <ul data-sidebar-lang={lang} class="space-y-2" style="display: none;">
+                {items.map(({ title, href, isActive }) => (
+                  <li>
+                    <a
+                      href={href}
+                      class={`block text-sm py-1.5 px-3 rounded-lg transition-colors ${
+                        isActive
+                          ? "bg-amber-500/10 text-amber-400 font-medium border border-amber-500/20"
+                          : "text-gray-400 hover:text-white hover:bg-white/5"
+                      }`}
+                    >
+                      {title}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            ))
+          }
+        </nav>
+      </aside>
+
+      <!-- Основной контент -->
+      <main class="lg:col-span-3 min-w-0">
+        <article class="markdown-body !bg-transparent text-left">
+          {
+            docData.map(({ lang, post, Content, locale, notFound }) => (
+              <div data-doc-lang={lang} style="display: none;">
+                {post && Content ? (
+                  <>
+                    <header class="mb-8 pb-6 border-b border-white/10">
+                      <h1 class="!text-3xl !font-bold !mb-3 !border-none !pb-0 text-white">{post.data.title}</h1>
+                      {post.data.description && (
+                        <p class="text-gray-400 text-lg mb-4 leading-relaxed">{post.data.description}</p>
+                      )}
+                      {post.data.date && (
+                        <div class="flex items-center gap-2 text-xs text-gray-500">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 002-2H5a2 2 0 002 2v12a2 2 0 002 2z"
+                            />
+                          </svg>
+                          <time datetime={post.data.date}>
+                            {new Date(post.data.date).toLocaleDateString(locale, {
+                              year: "numeric",
+                              month: "long",
+                              day: "numeric",
+                            })}
+                          </time>
+                        </div>
+                      )}
+                    </header>
+                    <Content />
+                  </>
+                ) : (
+                  <p class="text-gray-400">{notFound}</p>
+                )}
+              </div>
+            ))
+          }
+        </article>
+      </main>
+    </div>
+  </div>
+</Layout>
+
+<script src="../../scripts/i18n-dom.ts"></script>

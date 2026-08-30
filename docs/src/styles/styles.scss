@@ -1,0 +1,333 @@
+@use "variables" as *;
+
+.google-sans-flex {
+  font-family: "Google Sans Flex", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+  font-variation-settings:
+    "slnt" 0,
+    "wdth" 100,
+    "GRAD" 0,
+    "ROND" 0;
+}
+
+button {
+  cursor: pointer;
+}
+
+.onest {
+  font-family: "Onest", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+}
+
+.bg-dark {
+  background-color: #0b0e12;
+}
+
+body {
+  // background: $bg-liner-gradient;
+  background: $bg-dark;
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Google Sans Flex", "Onest", sans-serif;
+}
+
+@keyframes orbPulse {
+  0% {
+    transform: translateX(-50%) translate3d(0, 0, 0) scale(0.8);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateX(-50%) translate3d(0, 0, 0) scale(1.3);
+    opacity: 1;
+  }
+}
+
+.top-banner {
+  position: relative;
+  z-index: 1000;
+
+  a {
+    text-decoration: none;
+  }
+}
+
+.wrapper {
+  position: relative;
+
+  .container {
+    position: relative;
+    z-index: 2;
+  }
+}
+
+a {
+  color: #fff;
+  text-decoration: underline 1px;
+
+  &.normal {
+    text-decoration: none !important;
+  }
+
+  &.muted {
+    color: #ffffff56;
+  }
+}
+
+.app-hero {
+  display: block;
+  position: relative;
+
+  &__pin-wrapper {
+    position: relative;
+    // высота видимой залипающей области + запас на анимацию
+    height: calc(100vh - var(--header-height, 96px) + var(--pin-scroll-distance, 500px));
+  }
+
+  &__body {
+    position: sticky;
+    top: var(--header-height, 96px);
+    height: calc(100vh - var(--header-height, 96px));
+    display: flex;
+    z-index: 10;
+
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: var(--bg-url);
+      top: -$header-height;
+      background-size: cover;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .mockup-window {
+      width: 100%;
+
+      & > .flex {
+        height: 100% !important;
+        position: relative;
+        overflow: hidden;
+      }
+    }
+
+    &__image {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+
+      [data-platform] {
+        position: absolute;
+        inset: 0;
+        transition: opacity 0.3s ease;
+
+        img {
+          position: absolute;
+          max-width: 1000px;
+          left: 50%;
+          top: 0;
+          z-index: 10;
+          transform: translate(calc(-50% + var(--img-offset-x, 30%)), var(--img-offset-y, 0px));
+          will-change: transform;
+        }
+      }
+    }
+
+    &__text-content {
+      margin-top: 8em;
+      margin-bottom: 6em;
+      max-width: 600px;
+      position: relative;
+      z-index: 1;
+      will-change: opacity;
+
+      h1.app-title {
+        font-size: 42px;
+        font-weight: 600;
+      }
+
+      h3 {
+        font-size: 20px;
+        font-weight: 300;
+      }
+    }
+
+    .app-preview {
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+    }
+
+    .desktop-preview {
+      // width: 90%;
+    }
+
+    .android-preview {
+      position: relative;
+    }
+  }
+
+  &__footer {
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
+    transform: translateY(var(--footer-offset-y, 0%));
+    opacity: var(--footer-opacity, 1);
+    transition: none;
+    will-change: transform, opacity;
+    pointer-events: var(--footer-pointer-events, auto);
+
+    .releases {
+      width: 100%;
+      border-top: solid 1px var(--border);
+      border-bottom: solid 1px var(--border);
+      background-color: #0b0e121f;
+      backdrop-filter: blur(120px);
+
+      .text-content {
+        display: flex;
+        justify-content: center;
+
+        h3 {
+          font-size: 20px;
+          font-weight: 500;
+        }
+        span {
+          color: #ffffff34;
+        }
+      }
+
+      & > div {
+        display: flex;
+        justify-content: space-between;
+        padding: 1.2em 0;
+      }
+
+      .platform {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 60px;
+
+        .platform-tab {
+          position: relative;
+          z-index: 0; // чтобы pill не перекрыл соседние табы
+
+          &__pill {
+            position: absolute;
+            bottom: -20px;
+            width: 100%;
+            height: 1px;
+            background-color: #fff;
+            border-radius: var(--radius-lg);
+            z-index: 0;
+          }
+        }
+
+        .active {
+          position: relative;
+
+          &::after {
+            content: "";
+            position: absolute;
+            background-color: #fff;
+            bottom: -20px;
+            width: 100%;
+            height: 1px;
+          }
+        }
+      }
+    }
+  }
+}
+
+h1 {
+  font-size: large;
+}
+
+h2 {
+  font-size: larger;
+}
+
+.dropdown-button-active {
+  background: #fff;
+}
+
+svg.animate,
+svg.animate * {
+  animation-play-state: paused !important;
+  animation-fill-mode: forwards;
+}
+
+svg.animate.is-playing,
+svg.animate.is-playing * {
+  animation-play-state: running !important;
+  animation-iteration-count: 1 !important;
+  animation-fill-mode: forwards !important;
+}
+
+.features-cols {
+  .feature-column {
+    container-type: inline-size;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    height: 100%;
+    min-height: 391px;
+  }
+
+  .feature-card {
+    padding: 1.2em;
+    border: 1px solid #3a3a3a;
+    background: rgba(15, 15, 15, 0.59);
+
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+
+    border-radius: clamp(16px, 6cqw, 28px);
+
+    img {
+      display: block;
+      margin: 0 auto 12px auto;
+      max-width: 100%;
+      height: auto;
+    }
+
+    svg.animate {
+      display: block;
+      margin: 0 auto 12px auto;
+      max-width: 100%;
+      margin-bottom: 20px;
+    }
+
+    h3 {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 19px;
+      font-weight: 400;
+      margin-bottom: 6px;
+    }
+
+    p {
+      color: rgba(255, 255, 255, 0.23);
+      font-weight: 300;
+      font-size: 16px;
+      line-height: 1.4;
+    }
+  }
+}
+
+.card {
+  background-color: rgba(15, 15, 15, 0.59);
+  border: 1px solid #3a3a3a;
+}

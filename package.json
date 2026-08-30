@@ -38,8 +38,10 @@
     "@types/react-dom": "^19.2.5",
     "@vitejs/plugin-react": "^4.7.0",
     "autoprefixer": "^10.5.4",
+    "daisyui": "^5.7.22",
     "postcss": "^8.5.26",
     "sass-embedded": "^1.103.1",
+    "tailwind": "^4.0.0",
     "tailwindcss": "^4.3.3",
     "typescript": "~5.8.3",
     "vite": "^7.3.6"

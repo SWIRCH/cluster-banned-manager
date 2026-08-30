@@ -1,0 +1,47 @@
+{
+  "common.loading": "Загрузка...",
+  "common.docs": "Документация",
+  "common.download": "Скачать",
+  "common.downloadFor": "Скачать для",
+
+  "nav.languages": "Языки",
+  "nav.found_error": "Нашли ошибку?",
+  "nav.features": "Возможности",
+
+  "wrapper.footer.title": "Мы позаботились о ваших устройствах:",
+  "wrapper.footer.subtitle": "У нас есть пособия как использовать клиент",
+  "wrapper.subtitle": "Оптимизируйте соединение, выбирайте лучшие серверы, контролируйте игровой опыт",
+
+  "marker.features": "Возможности приложения",
+  "marker.features.subtitle": "Все, что нужно для оптимального игрового опыта",
+
+  "marker.quickstart": "Быстрый старт",
+  "marker.quickstart.subtitle": "Быстрый старт и руководство по использованию",
+
+  "quickstart.windows.step1.title": "Скачайте и установите приложение",
+  "quickstart.windows.step1.description": "Скачайте установщик из раздела releases на github и запустите его. Следуйте инструкциям установщика.",
+  "quickstart.windows.step1.installer_file_name": "clusterbanned_x.x.x_x64-setup.exe",
+  "quickstart.android.step1.title": "Скачайте APK и установите приложение",
+  "quickstart.android.step1.description": "Скачайте APK файл из раздела releases на github и запустите его.",
+  "quickstart.android.step1.installer_file_name": "app-universal-release.apk",
+
+  "quickstart.windows.step2.title": "Запустите от имени Администратора",
+  "quickstart.windows.step2.description": "Для работы функций блокировки серверов запустите приложение с правами администратора:",
+  "quickstart.windows.step2.footer": "Программа не может получить доступ к hosts файлу без прав администратора.",
+  "quickstart.windows.step2.list.pkm_run_admin": "ПКМ по ярлыку → 'Запуск от имени администратора'",
+  "quickstart.windows.step2.list.set_run_admin": "Или настройте ярлык на постоянный запуск с правами администратора",
+  "quickstart.android.step2.title": "Выберите регион",
+  "quickstart.android.step2.description": "В самом верху главного окна выберите регион игры. В нижней части вы увидите кластеры данного региона.",
+  "quickstart.android.step2.footer": "Совет: Серверы с пингом менее 50ms отмечены зеленым, 50-100ms - желтым, выше 100ms - красным.",
+
+  "quickstart.windows.step3.title": "Выберите регион и сервер",
+  "quickstart.windows.step3.description": "В главном окне выберите регион игры и сервер с наименьшим пингом (зеленый показатель).",
+  "quickstart.windows.step3.footer": "Совет: Серверы с пингом менее 50ms отмечены зеленым, 50-100ms - желтым, выше 100ms - красным.",
+  "quickstart.android.step3.title": "Настройте блокировку и запустите игру",
+  "quickstart.android.step3.description": "Отметьте кластеры, которые хотите заблокировать, и нажмите на кнопку с замком по центру экрана дождитесь пока она загорится зелёным цветом или в статусе будет написано 'Блокировка включена'. Затем можете запустить игру.",
+
+  "quickstart.windows.step4.title": "Настройте блокировку и запустите игру",
+  "quickstart.windows.step4.description": "Отметьте кластеры, которые хотите заблокировать, и нажмите 'Обновить блок'. Затем можете запустить игру.",
+
+  "quickstart.need_help": "Нужна помощь? Ознакомьтесь с документацией"
+}

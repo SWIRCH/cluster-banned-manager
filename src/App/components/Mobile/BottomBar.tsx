@@ -17,7 +17,6 @@ type BottomBarProps = {
   onOtherClick?: () => void;
 };
 
-// Варианты анимации для выпрыгивания и поворота иконки
 const iconVariants: Variants = {
   idle: { y: 0, rotate: 0, scale: 1 },
   active: {

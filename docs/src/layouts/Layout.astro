@@ -1,0 +1,120 @@
+---
+import Navbar from "../components/Navbar/Navbar.js";
+import TopBanner from "../components/TopBanner";
+import "../styles/global.css";
+import "../styles/styles.scss";
+
+interface Props {
+  title?: string;
+  description?: string;
+  keywords?: string;
+  image?: string;
+}
+
+const baseUrl = import.meta.env.BASE_URL;
+
+const {
+  title = "Cluster Banned Manager — WoT Blitz & Android",
+  description = "Cluster Banned Manager для World of Tanks Blitz и Tanks Blitz. Оптимизация пинга, выбор сервера, блокировка хостов. Доступно для Windows и Android.",
+  keywords = "cluster, banned, wot, lesta, android, apk, wargaming, eu, asia, tanks blitz, WoT Blitz, сервер, менеджер, пинг, оптимизация, hosts, firewall, Windows, скачать",
+  image = `${baseUrl}/img/clusterbanned.png`,
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site || "https://swirch.github.io/cluster-banned-manager/");
+---
+
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="google-site-verification" content="i8IEBQf3N9tIo243C1ipdwOuZW4HelUk2fYLlF1tV28" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="keywords" content={keywords} />
+    <link rel="canonical" href={canonicalURL} />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={image} />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={canonicalURL} />
+    <meta property="twitter:title" content={title} />
+    <meta property="twitter:description" content={description} />
+    <meta property="twitter:image" content={image} />
+
+    <!-- Favicon & Fonts -->
+    <link rel="icon" type="image/x-icon" href={`${baseUrl}/favicon.ico`} />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&family=Onest:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
+    <script is:inline>
+      (function () {
+        try {
+          const STORAGE_KEY = "lang";
+          const saved = localStorage.getItem(STORAGE_KEY);
+          // Если язык есть в storage - применяем его, иначе оставляем по умолчанию (например 'ru')
+          const lang = saved || "ru";
+          document.documentElement.setAttribute("data-lang", lang);
+        } catch (e) {}
+      })();
+    </script>
+    <style is:global>
+      html[data-lang="ru"] [data-doc-lang="en"],
+      html[data-lang="ru"] [data-sidebar-lang="en"],
+      html[data-lang="ru"] [data-lang-block="en"] {
+        display: none !important;
+      }
+
+      html[data-lang="en"] [data-doc-lang="ru"],
+      html[data-lang="en"] [data-sidebar-lang="ru"],
+      html[data-lang="en"] [data-lang-block="ru"] {
+        display: none !important;
+      }
+
+      html:not([data-lang]) [data-doc-lang],
+      html:not([data-lang]) [data-sidebar-lang],
+      html:not([data-lang]) [data-lang-block] {
+        display: none !important;
+      }
+    </style>
+  </head>
+
+  <body class="dark">
+    <!-- Top Banner -->
+    <TopBanner client:load baseUrl={baseUrl} />
+
+    <!-- Navbar -->
+    <Navbar client:load baseUrl={baseUrl} />
+
+    <!-- Content Slot -->
+    <main>
+      <slot />
+    </main>
+  </body>
+
+  <script>
+    import Lenis from "lenis";
+
+    const lenis = new Lenis({
+      duration: 0.4,
+      easing: (t: number) => 1 - Math.pow(1 - t, 3),
+      smoothWheel: true,
+    });
+
+    function raf(time: number) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+    requestAnimationFrame(raf);
+  </script>
+</html>

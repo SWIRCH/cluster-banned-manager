@@ -1,0 +1,43 @@
+{
+  "common.loading": "Loading...",
+  "common.docs": "Documentation",
+  "common.download": "Download",
+  "common.downloadFor": "Download for",
+
+  "nav.languages": "Languages",
+  "nav.found_error": "Found an error?",
+  "nav.features": "Features",
+
+  "wrapper.footer.title": "We've got your devices covered:",
+  "wrapper.footer.subtitle": "We have guides on how to use the client",
+  "wrapper.subtitle": "Optimize your connection, choose the best servers, and control your gaming experience",
+  "marker.features": "App Features",
+  "marker.features.subtitle": "Everything you need for the best gaming experience",
+
+  "quickstart.windows.step1.title": "Download and install the app",
+  "quickstart.windows.step1.description": "Download the installer from the GitHub releases section and run it. Follow the setup wizard instructions.",
+  "quickstart.windows.step1.installer_file_name": "clusterbanned_x.x.x_x64-setup.exe",
+  "quickstart.android.step1.title": "Download APK and install the app",
+  "quickstart.android.step1.description": "Download the APK file from the GitHub releases section and install it.",
+  "quickstart.android.step1.installer_file_name": "app-universal-release.apk",
+
+  "quickstart.windows.step2.title": "Run as Administrator",
+  "quickstart.windows.step2.description": "To enable server blocking features, launch the application with administrator privileges:",
+  "quickstart.windows.step2.footer": "The application cannot access the hosts file without administrator rights.",
+  "quickstart.windows.step2.list.pkm_run_admin": "Right-click the shortcut → 'Run as administrator'",
+  "quickstart.windows.step2.list.set_run_admin": "Or configure the shortcut to always run as administrator",
+  "quickstart.android.step2.title": "Select region",
+  "quickstart.android.step2.description": "Select your game region at the very top of the main screen. The clusters for that region will appear at the bottom.",
+  "quickstart.android.step2.footer": "Tip: Servers with ping under 50ms are marked green, 50-100ms yellow, and above 100ms red.",
+
+  "quickstart.windows.step3.title": "Select region and server",
+  "quickstart.windows.step3.description": "In the main window, choose your game region and a server with the lowest ping (indicated in green).",
+  "quickstart.windows.step3.footer": "Tip: Servers with ping under 50ms are marked green, 50-100ms yellow, and above 100ms red.",
+  "quickstart.android.step3.title": "Configure blocking and launch the game",
+  "quickstart.android.step3.description": "Check the clusters you want to block, then tap the lock button in the center of the screen until it turns green or the status displays 'Blocking enabled'. After that, launch the game.",
+
+  "quickstart.windows.step4.title": "Configure blocking and launch the game",
+  "quickstart.windows.step4.description": "Check the clusters you want to block and click 'Update Block'. Then launch the game using the 'Play' button or via its shortcut.",
+
+  "quickstart.need_help": "Need help? Read the docs"
+}

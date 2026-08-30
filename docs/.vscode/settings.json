@@ -1,0 +1,22 @@
+{
+  "tailwindCSS.experimental.classRegex": ["class: \"([^\"]*)\"", "className: \"([^\"]*)\""],
+  "tailwindCSS.includeLanguages": {
+    "html": "html",
+    "javascript": "javascript",
+    "css": "css"
+  },
+  "tailwindCSS.emmetCompletions": true,
+  "editor.quickSuggestions": {
+    "strings": true
+  },
+  "files.associations": {
+    "*.css": "tailwindcss"
+  },
+  "css.validate": false,
+  "less.validate": false,
+  "scss.validate": false,
+  "[astro]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "cSpell.words": ["clusterbanned", "imgs", "lerp", "nanostores", "svgs", "пинга", "пингом"]
+}

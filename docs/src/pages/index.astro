@@ -1,0 +1,239 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { Image } from "astro:assets";
+
+import appPreviewWindows from "../assets/app-releases-interface-windows.png";
+import appPreviewAndroid from "../assets/app-releases-interface-android.png";
+import ClusterSearchAnimate from "../assets/ClusterSearchAnimate.svg";
+import VpnServiceAnimate from "../assets/VpnServiceAnimate.svg";
+import WrapperFooterTabs from "@/components/ui/wrapper/Footer";
+import AppPreviewSwitcher from "@/components/ui/wrapper/AppPreviewSwitcher";
+import PlatformDownloadButton from "@/components/ui/wrapper/PlatformDownloadButton";
+import { Ban, BroomSparkles, ChartArea, CloudBackup, Download, Earth, Gamepad } from "lucide-react";
+import Android from "@/components/Icons/Android";
+import BlockMarker from "@/components/BlockMarker";
+import Quickstart from "@/components/Quickstart";
+
+const baseUrl = import.meta.env.BASE_URL;
+---
+
+<Layout>
+  <div class="wrapper" style={`--bg-url: url('${baseUrl}/img/wrapper-bg.png')`}>
+    <div class="app-hero">
+      <div class="app-hero__pin-wrapper">
+        <div class="app-hero__body pt-20">
+          <div class="container">
+            <div class="app-hero__body__text-content">
+              <div class="flex flex-col gap-2">
+                <img src={`${baseUrl}/img/clusterbanned.png`} width="90" alt="Cluster Banned Logo" />
+                <h1 class="app-title mt-3" data-t-dynamic="wrapper.title-raw">Cluster Banned Manager</h1>
+                <h3 class="text-muted" data-t="wrapper.subtitle">
+                  Optimize your connection, choose the best servers, and control your gaming experience
+                </h3>
+              </div>
+
+              <div class="mt-6 inline-flex items-center gap-3">
+                <PlatformDownloadButton client:load />
+              </div>
+            </div>
+          </div>
+
+          <div class="app-hero__body__image">
+            <div data-platform="windows">
+              <Image src={appPreviewWindows} alt="Windows preview" class="app-preview" quality="max" format="webp" />
+            </div>
+            <div data-platform="android">
+              <Image src={appPreviewAndroid} alt="Android preview" class="app-preview" quality="max" format="webp" />
+            </div>
+            <!-- <div data-platform="ios">
+              <Image src={appPreviewIOS} alt="iOS preview" class="app-preview" quality="max" format="webp" />
+            </div> -->
+          </div>
+
+          <AppPreviewSwitcher client:load />
+        </div>
+      </div>
+      <div class="app-hero__footer mt-15">
+        <WrapperFooterTabs client:load />
+      </div>
+    </div>
+  </div>
+
+  <div class="block-features">
+    <div class="block-titles">
+      <BlockMarker client:load title="marker.features" subtitle="marker.features.subtitle" />
+    </div>
+    <div class="container mt-22">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 features-cols">
+        <div class="feature-column">
+          <div class="feature-card">
+            <ClusterSearchAnimate class="animate" />
+            <h3>
+              <ChartArea size={20} />
+              Мониторинг пинга
+            </h3>
+            <p>Реальная статистика задержек и потери пакетов для каждого сервера с историей измерений</p>
+          </div>
+        </div>
+        <div class="feature-column">
+          <div class="feature-card">
+            <h3>
+              <Ban size={20} />
+              Блокировка кластеров
+            </h3>
+            <p>Блокировка нестабильных серверов через hosts файл и брандмауэр Windows</p>
+          </div>
+          <div class="feature-card">
+            <h3>
+              <Earth size={20} />
+              Все регионы
+            </h3>
+            <p>Поддержка EU, RU, NA и ASIA регионов с детальной статистикой пинга</p>
+          </div>
+          <div class="feature-card">
+            <h3>
+              <CloudBackup size={20} />
+              Резервные копии
+            </h3>
+            <p>Автоматическое создание backup перед внесением изменений в hosts</p>
+          </div>
+        </div>
+        <div class="feature-column">
+          <div class="feature-card">
+            <!-- <img src={`${baseUrl}/img/VpnExampleAndroid.svg`} class="mb-3 relative left-4.75" /> -->
+            <VpnServiceAnimate class="mb-3 animate" />
+            <h3>
+              <Android className="size-6" />
+              Android
+            </h3>
+            <p>Блокировка кластеров через локальный VPN сервис без требования root прав</p>
+          </div>
+          <div class="feature-card max-h-30">
+            <h3>
+              <Gamepad size={20} />
+              Запуск игры
+            </h3>
+            <p>Быстрый запуск WoT Blitz через Steam или Google Play прямо из приложения</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="block-quickstart mt-40">
+      <div class="block-titles">
+        <BlockMarker client:load title="marker.quickstart" subtitle="marker.quickstart.subtitle" />
+      </div>
+
+      <div class="container max-w-4xl mx-auto mt-12 px-4">
+        <Quickstart client:load />
+      </div>
+    </div>
+
+    <div class="pt-100"></div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const featuresContainer = document.querySelector(".features-cols");
+        if (!featuresContainer) return;
+
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                const svgs = featuresContainer.querySelectorAll("svg.animate");
+
+                if (svgs.length) {
+                  svgs.forEach((svg) => {
+                    svg.classList.add("is-playing");
+                  });
+                }
+
+                observer.unobserve(featuresContainer);
+              }
+            });
+          },
+          {
+            rootMargin: "-48% 0px -48% 0px",
+            threshold: 0,
+          },
+        );
+
+        observer.observe(featuresContainer);
+      });
+    </script>
+
+    <script src="../scripts/i18n-dom.ts"></script>
+
+    <script>
+      const HEADER_HEIGHT = 96;
+      const ANIMATION_DISTANCE = 500;
+      const HOLD_DISTANCE = 200;
+      const FOOTER_EXIT_DISTANCE = 150;
+
+      const PIN_DISTANCE = ANIMATION_DISTANCE + HOLD_DISTANCE;
+      const SCROLL_DISTANCE = PIN_DISTANCE + FOOTER_EXIT_DISTANCE;
+
+      const START_OFFSET_X = 55;
+
+      document.documentElement.style.setProperty("--header-height", `${HEADER_HEIGHT}px`);
+      document.documentElement.style.setProperty("--pin-scroll-distance", `${SCROLL_DISTANCE}px`);
+
+      const pinWrapper = document.querySelector(".app-hero__pin-wrapper") as HTMLElement | null;
+      const imgs = document.querySelectorAll<HTMLElement>(".app-hero__body__image .app-preview");
+      const textContent = document.querySelector(".app-hero__body__text-content") as HTMLElement | null;
+      const footer = document.querySelector(".app-hero__footer") as HTMLElement | null;
+
+      const ease = (t: number) => t * t * (3 - 2 * t);
+      const clamp = (v: number, min: number, max: number) => Math.min(Math.max(v, min), max);
+
+      const lerp = (start: number, end: number, t: number) => start + (end - start) * t;
+
+      if (pinWrapper && imgs.length) {
+        let rafId: number | null = null;
+        let currentEased = 0;
+
+        const update = () => {
+          const rect = pinWrapper.getBoundingClientRect();
+          const rawScrolled = Math.max(HEADER_HEIGHT - rect.top, 0);
+
+          const animProgress = clamp(rawScrolled / ANIMATION_DISTANCE, 0, 1);
+          const targetEased = ease(animProgress);
+
+          currentEased = lerp(currentEased, targetEased, 0.15);
+
+          const offsetX = START_OFFSET_X * (1 - currentEased);
+          imgs.forEach((img) => img.style.setProperty("--img-offset-x", `${offsetX}%`));
+
+          if (textContent) {
+            textContent.style.opacity = `${1 - currentEased}`;
+          }
+
+          if (footer) {
+            const footerRaw = clamp(rawScrolled - PIN_DISTANCE, 0, FOOTER_EXIT_DISTANCE);
+            const footerProgress = ease(footerRaw / FOOTER_EXIT_DISTANCE);
+
+            footer.style.setProperty("--footer-offset-y", `${footerProgress * 100}%`);
+            footer.style.setProperty("--footer-opacity", `${1 - footerProgress}`);
+            footer.style.setProperty("--footer-pointer-events", footerProgress > 0.9 ? "none" : "auto");
+          }
+
+          if (Math.abs(currentEased - targetEased) > 0.001) {
+            rafId = requestAnimationFrame(update);
+          } else {
+            rafId = null;
+          }
+        };
+
+        const onScroll = () => {
+          if (rafId === null) {
+            rafId = requestAnimationFrame(update);
+          }
+        };
+
+        window.addEventListener("scroll", onScroll, { passive: true });
+        window.addEventListener("resize", onScroll);
+        update();
+      }
+    </script>
+  </div>
+</Layout>
