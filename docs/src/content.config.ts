@@ -6,6 +6,11 @@ const docs = defineCollection({
   schema: z.object({
     title: z.string(),
     description: z.string().optional(),
+    date: z.string(),
+    keywords: z.string().optional(),
+    author: z.string().optional(),
+    author_link: z.string().optional(),
+    priority: z.number().optional(),
   }),
 });
 

@@ -11,29 +11,24 @@ interface BlockMarkerProps {
 export default function BlockMarker({ title, subtitle }: BlockMarkerProps) {
   const { t } = useTranslation();
 
-  // 1. Создаем реф для отслеживания элемента
   const ref = useRef<HTMLDivElement>(null);
 
-  // 2. Настраиваем триггер видимости.
-  // "0px 0px -30% 0px" означает: триггер сработает, когда элемент поднимется на 30% снизу экрана.
-  // once: true заставит анимацию проиграться только один раз. Если нужно крутить её туда-обратно, уберите этот параметр.
   const isInView = useInView(ref, {
     margin: "0px 0px -40% 0px",
     once: true,
   });
 
-  // 3. Описываем варианты анимации (Variants) для Framer Motion
   const subtitleVariants: Variants = {
     hidden: {
       opacity: 0,
-      y: 40, // Начальная позиция: смещен вниз на 40px
+      y: 40,
     },
     visible: {
-      opacity: 0.2, // Ваша исходная прозрачность h3
-      y: 0, // Возвращается на свое место
+      opacity: 0.2,
+      y: 0,
       transition: {
-        duration: 0.6, // Длительность анимации
-        ease: [0.215, 0.61, 0.355, 1.0], // Красивый кубический bezier (easeOutCubic)
+        duration: 0.6,
+        ease: [0.215, 0.61, 0.355, 1.0],
       },
     },
   };

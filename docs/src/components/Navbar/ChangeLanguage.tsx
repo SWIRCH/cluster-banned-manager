@@ -1,20 +1,22 @@
-import React, { useEffect, useState } from "react";
-import { ui, defaultLang, type KnownLanguageCode } from "@/i18n/ui";
+// ChangeLanguage.tsx
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuGroup,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Spinner } from "@/components/ui/spinner";
-import { ArrowUpRightIcon } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
+import { defaultLang, type KnownLanguageCode } from "@/i18n/ui";
+import { currentLang, setLang } from "@/stores/i18n";
+import { config } from "@/utils/config";
+import { openUrl } from "@/utils/openUrl";
+import { useStore } from "@nanostores/react";
+import { ArrowUpRightIcon } from "lucide-react";
+import { useEffect, useState } from "react";
 
 interface Language {
   code: KnownLanguageCode;
@@ -32,57 +34,88 @@ const Languages: Language[] = [
   { code: "en", label: "English", flag: "US.svg" },
 ];
 
-export default function ChangeLanguage({ baseUrl = "", onLanguageChange }: ChangeLanguageProps) {
-  const [currentLang, setCurrentLang] = useState<Language | null>(null);
-  const currentCode = currentLang?.code || defaultLang;
-  const { lang, setLang, t } = useTranslation();
+const getLanguage = (code: KnownLanguageCode): Language => {
+  const found = Languages.find((l) => l.code === code);
+  if (!found) {
+    console.warn(`Language with code "${code}" not found, falling back to default`);
+    return Languages[0]!;
+  }
+  return found;
+};
+
+export default function ChangeLanguage({ baseUrl = config.BASE_URL, onLanguageChange }: ChangeLanguageProps) {
+  const [mounted, setMounted] = useState(false);
+  const lang = useStore(currentLang);
+  const { t } = useTranslation();
 
   useEffect(() => {
-    const savedLangCode = (localStorage.getItem("lang") as KnownLanguageCode) || defaultLang;
-    const foundLang = Languages.find((lang) => lang.code === savedLangCode) || Languages[0];
-
-    if (foundLang) {
-      setCurrentLang(foundLang);
-      setLang(foundLang.code);
-    }
+    setMounted(true);
   }, []);
 
-  const handleSelectLanguage = (lang: Language) => {
-    if (lang.code !== currentCode) {
-      setCurrentLang(lang);
-      localStorage.setItem("lang", lang.code);
+  // Находим текущий язык или используем первый как fallback
+  const currentLangObj = getLanguage(lang);
+
+  const handleSelectLanguage = (langCode: KnownLanguageCode) => {
+    if (langCode !== lang) {
+      localStorage.setItem("lang", langCode);
+      setLang(langCode);
 
       if (onLanguageChange) {
-        onLanguageChange(lang.code);
+        onLanguageChange(langCode);
       }
-
-      window.location.reload();
     }
   };
 
+  // Во время SSR и до гидратации показываем плейсхолдер
+  if (!mounted) {
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          render={
+            <Button variant="link">
+              English <ArrowUpRightIcon />
+            </Button>
+          }
+        />
+        <DropdownMenuContent side="bottom">
+          <DropdownMenuGroup>
+            <DropdownMenuLabel>{t("nav.languages")}</DropdownMenuLabel>
+            {Languages.map((lang) => (
+              <DropdownMenuCheckboxItem key={lang.code} checked={lang.code === defaultLang}>
+                {lang.label}
+              </DropdownMenuCheckboxItem>
+            ))}
+          </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuGroup>
+            <Button variant="link">{t("nav.found_error")}</Button>
+          </DropdownMenuGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+  }
+
   return (
     <DropdownMenu>
-      {currentLang === null ? (
-        <div className="h-full w-full flex justify-center items-center">
-          <Spinner />
-        </div>
-      ) : (
-        <DropdownMenuTrigger render={<Button variant="link" />}>
-          {currentLang.label} <ArrowUpRightIcon />
-        </DropdownMenuTrigger>
-      )}
+      <DropdownMenuTrigger
+        render={
+          <Button variant="link">
+            {currentLangObj.label} <ArrowUpRightIcon />
+          </Button>
+        }
+      />
 
       <DropdownMenuContent side="bottom">
         <DropdownMenuGroup>
           <DropdownMenuLabel>{t("nav.languages")}</DropdownMenuLabel>
 
-          {Languages.map((lang) => (
+          {Languages.map((langItem) => (
             <DropdownMenuCheckboxItem
-              key={lang.code}
-              checked={currentLang?.code === lang.code}
-              onClick={() => handleSelectLanguage(lang)}
+              key={langItem.code}
+              checked={currentLangObj.code === langItem.code}
+              onClick={() => handleSelectLanguage(langItem.code)}
             >
-              {lang.label}
+              {langItem.label}
             </DropdownMenuCheckboxItem>
           ))}
         </DropdownMenuGroup>
@@ -90,7 +123,9 @@ export default function ChangeLanguage({ baseUrl = "", onLanguageChange }: Chang
         <DropdownMenuSeparator />
 
         <DropdownMenuGroup>
-          <Button variant="link">{t("nav.found_error")}</Button>
+          <Button variant="link" onClick={() => openUrl(config.GITHUB_URL + "/issues")}>
+            {t("nav.found_error")}
+          </Button>
         </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>

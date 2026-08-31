@@ -5,13 +5,12 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "paraglide-js compile --project ./project.inlang --outdir ./src\\paraglide && astro build",
+    "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
     "machine-translate": "inlang machine translate --project project.inlang"
   },
   "devDependencies": {
-    "@inlang/cli": "^3.0.0",
     "@tailwindcss/typography": "^0.5.20",
     "@tailwindcss/vite": "^4.3.3",
     "@types/bun": "latest",
@@ -47,6 +46,9 @@
     "prettier-plugin-astro": "^0.14.1",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
+    "remark-emoji": "^5.0.2",
+    "remark-gfm": "^4.0.1",
+    "remark-github-alerts": "^0.1.1",
     "shadcn": "^4.19.0",
     "sharp": "^0.35.4",
     "tailwind-merge": "^3.6.0",

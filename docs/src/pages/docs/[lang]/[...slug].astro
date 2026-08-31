@@ -1,0 +1,127 @@
+---
+import DocAuthorBadge from "@/components/Docs/DocAuthorBadge";
+import DocDateBadge from "@/components/Docs/DocDateBadge";
+import Layout from "@/layouts/Layout.astro";
+import { getCollection, render } from "astro:content";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("docs");
+
+  return posts.map((post) => {
+    const [lang, ...slugParts] = post.id.split("/");
+
+    return {
+      params: {
+        lang,
+        slug: slugParts.join("/") || undefined,
+      },
+      props: { post },
+    };
+  });
+}
+
+const { slug } = Astro.params;
+const posts = await getCollection("docs");
+const baseUrl = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+const languages = [
+  { lang: "ru", locale: "ru-RU", notFound: "Документ не доступен на русском языке." },
+  { lang: "en", locale: "en-US", notFound: "Document is not available in English." },
+];
+
+const docData = await Promise.all(
+  languages.map(async ({ lang, locale, notFound }) => {
+    const post = posts.find((p) => p.id === `${lang}/${slug}`);
+
+    const rendered = post ? await render(post) : null;
+    const Content = rendered ? rendered.Content : null;
+
+    const docs = posts.filter((p) => p.id.startsWith(`${lang}/`));
+
+    return { lang, post, Content, docs, locale, notFound };
+  }),
+);
+
+const sidebarLangs = docData.map(({ lang, docs }) => ({
+  lang,
+  items: docs.map((doc) => {
+    const docSlug = doc.id.replace(new RegExp(`^${lang}/`), "");
+    return {
+      title: doc.data.title,
+      href: `${baseUrl}/docs/${docSlug}`,
+      isActive: docSlug === slug,
+      priority: doc.data.priority || 0,
+    };
+  }),
+}));
+
+const { lang = "ru" } = Astro.params;
+
+const activePost = docData.find((d) => d.lang === lang)?.post || docData.find((d) => d.post)?.post;
+const { title, description, keywords, author } = activePost?.data || {};
+const pageTitle = title || "Документация — Cluster Banned Manager";
+---
+
+<Layout title={pageTitle} description={description} keywords={keywords} author={author} onlyImgNavbarLogo={true}>
+  <div class="container max-w-7xl mx-auto px-4 py-8">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      <!-- Сайдбар -->
+      <aside class="sidebar lg:col-span-1 border-b lg:border-b-0 lg:border-r border-white/10 pb-6 lg:pb-0 lg:pr-6">
+        <nav class="sticky top-20 space-y-6">
+          <h2 class="text-xs font-light text-white tracking-wider mb-3 px-3" data-t="common.docs"></h2>
+          {
+            sidebarLangs.map(({ lang, items }) => (
+              <ul data-sidebar-lang={lang} class="space-y-2" style="display: none;">
+                {[...items]
+                  .sort((a, b) => (b.priority || 0) - (a.priority || 0))
+                  .map(({ title, href, isActive }) => (
+                    <li>
+                      <a
+                        href={href}
+                        class={`block normal text-sm py-1.5 px-3 rounded-lg transition-colors ${isActive ? "active" : undefined}`}
+                      >
+                        {title}
+                      </a>
+                    </li>
+                  ))}
+              </ul>
+            ))
+          }
+        </nav>
+      </aside>
+
+      <!-- Основной контент -->
+      <main class="lg:col-span-3 min-w-0">
+        <article class="markdown-body bg-transparent! text-left">
+          {
+            docData.map(({ lang, post, Content, locale, notFound }) => (
+              <div data-doc-lang={lang} style="display: none;">
+                {post && Content ? (
+                  <>
+                    <header class="mb-8 pb-6 border-b border-white/10">
+                      <h1 class="text-3xl! font-bold! mb-3! border-none! pb-0! text-white">{post.data.title}</h1>
+                      {post.data.description && (
+                        <p class="text-gray-400 text-lg mb-4 leading-relaxed">{post.data.description}</p>
+                      )}
+                      <div class="inline-flex items-center gap-3">
+                        {post.data.date && <DocDateBadge client:load date={post.data.date} locale={locale} />}
+                        {post.data.author && (
+                          <DocAuthorBadge client:load author={post.data.author} author_url={post.data.author_link} />
+                        )}
+                      </div>
+                    </header>
+
+                    {/* class="prose prose-slate dark:prose-invert max-w-none" */}
+                    <article>{Content ? <Content /> : <p class="text-gray-400">{notFound}</p>}</article>
+                  </>
+                ) : (
+                  <p class="text-gray-400">{notFound}</p>
+                )}
+              </div>
+            ))
+          }
+        </article>
+      </main>
+    </div>
+  </div>
+</Layout>

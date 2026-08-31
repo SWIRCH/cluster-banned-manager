@@ -1,59 +1,74 @@
 ---
-import Layout from "../layouts/Layout.astro";
+import Layout from "@/layouts/Layout.astro";
 import { Image } from "astro:assets";
-
-import appPreviewWindows from "../assets/app-releases-interface-windows.png";
-import appPreviewAndroid from "../assets/app-releases-interface-android.png";
-import ClusterSearchAnimate from "../assets/ClusterSearchAnimate.svg";
-import VpnServiceAnimate from "../assets/VpnServiceAnimate.svg";
+import LogoImg from "@/assets/clusterbanned.png";
+import WrapperBgImg from "@/assets/wrapper-bg.png";
+import appPreviewWindows from "@/assets/app-releases-interface-windows.png";
+import appPreviewAndroid from "@/assets/AppAndroidPreview.png";
+import ClusterSearchAnimate from "@/assets/ClusterSearchAnimate.svg";
+import VpnServiceAnimate from "@/assets/VpnServiceAnimate.svg";
 import WrapperFooterTabs from "@/components/ui/wrapper/Footer";
 import AppPreviewSwitcher from "@/components/ui/wrapper/AppPreviewSwitcher";
 import PlatformDownloadButton from "@/components/ui/wrapper/PlatformDownloadButton";
-import { Ban, BroomSparkles, ChartArea, CloudBackup, Download, Earth, Gamepad } from "lucide-react";
+import { Ban, ChartArea, CloudBackup, Earth, Gamepad } from "lucide-react";
 import Android from "@/components/Icons/Android";
 import BlockMarker from "@/components/BlockMarker";
 import Quickstart from "@/components/Quickstart";
-
-const baseUrl = import.meta.env.BASE_URL;
 ---
 
 <Layout>
-  <div class="wrapper" style={`--bg-url: url('${baseUrl}/img/wrapper-bg.png')`}>
+  <div class="wrapper" style={`--bg-url: url('${WrapperBgImg.src}')`}>
     <div class="app-hero">
       <div class="app-hero__pin-wrapper">
-        <div class="app-hero__body pt-20">
-          <div class="container">
+        <div class="app-hero__body pt-12 md:pt-20">
+          <div class="container px-4 md:px-6">
             <div class="app-hero__body__text-content">
-              <div class="flex flex-col gap-2">
-                <img src={`${baseUrl}/img/clusterbanned.png`} width="90" alt="Cluster Banned Logo" />
-                <h1 class="app-title mt-3" data-t-dynamic="wrapper.title-raw">Cluster Banned Manager</h1>
-                <h3 class="text-muted" data-t="wrapper.subtitle">
+              <div class="flex flex-col gap-2 text-center md:text-left items-center md:items-start">
+                <img src={LogoImg.src} width="70" class="md:w-22.5" alt="Cluster Banned Logo" />
+                <h1 class="app-title mt-3 text-2xl md:text-4xl font-bold">Cluster Banned Manager</h1>
+                <h3 class="text-muted text-sm md:text-base max-w-xl" data-t="wrapper.subtitle">
                   Optimize your connection, choose the best servers, and control your gaming experience
                 </h3>
               </div>
 
-              <div class="mt-6 inline-flex items-center gap-3">
+              <div class="mt-6 flex justify-center md:justify-start items-center gap-3">
                 <PlatformDownloadButton client:load />
               </div>
             </div>
           </div>
 
-          <div class="app-hero__body__image">
+          <div class="app-hero__body__image px-4 mt-8 md:mt-0">
             <div data-platform="windows">
-              <Image src={appPreviewWindows} alt="Windows preview" class="app-preview" quality="max" format="webp" />
+              <Image
+                src={appPreviewWindows}
+                alt="Windows preview"
+                class="app-preview w-full mx-auto left-0"
+                quality="max"
+                format="webp"
+              />
             </div>
             <div data-platform="android">
-              <Image src={appPreviewAndroid} alt="Android preview" class="app-preview" quality="max" format="webp" />
+              <Image
+                src={appPreviewAndroid}
+                alt="Android preview"
+                class="app-preview mx-auto"
+                quality="high"
+                format="png"
+              />
+              <!-- <AppPreviewAndroidAnimate class="app-preview w-full max-w-9xl mx-auto left-0" /> -->
+              <!-- <AppPreviewAndroid class="app-preview w-full mx-auto left-0" /> -->
             </div>
             <!-- <div data-platform="ios">
               <Image src={appPreviewIOS} alt="iOS preview" class="app-preview" quality="max" format="webp" />
             </div> -->
           </div>
 
-          <AppPreviewSwitcher client:load />
+          <div class="mt-4 md:mt-0">
+            <AppPreviewSwitcher client:load />
+          </div>
         </div>
       </div>
-      <div class="app-hero__footer mt-15">
+      <div class="app-hero__footer mt-10 md:mt-15">
         <WrapperFooterTabs client:load />
       </div>
     </div>
@@ -70,50 +85,57 @@ const baseUrl = import.meta.env.BASE_URL;
             <ClusterSearchAnimate class="animate" />
             <h3>
               <ChartArea size={20} />
-              Мониторинг пинга
+              <span data-t="features.ping_monitoring">Мониторинг пинга</span>
             </h3>
-            <p>Реальная статистика задержек и потери пакетов для каждого сервера с историей измерений</p>
+            <p data-t="features.ping_monitoring.desc">
+              Реальная статистика задержек и потери пакетов для каждого сервера с историей измерений
+            </p>
           </div>
         </div>
         <div class="feature-column">
           <div class="feature-card">
             <h3>
               <Ban size={20} />
-              Блокировка кластеров
+              <span data-t="features.cluster_blocking">Блокировка кластеров</span>
             </h3>
-            <p>Блокировка нестабильных серверов через hosts файл и брандмауэр Windows</p>
+            <p data-t="features.cluster_blocking.desc">
+              Блокировка нестабильных серверов через hosts файл и брандмауэр Windows
+            </p>
           </div>
           <div class="feature-card">
             <h3>
               <Earth size={20} />
-              Все регионы
+              <span data-t="features.all_regions">Все регионы</span>
             </h3>
-            <p>Поддержка EU, RU, NA и ASIA регионов с детальной статистикой пинга</p>
+            <p data-t="features.all_regions.desc">Поддержка EU, RU, NA и ASIA регионов с детальной статистикой пинга</p>
           </div>
           <div class="feature-card">
             <h3>
               <CloudBackup size={20} />
-              Резервные копии
+              <span data-t="features.backups">Резервные копии</span>
             </h3>
-            <p>Автоматическое создание backup перед внесением изменений в hosts</p>
+            <p data-t="features.backups.desc">Автоматическое создание backup перед внесением изменений в hosts</p>
           </div>
         </div>
         <div class="feature-column">
           <div class="feature-card">
-            <!-- <img src={`${baseUrl}/img/VpnExampleAndroid.svg`} class="mb-3 relative left-4.75" /> -->
             <VpnServiceAnimate class="mb-3 animate" />
             <h3>
               <Android className="size-6" />
-              Android
+              <span data-t="features.android">Android</span>
             </h3>
-            <p>Блокировка кластеров через локальный VPN сервис без требования root прав</p>
+            <p data-t="features.android.desc">
+              Блокировка кластеров через локальный VPN сервис без требования root прав
+            </p>
           </div>
           <div class="feature-card max-h-30">
             <h3>
               <Gamepad size={20} />
-              Запуск игры
+              <span data-t="features.game_launch">Запуск игры</span>
             </h3>
-            <p>Быстрый запуск WoT Blitz через Steam или Google Play прямо из приложения</p>
+            <p data-t="features.game_launch.desc">
+              Быстрый запуск WoT Blitz через Steam или Google Play прямо из приложения
+            </p>
           </div>
         </div>
       </div>
@@ -128,8 +150,6 @@ const baseUrl = import.meta.env.BASE_URL;
         <Quickstart client:load />
       </div>
     </div>
-
-    <div class="pt-100"></div>
 
     <script>
       document.addEventListener("DOMContentLoaded", () => {
@@ -161,8 +181,6 @@ const baseUrl = import.meta.env.BASE_URL;
         observer.observe(featuresContainer);
       });
     </script>
-
-    <script src="../scripts/i18n-dom.ts"></script>
 
     <script>
       const HEADER_HEIGHT = 96;

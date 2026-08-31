@@ -1,4 +1,5 @@
 @use "variables" as *;
+@use "docs.scss";
 
 .google-sans-flex {
   font-family: "Google Sans Flex", sans-serif;
@@ -23,6 +24,30 @@ button {
 
 .bg-dark {
   background-color: #0b0e12;
+}
+
+.logo {
+  will-change: transform;
+}
+
+html:not([data-lang]) [data-doc-lang] {
+  display: none;
+}
+
+.footer {
+  margin-top: 10em;
+  background-color: #08090f33;
+  border-color: #3a3a3a44;
+
+  a {
+    text-decoration: none;
+  }
+}
+
+#mobile-menu {
+  a {
+    text-decoration: none;
+  }
 }
 
 body {
@@ -136,6 +161,22 @@ a {
           transform: translate(calc(-50% + var(--img-offset-x, 30%)), var(--img-offset-y, 0px));
           will-change: transform;
         }
+
+        svg {
+          position: absolute;
+          max-height: 706px;
+          left: 50%;
+          top: 0;
+          z-index: 10;
+          transform: translate(calc(-50% + var(--img-offset-x, 30%)), var(--img-offset-y, 0px));
+          will-change: transform;
+
+          #AppAndroidPreviewAnimate * {
+            animation-play-state: running !important;
+            animation-iteration-count: 1 !important;
+            animation-fill-mode: forwards !important;
+          }
+        }
       }
     }
 
@@ -170,6 +211,28 @@ a {
 
     .android-preview {
       position: relative;
+    }
+  }
+
+  @media (max-width: 699.99px) {
+    .app-hero {
+      &__body {
+        &__text-content {
+          margin-top: 6em;
+        }
+
+        &__image {
+          [data-platform] {
+            img {
+              display: none;
+            }
+          }
+        }
+      }
+
+      &__footer {
+        display: none !important;
+      }
     }
   }
 

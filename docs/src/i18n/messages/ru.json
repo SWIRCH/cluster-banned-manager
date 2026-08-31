@@ -4,9 +4,18 @@
   "common.download": "Скачать",
   "common.downloadFor": "Скачать для",
 
+  "platform.not_available": "Платформа недоступна",
+  "platform.dev_work": "Мы ведём разработку под данную платформу",
+
   "nav.languages": "Языки",
   "nav.found_error": "Нашли ошибку?",
   "nav.features": "Возможности",
+
+  "footer.description": "Оптимизируйте соединение, выбирайте лучшие серверы, контролируйте игровой опыт",
+  "footer.nav.homepage": "Главная",
+  "footer.nav.docs": "Документация",
+  "footer.nav.github_repo": "Github репозиторий",
+  "footer.endorsed_sponsored": "Этот проект не связан с компаниями Wargaming или Lesta Gaming, не поддерживается и не спонсируется ими. Все названия игр, логотипы и товарные знаки являются собственностью их соответствующих владельцев.",
 
   "wrapper.footer.title": "Мы позаботились о ваших устройствах:",
   "wrapper.footer.subtitle": "У нас есть пособия как использовать клиент",
@@ -17,6 +26,24 @@
 
   "marker.quickstart": "Быстрый старт",
   "marker.quickstart.subtitle": "Быстрый старт и руководство по использованию",
+
+  "features.ping_monitoring": "Мониторинг пинга",
+  "features.ping_monitoring.desc": "Реальная статистика задержек и потери пакетов для каждого сервера с историей измерений",
+
+  "features.cluster_blocking": "Блокировка кластеров",
+  "features.cluster_blocking.desc": "Блокировка нестабильных серверов через hosts файл и брандмауэр Windows",
+
+  "features.all_regions": "Все регионы",
+  "features.all_regions.desc": "Поддержка EU, RU, NA и ASIA регионов с детальной статистикой пинга",
+
+  "features.backups": "Резервные копии",
+  "features.backups.desc": "Автоматическое создание backup перед внесением изменений в hosts",
+
+  "features.android": "Android",
+  "features.android.desc": "Блокировка кластеров через локальный VPN сервис без требования root прав",
+
+  "features.game_launch": "Запуск игры",
+  "features.game_launch.desc": "Быстрый запуск WoT Blitz через Steam или Google Play прямо из приложения",
 
   "quickstart.windows.step1.title": "Скачайте и установите приложение",
   "quickstart.windows.step1.description": "Скачайте установщик из раздела releases на github и запустите его. Следуйте инструкциям установщика.",

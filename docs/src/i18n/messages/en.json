@@ -4,15 +4,46 @@
   "common.download": "Download",
   "common.downloadFor": "Download for",
 
+  "platform.not_available": "Platform not available",
+  "platform.dev_work": "We are developing for this platform.",
+
   "nav.languages": "Languages",
   "nav.found_error": "Found an error?",
   "nav.features": "Features",
 
+  "footer.description": "Optimize your connection, choose the best servers, and control your gaming experience",
+  "footer.nav.homepage": "Homepage",
+  "footer.nav.docs": "Docs",
+  "footer.nav.github_repo": "Github Repository",
+  "footer.endorsed_sponsored": "This project is not affiliated with, endorsed, or sponsored by Wargaming or Lesta Gaming. All game titles, logos and trademarks are property of their respective owners.",
+
   "wrapper.footer.title": "We've got your devices covered:",
   "wrapper.footer.subtitle": "We have guides on how to use the client",
   "wrapper.subtitle": "Optimize your connection, choose the best servers, and control your gaming experience",
+
   "marker.features": "App Features",
   "marker.features.subtitle": "Everything you need for the best gaming experience",
+
+  "marker.quickstart": "Quick Start",
+  "marker.quickstart.subtitle": "Quick Start and User Guide",
+
+  "features.ping_monitoring": "Ping Monitoring",
+  "features.ping_monitoring.desc": "Real-time latency and packet loss statistics for each server with measurement history",
+
+  "features.cluster_blocking": "Cluster Blocking",
+  "features.cluster_blocking.desc": "Block unstable servers via hosts file and Windows Firewall",
+
+  "features.all_regions": "All Regions",
+  "features.all_regions.desc": "Support for EU, RU, NA, and ASIA regions with detailed ping statistics",
+
+  "features.backups": "Backups",
+  "features.backups.desc": "Automatic backup creation before modifying the hosts file",
+
+  "features.android": "Android",
+  "features.android.desc": "Block clusters via a local VPN service without requiring root permissions",
+
+  "features.game_launch": "Game Launch",
+  "features.game_launch.desc": "Quickly launch WoT Blitz via Steam or Google Play directly from the app",
 
   "quickstart.windows.step1.title": "Download and install the app",
   "quickstart.windows.step1.description": "Download the installer from the GitHub releases section and run it. Follow the setup wizard instructions.",

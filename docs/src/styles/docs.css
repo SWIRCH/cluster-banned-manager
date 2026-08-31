@@ -1,8 +1,0 @@
-@import "github-markdown-css/github-markdown-dark.css";
-
-.markdown-body hr {
-  background: rgba(0, 0, 0, 0);
-  border-bottom: 1px solid #ffffff10;
-  height: 1px;
-  background-color: #ffffff10;
-}

@@ -1,11 +1,14 @@
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence, type Variants } from "framer-motion";
-import { Badge } from "../ui/badge";
+import LogoImg from "@/assets/clusterbanned.png";
 import { getGitHubLastRelease } from "@/lib/github";
-import { Spinner } from "../ui/spinner";
+import { config } from "@/utils/config";
+import { openUrl } from "@/utils/openUrl";
+import { AnimatePresence, motion, type Variants } from "framer-motion";
+import { useEffect, useState } from "react";
+import { Badge } from "../ui/badge";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "../ui/hover-card";
+import { Spinner } from "../ui/spinner";
 
-export default function Logo({ baseUrl = "/" }) {
+export default function Logo({ baseUrl = config.BASE_URL, onlyImg = false }) {
   const [isHeroTextVisible, setIsHeroTextVisible] = useState(true);
   const [lastVersion, setLastVersion] = useState<string | null>(null);
   const [versionName, setVersionName] = useState<string | null>(null);
@@ -22,7 +25,10 @@ export default function Logo({ baseUrl = "/" }) {
           setIsHeroTextVisible(entry.isIntersecting);
         }
       },
-      { threshold: 0.1 },
+      {
+        threshold: 0.1,
+        rootMargin: "50px 0px",
+      },
     );
 
     observer.observe(targetElement);
@@ -77,21 +83,22 @@ export default function Logo({ baseUrl = "/" }) {
 
   return (
     <div className="flex shrink-0 items-center gap-3">
-      <motion.a layout href={baseUrl} className="inline-flex items-center gap-2">
+      {/* Заменили motion.a на motion.div */}
+      <motion.div className="logo inline-flex items-center gap-2">
         <motion.div
-          layout
           className="relative flex items-center justify-center"
           transition={{ type: "spring", stiffness: 300, damping: 28 }}
         >
           <AnimatePresence mode="wait" initial={false}>
-            {isHeroTextVisible ? (
+            {isHeroTextVisible && !onlyImg ? (
               <motion.div
                 key="badge"
                 variants={switchVariants}
                 initial="initial"
                 animate="animate"
                 exit="exit"
-                className="aura text-cyan-600 inline-flex items-center"
+                className="aura text-cyan-600 inline-flex items-center cursor-pointer"
+                onClick={() => openUrl(`${config.GITHUB_URL}`)}
               >
                 <HoverCard>
                   <HoverCardTrigger delay={100} closeDelay={200}>
@@ -101,25 +108,21 @@ export default function Logo({ baseUrl = "/" }) {
                 </HoverCard>
               </motion.div>
             ) : (
-              <motion.div
+              <motion.a
                 key="logo"
+                href={baseUrl}
                 variants={switchVariants}
                 initial="initial"
                 animate="animate"
                 exit="exit"
                 className="inline-flex items-center"
               >
-                <img
-                  src="/cluster-banned-manager/img/clusterbanned.png"
-                  width="30"
-                  height="30"
-                  alt="Cluster Banned Logo"
-                />
-              </motion.div>
+                <img src={LogoImg.src} width="30" height="30" alt="Cluster Banned Logo" />
+              </motion.a>
             )}
           </AnimatePresence>
         </motion.div>
-      </motion.a>
+      </motion.div>
     </div>
   );
 }

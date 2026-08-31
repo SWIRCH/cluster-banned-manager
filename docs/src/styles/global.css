@@ -2,7 +2,6 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/inter";
-@import "./docs";
 /* @plugin "daisyui"; */
 @plugin "@tailwindcss/typography";
 
@@ -22,21 +21,104 @@ body {
   @apply text-white/20;
 }
 
-[data-t],
-[data-t-dynamic] {
-  opacity: 0;
-  transition: opacity 0.2s ease-in-out;
+#page-preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0b0e12;
+  transition:
+    opacity 0.35s ease,
+    visibility 0.35s ease;
 }
 
-/* Класс, который мы добавим, когда язык определен */
-.lang-loaded [data-t],
-.lang-loaded [data-t-dynamic] {
-  opacity: 1;
+#page-preloader .page-preloader__mark {
+  position: relative;
+  width: 88px;
+  height: 88px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#page-preloader .page-preloader__mark::after {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  border: 2px solid rgb(236 249 255 / 0.12);
+  border-top-color: #ecf9ff;
+  animation: page-preloader-spin 0.7s linear infinite;
+}
+
+#page-preloader img {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+}
+
+@keyframes page-preloader-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+html.lang-loaded #page-preloader {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
 }
 
 /* .tranp-button {
   @apply rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-white/5 hover:text-white;
 } */
+
+/* Красивые кастомные алерты для Markdown */
+.markdown-alert {
+  @apply my-6 rounded-xl border-l-4 p-4 text-sm backdrop-blur-xs transition-all;
+}
+
+.markdown-alert-title {
+  @apply mb-2 flex items-center gap-2 font-bold uppercase tracking-wider text-xs;
+}
+
+/* Настройки неоновых цветов для каждого типа алерта */
+.markdown-alert-note {
+  @apply border-sky-500 bg-sky-500/10 text-sky-200;
+  & .markdown-alert-title {
+    @apply text-sky-400;
+  }
+}
+
+.markdown-alert-tip {
+  @apply border-emerald-500 bg-emerald-500/10 text-emerald-200;
+  & .markdown-alert-title {
+    @apply text-emerald-400;
+  }
+}
+
+.markdown-alert-important {
+  @apply border-purple-500 bg-purple-500/10 text-purple-200;
+  & .markdown-alert-title {
+    @apply text-purple-400;
+  }
+}
+
+.markdown-alert-warning {
+  @apply border-amber-500 bg-amber-500/10 text-amber-200;
+  & .markdown-alert-title {
+    @apply text-amber-400;
+  }
+}
+
+.markdown-alert-caution {
+  @apply border-rose-500 bg-rose-500/10 text-rose-200;
+  & .markdown-alert-title {
+    @apply text-rose-400;
+  }
+}
 
 @theme inline {
   --font-heading: var(--font-sans);

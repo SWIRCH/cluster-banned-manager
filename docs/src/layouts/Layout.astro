@@ -1,14 +1,19 @@
 ---
+import { TooltipProvider } from "@/components/ui/tooltip";
 import Navbar from "../components/Navbar/Navbar.js";
 import TopBanner from "../components/TopBanner";
 import "../styles/global.css";
 import "../styles/styles.scss";
+import Footer from "@/components/Footer";
+import LogoImg from "@/assets/clusterbanned.png";
 
 interface Props {
   title?: string;
   description?: string;
   keywords?: string;
+  author?: string;
   image?: string;
+  onlyImgNavbarLogo?: boolean;
 }
 
 const baseUrl = import.meta.env.BASE_URL;
@@ -17,14 +22,16 @@ const {
   title = "Cluster Banned Manager — WoT Blitz & Android",
   description = "Cluster Banned Manager для World of Tanks Blitz и Tanks Blitz. Оптимизация пинга, выбор сервера, блокировка хостов. Доступно для Windows и Android.",
   keywords = "cluster, banned, wot, lesta, android, apk, wargaming, eu, asia, tanks blitz, WoT Blitz, сервер, менеджер, пинг, оптимизация, hosts, firewall, Windows, скачать",
-  image = `${baseUrl}/img/clusterbanned.png`,
+  author = "swirch",
+  image = `${LogoImg.src}`,
+  onlyImgNavbarLogo = false,
 } = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site || "https://swirch.github.io/cluster-banned-manager/");
 ---
 
 <!doctype html>
-<html lang="ru">
+<html lang="ru" class="lenis lenis-scrolling lenis-smooth">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -32,6 +39,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || "https://swirch.g
     <title>{title}</title>
     <meta name="description" content={description} />
     <meta name="keywords" content={keywords} />
+    {author && <meta name="author" content={author} />}
     <link rel="canonical" href={canonicalURL} />
 
     <!-- Open Graph / Facebook -->
@@ -62,12 +70,114 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || "https://swirch.g
         try {
           const STORAGE_KEY = "lang";
           const saved = localStorage.getItem(STORAGE_KEY);
-          // Если язык есть в storage - применяем его, иначе оставляем по умолчанию (например 'ru')
           const lang = saved || "ru";
           document.documentElement.setAttribute("data-lang", lang);
         } catch (e) {}
       })();
     </script>
+    <!-- Google Tag Manager -->
+    <script is:inline>
+      (function (w, d, s, l, i) {
+        w[l] = w[l] || [];
+        w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
+        var f = d.getElementsByTagName(s)[0],
+          j = d.createElement(s),
+          dl = l != "dataLayer" ? "&l=" + l : "";
+        j.async = true;
+        j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
+        f.parentNode.insertBefore(j, f);
+      })(window, document, "script", "dataLayer", "GTM-NRFKZZQZ");
+    </script>
+    <!-- End Google Tag Manager -->
+
+    <!-- Yandex.Metrika counter -->
+    <script type="text/javascript">
+      (function (m, e, t, r, i, k, a) {
+        m[i] =
+          m[i] ||
+          function () {
+            (m[i].a = m[i].a || []).push(arguments);
+          };
+        m[i].l = 1 * new Date();
+        for (var j = 0; j < document.scripts.length; j++) {
+          if (document.scripts[j].src === r) {
+            return;
+          }
+        }
+        ((k = e.createElement(t)),
+          (a = e.getElementsByTagName(t)[0]),
+          (k.async = 1),
+          (k.src = r),
+          a.parentNode.insertBefore(k, a));
+      })(window, document, "script", "https://mc.yandex.ru/metrika/tag.js?id=112098070", "ym");
+
+      ym(112098070, "init", {
+        ssr: true,
+        webvisor: true,
+        clickmap: true,
+        ecommerce: "dataLayer",
+        referrer: document.referrer,
+        url: location.href,
+        accurateTrackBounce: true,
+        trackLinks: true,
+      });
+    </script>
+    <noscript>
+      <div>
+        <img src="https://mc.yandex.ru/watch/112098070" style="position:absolute; left:-9999px;" alt="" />
+      </div>
+    </noscript>
+    <!-- /Yandex.Metrika counter -->
+
+    <style is:inline>
+      html:not(.lang-loaded) {
+        overflow: hidden;
+      }
+      #page-preloader {
+        position: fixed;
+        inset: 0;
+        z-index: 99999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #0b0e12;
+        transition:
+          opacity 0.35s ease,
+          visibility 0.35s ease;
+      }
+      #page-preloader .page-preloader__mark {
+        position: relative;
+        width: 88px;
+        height: 88px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      #page-preloader .page-preloader__mark::after {
+        content: "";
+        position: absolute;
+        inset: -8px;
+        border-radius: 50%;
+        border: 2px solid rgb(236 249 255 / 0.12);
+        border-top-color: #ecf9ff;
+        animation: page-preloader-spin 0.7s linear infinite;
+      }
+      #page-preloader img {
+        width: 56px;
+        height: 56px;
+        object-fit: contain;
+      }
+      @keyframes page-preloader-spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      html.lang-loaded #page-preloader {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+      }
+    </style>
     <style is:global>
       html[data-lang="ru"] [data-doc-lang="en"],
       html[data-lang="ru"] [data-sidebar-lang="en"],
@@ -90,31 +200,113 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || "https://swirch.g
   </head>
 
   <body class="dark">
+    <!-- Google Tag Manager (noscript) -->
+    <noscript
+      ><iframe
+        src="https://www.googletagmanager.com/ns.html?id=GTM-NRFKZZQZ"
+        height="0"
+        width="0"
+        style="display:none;visibility:hidden"></iframe></noscript
+    >
+    <!-- End Google Tag Manager (noscript) -->
+
+    <div id="page-preloader" aria-busy="true" aria-live="polite">
+      <div class="page-preloader__mark">
+        <img src={LogoImg.src} alt="" width="56" height="56" />
+      </div>
+    </div>
+
     <!-- Top Banner -->
     <TopBanner client:load baseUrl={baseUrl} />
 
     <!-- Navbar -->
-    <Navbar client:load baseUrl={baseUrl} />
+    <Navbar client:load baseUrl={baseUrl} onlyImg={onlyImgNavbarLogo} />
 
     <!-- Content Slot -->
     <main>
       <slot />
     </main>
+
+    <Footer client:load />
+    <script src="../scripts/i18n-dom.ts"></script>
   </body>
-
-  <script>
-    import Lenis from "lenis";
-
-    const lenis = new Lenis({
-      duration: 0.4,
-      easing: (t: number) => 1 - Math.pow(1 - t, 3),
-      smoothWheel: true,
-    });
-
-    function raf(time: number) {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
-    }
-    requestAnimationFrame(raf);
-  </script>
 </html>
+
+<script is:inline>
+  const savedLang = localStorage.getItem("lang") || "ru";
+  document.documentElement.setAttribute("data-lang", savedLang);
+</script>
+
+<script is:inline>
+  function updateMetaTags(lang) {
+    const activeBlock =
+      document.querySelector(`[data-lang-block="${lang}"]`) || document.querySelector(`[data-doc-lang="${lang}"]`);
+    if (!activeBlock) return;
+
+    const desc = activeBlock.getAttribute("data-description");
+    const keywords = activeBlock.getAttribute("data-keywords");
+
+    if (desc) {
+      const metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc) metaDesc.setAttribute("content", desc);
+    }
+    if (keywords) {
+      const metaKeywords = document.querySelector('meta[name="keywords"]');
+      if (metaKeywords) metaKeywords.setAttribute("content", keywords);
+    }
+  }
+
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.attributeName === "data-lang") {
+        const currentLang = document.documentElement.getAttribute("data-lang");
+        updateMetaTags(currentLang);
+      }
+    });
+  });
+
+  observer.observe(document.documentElement, { attributes: true });
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const currentLang = document.documentElement.getAttribute("data-lang") || "ru";
+    updateMetaTags(currentLang);
+  });
+</script>
+
+<script>
+  import Lenis from "lenis";
+
+  if (typeof window !== "undefined") {
+    window.history.scrollRestoration = "manual";
+  }
+
+  const lenis = new Lenis({
+    duration: 1.2,
+    smoothWheel: true,
+    wheelMultiplier: 1,
+  });
+
+  lenis.raf(performance.now());
+
+  function raf(time: number) {
+    lenis.raf(time);
+    requestAnimationFrame(raf);
+  }
+  requestAnimationFrame(raf);
+</script>
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Cluster Banned Manager",
+    "description": "Менеджер для оптимизации пинга и выбора сервера в WoT Blitz",
+    "applicationCategory": "GameApplication",
+    "operatingSystem": "Windows, Android",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    }
+  }
+</script>

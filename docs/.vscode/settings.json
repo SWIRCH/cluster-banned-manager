@@ -18,5 +18,5 @@
   "[astro]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "cSpell.words": ["clusterbanned", "imgs", "lerp", "nanostores", "svgs", "пинга", "пингом"]
+  "cSpell.words": ["clusterbanned", "imgs", "lerp", "nanostores", "noopener", "satteri", "svgs", "пинга", "пингом"]
 }

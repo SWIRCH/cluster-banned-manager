@@ -1,5 +1,6 @@
 import { useTranslation, type Translations } from "@/hooks/useTranslation";
 import { activePlatform } from "@/stores/platform";
+import { config } from "@/utils/config";
 import { useStore } from "@nanostores/react";
 import { Download } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
@@ -24,7 +25,10 @@ export default function Quickstart() {
       </Tabs>
 
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-white/10 text-sm">
-        <a href="#" className="text-gray-400 hover:text-white inline-flex items-center gap-1.5 transition-colors">
+        <a
+          href={config.DOCS_URL}
+          className="text-gray-400 hover:text-white inline-flex items-center gap-1.5 transition-colors"
+        >
           {t("quickstart.need_help")}
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path

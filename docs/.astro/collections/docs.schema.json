@@ -8,11 +8,27 @@
     "description": {
       "type": "string"
     },
+    "date": {
+      "type": "string"
+    },
+    "keywords": {
+      "type": "string"
+    },
+    "author": {
+      "type": "string"
+    },
+    "author_link": {
+      "type": "string"
+    },
+    "priority": {
+      "type": "number"
+    },
     "$schema": {
       "type": "string"
     }
   },
   "required": [
-    "title"
+    "title",
+    "date"
   ]
 }
