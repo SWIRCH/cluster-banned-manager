@@ -1,0 +1,14 @@
+{
+	"pid": 20136,
+	"port": 4321,
+	"url": "http://localhost:4321",
+	"urls": {
+		"local": [
+			"http://localhost:4321/cluster-banned-manager"
+		],
+		"network": [],
+		"networkInterfaceNames": []
+	},
+	"background": false,
+	"startedAt": "2026-08-31T20:53:05.337Z"
+}
