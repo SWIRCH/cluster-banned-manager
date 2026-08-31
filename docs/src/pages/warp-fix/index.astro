@@ -1,0 +1,17 @@
+---
+const baseUrl = import.meta.env.BASE_URL.replace(/\/$/, "");
+---
+
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Redirecting...</title>
+    <script is:inline define:vars={{ baseUrl }}>
+      window.location.replace(`${baseUrl}/docs/warp-fix`);
+    </script>
+  </head>
+  <body class="bg-[#101015] text-white flex items-center justify-center h-screen">
+    <p class="text-gray-400 text-sm">Loading documentation...</p>
+  </body>
+</html>
