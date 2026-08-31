@@ -10,21 +10,20 @@
 ![React](https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black)
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
 ![Windows](https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white)
+![Android](https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white)
 
-**Management of connections to World of Tanks Blitz game servers. <br> By hard-blocking connections to clusters at the firewall level.**
+**Manage connections to World of Tanks Blitz and Tanks Blitz game servers.<br> Block unwanted clusters at the network level for Windows and Android.**
 
 </div>
 
 > [!TIP]
-> The program supports two blocking modes: **basic** (via hosts file) and **advanced** (via Windows Firewall).
+> **Platform Features:**
 >
-> 1. Basic mode works with **any system settings**.
-> 2. Advanced level (Windows Firewall) automatically activates if the **firewall is enabled**. It creates special rules for **hard blocking** at the network level.
->
-> Recommendation: Ensure that **Windows Firewall is enabled** to utilize both protection levels.
+> 1. **Windows**: Supports blocking via the system `hosts` file and **Windows Firewall** rules (requires administrator privileges).
+> 2. **Android**: Uses an architectural approach based on **VpnService / Local Firewall**, blocking connections to unwanted server IP addresses on the fly without requiring Root access.
 
 > [!IMPORTANT]
-> If you are experiencing ping issues or high packet loss, please read the article [WARP FIX](https://swirch.github.io/cluster-banned-manager/warp-fix/)
+> If you experience high ping or packet loss, check out the [WARP FIX guide](https://swirch.github.io/cluster-banned-manager/docs/en/warp-fix/).
 
 ## 🌎 Translations
 
@@ -36,76 +35,83 @@
 - [🌟 Features](#features)
 - [🎮 Supported Regions](#supported-regions)
 - [⚙️ Usage](#usage)
-- [🛠 Technologies](#technologies)
-- [🚀 Project Support](#project-support)
-- [⚖️ Licensing](#licensing)
+- [🛠 Tech Stack](#tech-stack)
+- [🚀 Support the Project](#support-the-project)
+- [⚖️ License](#license)
 
 ## Features
 
-### 🎯 Core Functions
+### 🎯 Key Functions
 
-- **Smart Server Blocking** - selective disabling of unwanted game clusters
-- **Dual Protection** - combined blocking via hosts file and Windows Firewall
-- **Automatic Synchronization** - maintaining consistency between settings and actual system state
-- **Backup System** - creating backups of hosts file with configurable number of stored versions
-- **Ping Monitoring** - checking latency to servers for optimal connection selection
+- **Smart Server Blocking** — Selectively disable unwanted game clusters.
+- **Cross-Platform** — Full support for **Windows 10/11** and **Android** (APK).
+- **Dual Protection (Windows)** — Combined blocking via the `hosts` file and Windows Firewall.
+- **Local VPN Firewall (Android)** — Efficient traffic filtering without Root access.
+- **Ping Monitoring** — Real-time ping checks to all servers.
+- **Automatic Sync** — Keeps server block states in sync upon app restart.
 
-### 🛡 Blocking Levels
+### 🛡 Blocking Mechanisms
 
-1. **Hosts File** - traditional domain redirection method
-2. **Windows Firewall** - network-level blocking by IP addresses (more reliable)
-3. **Combined Mode** - simultaneous application of both methods
+1. **Windows**: Windows Firewall (IP-level) + Hosts file (domain-level).
+2. **Android**: System `VpnService` interface to intercept and filter target IP packets.
 
 ### 🎨 Interface
 
 ![ClasterBanned](/public/app_interface_1.png)
 
-- **Intuitive UI** - modern interface with animation support
-- **Multi-regional Support** - support for all WoT Blitz game regions
-- **Themes & Wallpapers** - random wallpapers of game events
-- **Real-time Status** - monitoring of blocking status and network latency
+- **Adaptive UI** — Modern unified interface for both PC and mobile devices.
+- **Multi-Region Support** — Covers all WoT Blitz (EU, NA, APAC) and Tanks Blitz (RU/Lesta) servers.
+- **Real-time Status** — Visual indicators for active subsystems and server statuses.
 
 ## Supported Regions
 
-|                                                                                         | Region            | Servers   | Location                             | IP Addresses                      |
-| --------------------------------------------------------------------------------------- | ----------------- | --------- | ------------------------------------ | --------------------------------- |
-| <img src="https://github.com/lipis/flag-icons/blob/main/flags/4x3/eu.svg" width="32" /> | **Europe**        | 5 servers | Amsterdam, Frankfurt, Warsaw, Almaty | [IP List](/src/data/servers.json) |
-| <img src="https://github.com/lipis/flag-icons/blob/main/flags/4x3/ru.svg" width="32"/>  | **Russia**        | 6 servers | Moscow, Krasnoyarsk, Yekaterinburg   | [IP List](/src/data/servers.json) |
-| <img src="https://github.com/lipis/flag-icons/blob/main/flags/4x3/jp.svg" width="32" /> | **Asia**          | 3 servers | Singapore, Tokyo                     | [IP List](/src/data/servers.json) |
-| <img src="https://github.com/lipis/flag-icons/blob/main/flags/4x3/us.svg" width="32" /> | **North America** | 3 servers | Chicago, Virginia, California        | [IP List](/src/data/servers.json) |
+|                                                                                         | Region               | Servers   | Location                              | IP Addresses                        |
+| --------------------------------------------------------------------------------------- | -------------------- | --------- | ------------------------------------- | ----------------------------------- |
+| <img src="https://github.com/lipis/flag-icons/blob/main/flags/4x3/eu.svg" width="32" /> | **Europe**           | 5 servers | Amsterdam, Frankfurt, Warsaw, Almaty  | [IP List](/src/data/servers.json)   |
+| <img src="https://github.com/lipis/flag-icons/blob/main/flags/4x3/ru.svg" width="32"/>  | **Russia (Lesta)**   | 6 servers | Moscow, Krasnoyarsk, Yekaterinburg    | [IP List](/src/data/servers.json)   |
+| <img src="https://github.com/lipis/flag-icons/blob/main/flags/4x3/jp.svg" width="32" /> | **Asia**             | 3 servers | Singapore, Tokyo                      | [IP List](/src/data/servers.json)   |
+| <img src="https://github.com/lipis/flag-icons/blob/main/flags/4x3/us.svg" width="32" /> | **North America**    | 3 servers | Chicago, Virginia, California         | [IP List](/src/data/servers.json)   |
 
 ## Usage
 
-1. Download the installer from the [latest release page](https://github.com/SWIRCH/cluster-banned-manager/releases)
-2. Go through the application installation process
-3. Run the application as administrator to access system files
-4. Select a game region in the left menu
-5. Configure the desired servers for blocking
-> [!IMPORTANT]
-> A white indicator in the server list means it is enabled and available for connection.
+### 💻 Windows
+1. Download the `.exe` or `.msi` installer from the [latest release page](https://github.com/SWIRCH/cluster-banned-manager/releases).
+2. Install and launch the application as Administrator.
+3. Select your game region and block unwanted servers.
 
-## Building the Application Yourself
+### 📱 Android
+1. Download the `.apk` file from the [latest release page](https://github.com/SWIRCH/cluster-banned-manager/releases).
+2. Allow installation from unknown sources when prompted by the system.
+3. Open the app, select the servers to block, and grant permission to set up a local VPN connection (required for firewall operation).
+
+> [!IMPORTANT]
+> A white indicator next to a server in the list means it is enabled and available for connection.
+
+## Building from Source
 
 Requirements:
 
-1. **Windows 10/11** (64-bit)
-2. **Node.js** 18+ and **bun**
-3. **Rust** and **Cargo**
-4. **Visual Studio Build Tools** (for Windows)
+1. **Node.js** 18+ and **bun**
+2. **Rust** and **Cargo**
+3. **Android SDK / NDK** *(only required for building the Android APK)*
+4. **Visual Studio Build Tools** *(for Windows)*
 
 ```bash
-# Clone repository
-git clone https://github.com/SWIRCH/cluster-banned-manager.git
+# Clone the repository
+git clone [https://github.com/SWIRCH/cluster-banned-manager.git](https://github.com/SWIRCH/cluster-banned-manager.git)
 cd cluster-banned-manager
 
 # Install dependencies
 bun install
 
-# Run in development mode
+# Run in development mode (Desktop)
 bun tauri dev
 
-# Build release version
+# Build release version for Windows
 bun tauri build
+
+# Build release version for Android (APK)
+bun tauri android build
 ```
 
 ## Technologies
