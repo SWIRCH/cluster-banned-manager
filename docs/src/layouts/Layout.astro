@@ -1,5 +1,4 @@
 ---
-import { TooltipProvider } from "@/components/ui/tooltip";
 import Navbar from "../components/Navbar/Navbar.js";
 import TopBanner from "../components/TopBanner";
 import "../styles/global.css";
@@ -27,7 +26,9 @@ const {
   onlyImgNavbarLogo = false,
 } = Astro.props;
 
-const canonicalURL = new URL(Astro.url.pathname, Astro.site || "https://swirch.github.io/cluster-banned-manager/");
+const siteUrl = Astro.site?.origin || "https://swirch.github.io";
+const cleanPathname = Astro.url.pathname.replace(/^\/docs/, '');
+const canonicalURL = new URL(cleanPathname, siteUrl);
 ---
 
 <!doctype html>
@@ -36,6 +37,12 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || "https://swirch.g
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="google-site-verification" content="i8IEBQf3N9tIo243C1ipdwOuZW4HelUk2fYLlF1tV28" />
+    
+    <!-- Robots & Sitemap -->
+    <meta name="robots" content="index, follow" />
+    <meta name="googlebot" content="index, follow" />
+    <link rel="sitemap" type="application/xml" href={`${baseUrl}/sitemap.xml`} />
+
     <title>{title}</title>
     <meta name="description" content={description} />
     <meta name="keywords" content={keywords} />
@@ -85,7 +92,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || "https://swirch.g
           dl = l != "dataLayer" ? "&l=" + l : "";
         j.async = true;
         j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
-        f.parentNode.insertBefore(j, f);
+        f.parentNode.insertBefore(k, a);
       })(window, document, "script", "dataLayer", "GTM-NRFKZZQZ");
     </script>
     <!-- End Google Tag Manager -->
@@ -217,7 +224,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || "https://swirch.g
     </div>
 
     <!-- Top Banner -->
-    <TopBanner client:load baseUrl={baseUrl} />
+    <TopBanner client:load />
 
     <!-- Navbar -->
     <Navbar client:load baseUrl={baseUrl} onlyImg={onlyImgNavbarLogo} />
@@ -274,7 +281,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || "https://swirch.g
 </script>
 
 <script>
-  import Lenis from "lenis";
+  import Lenis from "lenis"
 
   if (typeof window !== "undefined") {
     window.history.scrollRestoration = "manual";

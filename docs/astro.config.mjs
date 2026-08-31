@@ -1,11 +1,11 @@
-import { unified } from "@astrojs/markdown-remark";
-import mdx from "@astrojs/mdx";
-import react from "@astrojs/react";
-import tailwindcss from "@tailwindcss/vite";
-import { defineConfig } from "astro/config";
-import path from "path";
-import remarkEmoji from "remark-emoji";
-import remarkGithubAlerts from "remark-github-alerts";
+import { unified } from "@astrojs/markdown-remark"
+import mdx from "@astrojs/mdx"
+import react from "@astrojs/react"
+import tailwindcss from "@tailwindcss/vite"
+import { defineConfig } from "astro/config"
+import path from "path"
+import remarkEmoji from "remark-emoji"
+import remarkGithubAlerts from "remark-github-alerts"
 
 const unifiedProcessor = unified({
   syntaxHighlight: "prism",
@@ -15,7 +15,7 @@ const unifiedProcessor = unified({
 
 export default defineConfig({
   integrations: [react(), mdx()],
-  site: "https://github.io",
+  site: "https://swirch.github.io",
   base: "/cluster-banned-manager",
 
   markdown: {
