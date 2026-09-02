@@ -8,12 +8,12 @@ import {
 import { useAppStore } from "@/store/useAppStore"
 import type { Cluster, Game } from "@/types/cluster"
 import type { Selections } from "@/types/selections"
+import type { AppSettings } from "@/types/app-settings"
 import {
   allGameClusters,
   collectBlockedDomains,
   collectBlockedIps,
 } from "@/utils/blocking"
-import type { AppSettings } from "@/utils/settingsStorage"
 import { useState } from "react"
 
 export function useHostsActions(
@@ -130,14 +130,21 @@ export function useHostsActions(
       }
     }
 
+    if (domains.length === 0 && clusters.length > 0) {
+      const regionMap = selections[selectedRegionId] ?? {};
+      const allServersUnchecked = clusters.every(
+        (cluster) => regionMap[cluster.domain] === false,
+      );
+      if (allServersUnchecked) {
+        domains = clusters.map((cluster) => cluster.domain);
+      }
+    }
+
     if (domains.length === 0) {
       try {
-        const allBlocked: any = await safeInvoke("read_blocked_domains");
-        const blockedSet = new Set(
-          (allBlocked || []).map((s: string) => s.toLowerCase()),
-        );
+        const persistedRegion = settings.clusterSelections?.[selectedRegionId] ?? {};
         const toRemove = clusters
-          .filter((c) => blockedSet.has(c.domain.toLowerCase()))
+          .filter((c) => persistedRegion[c.domain] === false)
           .map((c) => c.domain);
         if (toRemove.length === 0) {
           return {
@@ -162,28 +169,51 @@ export function useHostsActions(
 
     try {
       setLoading(true);
+      const persistedRegion = settings.clusterSelections?.[selectedRegionId] ?? {};
+      const currentRegionBlocked = clusters
+        .filter((cluster) => persistedRegion[cluster.domain] === false)
+        .map((cluster) => cluster.domain);
       let updateRes: any;
       let firewallRes: any = null;
 
       // Настройки теперь читаются из файла в Rust-коде, но передаем для явности
       updateRes = isRemoval
         ? await safeInvoke("update_hosts_block", {
-            blocked_domains: domains,
+            blockedDomains: domains,
             remove: true,
             region: selectedRegionId,
           })
         : await safeInvoke("update_hosts_block", {
-            blocked_domains: domains,
+            blockedDomains: domains,
             region: selectedRegionId,
           });
 
       if (settings.useFirewall) {
         try {
-          firewallRes = await updateFirewallRules(
-            selectedRegionId,
-            domains,
-            !isRemoval,
+          const desiredBlocked = isRemoval ? [] : domains;
+          const desiredSet = new Set(
+            desiredBlocked.map((domain) => domain.toLowerCase()),
           );
+          const domainsToRemove = currentRegionBlocked.filter(
+            (domain) => !desiredSet.has(domain.toLowerCase()),
+          );
+          const messages: string[] = [];
+
+          if (domainsToRemove.length > 0) {
+            messages.push(
+              await updateFirewallRules(
+                selectedRegionId,
+                domainsToRemove,
+                false,
+              ),
+            );
+          }
+          if (desiredBlocked.length > 0) {
+            messages.push(
+              await updateFirewallRules(selectedRegionId, desiredBlocked, true),
+            );
+          }
+          firewallRes = messages.join("\n");
         } catch (firewallError) {
           console.error("Firewall update failed:", firewallError);
           firewallRes = `Предупреждение: не удалось обновить брандмауэр: ${firewallError}`;

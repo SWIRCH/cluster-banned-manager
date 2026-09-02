@@ -1,34 +1,47 @@
 import type { Game } from "@/types/cluster"
 import type { Selections } from "@/types/selections"
-import {
-  clearSelections,
-  loadSelections,
-  saveSelections,
-} from "@/utils/selectionStorage"
+import type { AppSettings } from "@/types/app-settings"
 import { useEffect, useState } from "react"
 
-export function useSelections(game: Game) {
+function createDefaultSelections(game: Game): Selections {
+  return Object.fromEntries(
+    game.regions.map((region) => [
+      region.id,
+      Object.fromEntries(
+        (region.clusters ?? []).map((cluster) => [cluster.domain, true]),
+      ),
+    ]),
+  );
+}
+
+function normalizeSelections(game: Game, stored?: Selections): Selections {
+  return Object.fromEntries(
+    game.regions.map((region) => [
+      region.id,
+      Object.fromEntries(
+        (region.clusters ?? []).map((cluster) => [
+          cluster.domain,
+          stored?.[region.id]?.[cluster.domain] ?? true,
+        ]),
+      ),
+    ]),
+  );
+}
+
+export function useSelections(
+  game: Game,
+  settings: AppSettings,
+  updateSettings: (settings: Partial<AppSettings>) => Promise<void>,
+  settingsLoading: boolean,
+) {
   const [selections, setSelections] = useState<Selections>({});
 
   useEffect(() => {
-    loadSelections().then(async (s) => {
-      const initial = s || {};
-      if (Object.keys(initial).length === 0) {
-        // First run — default all clusters to enabled (true)
-        const defaults: Selections = {};
-        for (const region of game.regions) {
-          defaults[region.id] = Object.fromEntries(
-            (region.clusters ?? []).map((c) => [c.domain, true]),
-          );
-        }
-        await saveSelections(defaults);
-        setSelections(defaults);
-      } else {
-        setSelections(initial);
-      }
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    if (settingsLoading) return;
+
+    const next = normalizeSelections(game, settings.clusterSelections);
+    setSelections(next);
+  }, [game, settings.clusterSelections, settingsLoading, updateSettings]);
 
   const updateSelection = (
     regionId: string,
@@ -39,10 +52,9 @@ export function useSelections(game: Game) {
       const prevRegion = prev[regionId] ?? {};
       const newRegion = { ...prevRegion, [domain]: checked };
       const next = { ...prev, [regionId]: newRegion };
-      saveSelections(next);
       return next;
     });
-  };
+  }
 
   const selectCluster = (regionId: string, domain: string, clusters: any[]) => {
     setSelections((prev) => {
@@ -50,21 +62,18 @@ export function useSelections(game: Game) {
         clusters.map((c) => [c.domain, c.domain === domain]),
       );
       const next = { ...prev, [regionId]: newRegion };
-      saveSelections(next);
       return next;
     });
-  };
+  }
 
   const clearAllSelections = async () => {
-    await clearSelections();
-    const defaults: Selections = {};
-    for (const region of game.regions) {
-      defaults[region.id] = Object.fromEntries(
-        (region.clusters ?? []).map((c) => [c.domain, true]),
-      );
-    }
+    const defaults = createDefaultSelections(game);
     setSelections(defaults);
-    await saveSelections(defaults);
+    return defaults;
+  };
+
+  const persistSelections = async (next: Selections) => {
+    await updateSettings({ clusterSelections: next });
   };
 
   return {
@@ -73,5 +82,6 @@ export function useSelections(game: Game) {
     updateSelection,
     selectCluster,
     clearAllSelections,
+    persistSelections,
   };
 }

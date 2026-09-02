@@ -53,7 +53,6 @@ export default function ClusterList({
 
 					return (
 						<motion.div
-							layout
 							key={c.domain}
 							custom={index}
 							variants={cardVariants}

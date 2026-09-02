@@ -86,7 +86,7 @@ fn check_hosts_consistency(selections: serde_json::Value) -> Result<serde_json::
 }
 
 #[tauri::command]
-fn update_hosts_block(blocked_domains: Vec<String>) -> Result<(), String> {
+fn update_hosts_block(blocked_domains: Vec<String>, remove: Option<bool>) -> Result<(), String> {
     // try to find an accessible hosts path and write the block
     let paths = ["C:\\Windows\\System32\\drivers\\etc\\hosts", "/etc/hosts"];
 
@@ -101,18 +101,20 @@ fn update_hosts_block(blocked_domains: Vec<String>) -> Result<(), String> {
             .map_err(|e| e.to_string())?;
             content = re.replace_all(&content, "").to_string();
 
-            // append new block
-            let mut block = String::new();
-            block.push_str(START_MARKER);
-            block.push('\n');
-            for d in &blocked_domains {
-                block.push_str(&format!("0.0.0.0 {}\n", d));
+            if !remove.unwrap_or(false) {
+                // append new block
+                let mut block = String::new();
+                block.push_str(START_MARKER);
+                block.push('\n');
+                for d in &blocked_domains {
+                    block.push_str(&format!("0.0.0.0 {}\n", d));
+                }
+                block.push_str(END_MARKER);
+                if !content.ends_with('\n') {
+                    content.push('\n');
+                }
+                content.push_str(&block);
             }
-            block.push_str(END_MARKER);
-            if !content.ends_with('\n') {
-                content.push('\n');
-            }
-            content.push_str(&block);
             // try write
             if std::fs::write(p, content).is_ok() {
                 return Ok(());
@@ -120,6 +122,67 @@ fn update_hosts_block(blocked_domains: Vec<String>) -> Result<(), String> {
         }
     }
     Err("failed to write hosts (permission or file missing)".into())
+}
+
+#[tauri::command]
+async fn update_cluster_rules(
+    _region_id: String,
+    blocked_domains: Vec<String>,
+    enable: bool,
+    use_hosts: bool,
+    use_firewall: bool,
+) -> Result<serde_json::Value, String> {
+    let hosts = if use_hosts {
+        update_hosts_block(blocked_domains, Some(!enable))
+            .map(|_| "Updated".to_string())
+            .map_err(|error| format!("Error: {error}"))?
+    } else {
+        "Skipped".to_string()
+    };
+
+    Ok(json!({
+        "success": true,
+        "hosts": hosts,
+        "firewall": if use_firewall { "Unsupported on mobile" } else { "Skipped" }
+    }))
+}
+
+fn settings_path() -> Result<std::path::PathBuf, String> {
+    let home =
+        std::env::var("HOME").map_err(|_| "HOME environment variable not found".to_string())?;
+    Ok(std::path::PathBuf::from(home)
+        .join(".config")
+        .join("clusterbanned")
+        .join("settings.json"))
+}
+
+#[tauri::command]
+fn get_settings() -> Result<serde_json::Value, String> {
+    let path = settings_path()?;
+    if !path.exists() {
+        return Ok(json!({
+            "useFirewall": true,
+            "useBackup": false,
+            "backupCount": 5
+        }));
+    }
+
+    let content = std::fs::read_to_string(path)
+        .map_err(|error| format!("Failed to read settings file: {error}"))?;
+    serde_json::from_str(&content)
+        .map_err(|error| format!("Failed to parse settings JSON: {error}"))
+}
+
+#[tauri::command]
+fn save_settings(settings: serde_json::Value) -> Result<(), String> {
+    let path = settings_path()?;
+    if let Some(parent) = path.parent() {
+        std::fs::create_dir_all(parent)
+            .map_err(|error| format!("Failed to create settings directory: {error}"))?;
+    }
+    let content = serde_json::to_string_pretty(&settings)
+        .map_err(|error| format!("Failed to serialize settings: {error}"))?;
+    std::fs::write(path, content).map_err(|error| format!("Failed to write settings file: {error}"))
 }
 
 #[tauri::command]
@@ -340,7 +403,10 @@ pub fn run() {
             ping_server,
             read_blocked_domains,
             check_hosts_consistency,
-            update_hosts_block
+            update_hosts_block,
+            update_cluster_rules,
+            get_settings,
+            save_settings
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

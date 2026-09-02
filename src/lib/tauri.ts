@@ -30,9 +30,6 @@ export async function safeInvoke<T = any>(
   return getMockResponse<T>(cmd, args);
 }
 
-// Псевдоним для совместимости
-export const directInvoke = safeInvoke;
-
 export type VpnState =
   | "off"
   | "starting"
@@ -87,7 +84,6 @@ function getMockResponse<T>(cmd: string, _args?: Record<string, any>): T {
     case "get_firewall_rules":
       return [] as T;
     case "update_firewall_rules":
-    case "update_cluster_rules":
     case "clear_firewall_rules":
     case "launch_game":
     case "kill_process":
@@ -146,26 +142,6 @@ export async function updateFirewallRules(
     blockedDomains,
     enable,
   });
-}
-
-export async function updateClusterRules(
-  regionId: string,
-  blockedDomains: string[],
-  enable: boolean,
-  useHosts: boolean,
-  useFirewall: boolean,
-) {
-  return safeInvoke("update_cluster_rules", {
-    region_id: regionId,
-    blocked_domains: blockedDomains,
-    enable,
-    use_hosts: useHosts,
-    use_firewall: useFirewall,
-  });
-}
-
-export async function getFirewallRules() {
-  return safeInvoke("get_firewall_rules");
 }
 
 export async function clearFirewallRules() {

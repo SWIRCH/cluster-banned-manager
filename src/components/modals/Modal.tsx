@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
 import { AnimatePresence, motion } from 'framer-motion'
-import React, { ReactElement } from 'react'
+import React from 'react'
 
 export type ModalSizeType =
 	| 'sm'
@@ -43,6 +43,7 @@ export type ModalProps = {
 	visibleHeader?: boolean
 	children: React.ReactNode
 	size?: ModalSizeType
+	maxWidthClass?: string
 	zIndex?: string
 	footer?: React.ReactNode
 	classNames?: {
@@ -66,6 +67,7 @@ export default function Modal({
 	visibleHeader = true,
 	footer,
 	size = '2xl',
+	maxWidthClass,
 	zIndex = 'z-50',
 	classNames
 }: ModalProps) {
@@ -85,6 +87,7 @@ export default function Modal({
 					autoFocus={false}
 					className={cn(
 						sizeClasses[size],
+						maxWidthClass,
 						zIndex,
 						classNames?.main,
 						'max-h-[500px] overflow-hidden'

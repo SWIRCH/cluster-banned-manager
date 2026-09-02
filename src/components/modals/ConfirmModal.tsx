@@ -103,6 +103,7 @@ export default function ConfirmModal({
 					}`}
 					onClick={() => {
 						if (isBlockingAll) {
+							onClose()
 							onBlockingAllConfirm()
 						} else {
 							onConfirm()

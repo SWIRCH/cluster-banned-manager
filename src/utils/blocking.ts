@@ -17,9 +17,6 @@ export function collectBlockedDomains(
           : true;
       if (!enabled) {
         domains.add(cluster.domain);
-        console.log(
-          `[blocking] Blocked domain: ${cluster.domain} from region ${region.id}`,
-        );
       }
     }
   }

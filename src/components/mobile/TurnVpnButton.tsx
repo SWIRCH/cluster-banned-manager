@@ -1,6 +1,7 @@
 import { useAppStore } from "@/store/useAppStore"
 import { AnimatePresence, motion } from "framer-motion"
 import { AlertCircle, Power, Save } from "lucide-react"
+import { useTranslation } from "react-i18next"
 
 export type VpnStatus = "On" | "Off" | "Loading" | "NeedsApply" | "Error";
 
@@ -12,25 +13,28 @@ type TurnVpnButtonProps = {
   onUpdateClick?: () => Promise<void> | void;
 };
 
-const STATUS_CONFIG: Record<VpnStatus, { label: string; className: string }> = {
+const STATUS_CONFIG: Record<
+  VpnStatus,
+  { labelKey: "vpn.off" | "vpn.needs_apply" | "vpn.loading" | "vpn.on" | "vpn.error"; className: string }
+> = {
   Off: {
-    label: "Блокировка выключена",
+    labelKey: "vpn.off",
     className: "text-zinc-400",
   },
   NeedsApply: {
-    label: "Нажмите для применения изменений",
+    labelKey: "vpn.needs_apply",
     className: "text-amber-400 font-medium animate-pulse",
   },
   Loading: {
-    label: "Подключение...",
+    labelKey: "vpn.loading",
     className: "text-blue-400 animate-pulse",
   },
   On: {
-    label: "Блокировка включена",
+    labelKey: "vpn.on",
     className: "text-emerald-400",
   },
   Error: {
-    label: "Ошибка подключения",
+    labelKey: "vpn.error",
     className: "text-rose-500 font-medium",
   },
 };
@@ -42,6 +46,7 @@ export default function TurnVpnButton({
   onToggle,
   onUpdateClick,
 }: TurnVpnButtonProps) {
+  const { t } = useTranslation();
   const { vpnStatus, setVpnStatus } = useAppStore();
   const baseStatus = propStatus ?? vpnStatus ?? "Off";
   const currentStatus = hostsMismatch ? "NeedsApply" : baseStatus;
@@ -158,7 +163,7 @@ export default function TurnVpnButton({
             >
               {currentStatus === "Error" && errorMessage
                 ? errorMessage
-                : statusInfo.label}
+                : t(statusInfo.labelKey)}
             </motion.span>
           </AnimatePresence>
         </div>

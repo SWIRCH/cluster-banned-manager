@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Modal from "./Modal";
 import { X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 type ErrorModalProps = {
   open: boolean;
@@ -20,6 +21,7 @@ export default function ErrorModal({
   onRetry,
 }: ErrorModalProps) {
   const [showDetails, setShowDetails] = useState(false);
+  const { t } = useTranslation();
 
   return (
     <Modal
@@ -45,7 +47,7 @@ export default function ErrorModal({
               className="text-sm text-white/50 hover:text-white/80 transition-colors"
               onClick={() => setShowDetails(!showDetails)}
             >
-              {showDetails ? "Скрыть детали" : "Показать детали"}
+              {showDetails ? t("errors.hide_details") : t("errors.show_details")}
             </button>
             {showDetails && (
               <pre className="mt-2 p-3 bg-black/30 rounded text-xs text-white/60 overflow-auto max-h-48 font-mono max-w-full">
@@ -60,7 +62,7 @@ export default function ErrorModal({
             className="btn bg-white/10 px-4 py-2 rounded hover:bg-white/20 transition-colors"
             onClick={onClose}
           >
-            Закрыть
+            {t("buttons.close")}
           </button>
           {onRetry && (
             <button
@@ -70,7 +72,7 @@ export default function ErrorModal({
                 onRetry();
               }}
             >
-              Повторить
+              {t("buttons.retry")}
             </button>
           )}
         </div>
