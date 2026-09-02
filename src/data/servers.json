@@ -1,194 +1,216 @@
 {
-  "appId": 444200,
-  "alias_name": "wot_blitz",
-  "name": "World of Tanks Blitz",
-  "icon": "/Games/444200/mini.png",
-  "posters": [
-    "/Games/444200/posters/0.jpg",
-    "/Games/444200/posters/1.jpg",
-    "/Games/444200/posters/2.jpg",
-    "/Games/444200/posters/3.jpg",
-    "/Games/444200/posters/4.jpg"
-  ],
-  "regions": [
-    {
-      "id": "tanks_blitz",
-      "name": "Tanks Blitz",
-      "alias_name": "RU",
-      "icon": "/Games/444200/356.png",
-      "flag_icon": "/Flags/ru.svg",
-      "clusters": [
-        {
-          "id": "C0",
-          "domain": "login0.tanksblitz.ru",
-          "location": "Мосрентген (Москва)",
-          "ips": [
-            "92.223.6.76",
-            "92.223.6.73",
-            "92.223.6.71",
-            "92.223.6.74",
-            "92.223.6.72",
-            "92.223.6.75"
-          ]
-        },
-        {
-          "id": "C1",
-          "domain": "login1.tanksblitz.ru",
-          "location": "Долгопрудный (Москва)",
-          "ips": [
-            "92.223.33.223",
-            "92.223.33.239",
-            "92.223.33.240",
-            "92.223.33.238",
-            "92.223.33.222"
-          ]
-        },
-        {
-          "id": "C2",
-          "domain": "login2.tanksblitz.ru",
-          "location": "Красноярск",
-          "ips": [
-            "92.223.14.214",
-            "92.223.14.216",
-            "92.223.14.222",
-            "92.223.14.223"
-          ]
-        },
-        {
-          "id": "C3",
-          "domain": "login3.tanksblitz.ru",
-          "location": "Екатеринбург",
-          "ips": [
-            "92.38.156.189",
-            "92.38.156.13",
-            "92.38.156.142",
-            "92.38.156.93"
-          ]
-        },
-        {
-          "id": "C4",
-          "domain": "login4.tanksblitz.ru",
-          "location": "Мосрентген (Москва)",
-          "ips": [""]
-        },
-        {
-          "id": "C5",
-          "domain": "login5.tanksblitz.ru",
-          "location": "Москва",
-          "ips": [""]
-        }
-      ]
-    },
-    {
-      "id": "wot_eu",
-      "name": "Европа",
-      "alias_name": "EU",
-      "icon": "/Games/444200/276.png",
-      "flag_icon": "/Flags/eu.svg",
-      "clusters": [
-        {
-          "id": "C0",
-          "domain": "login0.wotblitz.eu",
-          "location": "Амстердам (Нидерланды)",
-          "ips": [
-            "92.223.31.130",
-            "92.223.31.132",
-            "92.223.31.12",
-            "92.223.31.138",
-            "92.223.31.131",
-            "92.223.31.140",
-            "92.223.31.134"
-          ]
-        },
-        {
-          "id": "C1",
-          "domain": "login1.wotblitz.eu",
-          "location": "Амстердам (Нидерланды)",
-          "ips": [
-            "63.179.84.77",
-            "52.29.25.170",
-            "18.153.122.187",
-            "35.157.169.188"
-          ]
-        },
-        {
-          "id": "C2",
-          "domain": "login2.wotblitz.eu",
-          "location": "Франкфурт-на-Майне (Германия)",
-          "ips": [""]
-        },
-        {
-          "id": "C3",
-          "domain": "login3.wotblitz.eu",
-          "location": "Варшава (Польша)",
-          "ips": [
-            "94.156.45.25",
-            "94.156.45.176",
-            "94.156.45.138",
-            "94.156.45.237"
-          ]
-        },
-        {
-          "id": "C4",
-          "domain": "login4.wotblitz.eu",
-          "location": "Алматы (Казахстан)",
-          "ips": ["83.229.15.235", "83.229.15.21", "83.229.15.195"]
-        }
-      ]
-    },
-    {
-      "id": "wot_asia",
-      "name": "Азия",
-      "alias_name": "ASIA",
-      "icon": "/Games/444200/276.png",
-      "flag_icon": "/Flags/jp.svg",
-      "clusters": [
-        {
-          "id": "C0",
-          "domain": "login0.wotblitz.asia",
-          "location": "Сингапур",
-          "ips": ["92.223.16.81", "92.223.16.59"]
-        },
-        {
-          "id": "C1",
-          "domain": "login1.wotblitz.asia",
-          "location": "Сингапур",
-          "ips": ["92.223.16.73", "92.223.16.30", "92.223.16.145"]
-        },
-        {
-          "id": "C2",
-          "domain": "login2.wotblitz.asia",
-          "location": "Токио (Япония)",
-          "ips": ["95.85.94.91", "95.85.94.170"]
-        }
-      ]
-    },
-    {
-      "id": "wot_na",
-      "name": "Северная Америка",
-      "alias_name": "NA",
-      "icon": "/Games/444200/276.png",
-      "flag_icon": "/Flags/us.svg",
-      "clusters": [
-        {
-          "id": "C0",
-          "domain": "login0.wotblitz.com",
-          "location": "Чикаго, Иллинойс (США)",
-          "ips": ["92.223.57.35", "92.223.57.86"]
-        },
-        {
-          "id": "C1",
-          "domain": "login1.wotblitz.com",
-          "location": "Манассас, Вирджиния (США)",
-          "ips": [""]
-        },
-        {
-          "id": "C2",
-          "domain": "login2.wotblitz.com",
-          "location": "Санта Клара, Калифорния (США)",
-          "ips": ["92.223.45.10", "92.223.45.13"]
-        }
-      ]
-    }
-  ]
+	"appId": 444200,
+	"alias_name": "wot_blitz",
+	"name": "World of Tanks Blitz",
+	"name_key": "games.wot_blitz.name",
+	"icon": "/Games/444200/mini.png",
+	"posters": [
+		"/Games/444200/posters/0.jpg",
+		"/Games/444200/posters/1.jpg",
+		"/Games/444200/posters/2.jpg",
+		"/Games/444200/posters/3.jpg",
+		"/Games/444200/posters/4.jpg"
+	],
+	"regions": [
+		{
+			"id": "tanks_blitz",
+			"name": "Tanks Blitz",
+			"name_key": "regions.russian",
+			"alias_name": "RU",
+			"icon": "/Games/444200/356.png",
+			"flag_icon": "/Flags/ru.svg",
+			"clusters": [
+				{
+					"id": "C0",
+					"domain": "login0.tanksblitz.ru",
+					"location": "Мосрентген (Москва)",
+					"location_key": "locations.mosrentgen_moscow",
+					"ips": [
+						"92.223.6.76",
+						"92.223.6.73",
+						"92.223.6.71",
+						"92.223.6.74",
+						"92.223.6.72",
+						"92.223.6.75"
+					]
+				},
+				{
+					"id": "C1",
+					"domain": "login1.tanksblitz.ru",
+					"location": "Долгопрудный (Москва)",
+					"location_key": "locations.dolgoprudny_moscow",
+					"ips": [
+						"92.223.33.223",
+						"92.223.33.239",
+						"92.223.33.240",
+						"92.223.33.238",
+						"92.223.33.222"
+					]
+				},
+				{
+					"id": "C2",
+					"domain": "login2.tanksblitz.ru",
+					"location": "Красноярск",
+					"location_key": "locations.krasnoyarsk",
+					"ips": [
+						"92.223.14.214",
+						"92.223.14.216",
+						"92.223.14.222",
+						"92.223.14.223"
+					]
+				},
+				{
+					"id": "C3",
+					"domain": "login3.tanksblitz.ru",
+					"location": "Екатеринбург",
+					"location_key": "locations.yekaterinburg",
+					"ips": [
+						"92.38.156.189",
+						"92.38.156.13",
+						"92.38.156.142",
+						"92.38.156.93"
+					]
+				},
+				{
+					"id": "C4",
+					"domain": "login4.tanksblitz.ru",
+					"location": "Мосрентген (Москва)",
+					"location_key": "locations.mosrentgen_moscow",
+					"ips": [""]
+				},
+				{
+					"id": "C5",
+					"domain": "login5.tanksblitz.ru",
+					"location": "Москва",
+					"location_key": "locations.moscow",
+					"ips": [""]
+				}
+			]
+		},
+		{
+			"id": "wot_eu",
+			"name": "Европа",
+			"name_key": "regions.europe",
+			"alias_name": "EU",
+			"icon": "/Games/444200/276.png",
+			"flag_icon": "/Flags/eu.svg",
+			"clusters": [
+				{
+					"id": "C0",
+					"domain": "login0.wotblitz.eu",
+					"location": "Амстердам (Нидерланды)",
+					"location_key": "locations.amsterdam_netherlands",
+					"ips": [
+						"92.223.31.130",
+						"92.223.31.132",
+						"92.223.31.12",
+						"92.223.31.138",
+						"92.223.31.131",
+						"92.223.31.140",
+						"92.223.31.134"
+					]
+				},
+				{
+					"id": "C1",
+					"domain": "login1.wotblitz.eu",
+					"location": "Амстердам (Нидерланды)",
+					"location_key": "locations.amsterdam_netherlands",
+					"ips": [
+						"63.179.84.77",
+						"52.29.25.170",
+						"18.153.122.187",
+						"35.157.169.188"
+					]
+				},
+				{
+					"id": "C2",
+					"domain": "login2.wotblitz.eu",
+					"location": "Франкфурт-на-Майне (Германия)",
+					"location_key": "locations.frankfurt_germany",
+					"ips": [""]
+				},
+				{
+					"id": "C3",
+					"domain": "login3.wotblitz.eu",
+					"location": "Варшава (Польша)",
+					"location_key": "locations.warsaw_poland",
+					"ips": [
+						"94.156.45.25",
+						"94.156.45.176",
+						"94.156.45.138",
+						"94.156.45.237"
+					]
+				},
+				{
+					"id": "C4",
+					"domain": "login4.wotblitz.eu",
+					"location": "Алматы (Казахстан)",
+					"location_key": "locations.almaty_kazakhstan",
+					"ips": ["83.229.15.235", "83.229.15.21", "83.229.15.195"]
+				}
+			]
+		},
+		{
+			"id": "wot_asia",
+			"name": "Азия",
+			"name_key": "regions.asia",
+			"alias_name": "ASIA",
+			"icon": "/Games/444200/276.png",
+			"flag_icon": "/Flags/jp.svg",
+			"clusters": [
+				{
+					"id": "C0",
+					"domain": "login0.wotblitz.asia",
+					"location": "Сингапур",
+					"location_key": "locations.singapore",
+					"ips": ["92.223.16.81", "92.223.16.59"]
+				},
+				{
+					"id": "C1",
+					"domain": "login1.wotblitz.asia",
+					"location": "Сингапур",
+					"location_key": "locations.singapore",
+					"ips": ["92.223.16.73", "92.223.16.30", "92.223.16.145"]
+				},
+				{
+					"id": "C2",
+					"domain": "login2.wotblitz.asia",
+					"location": "Токио (Япония)",
+					"location_key": "locations.tokyo_japan",
+					"ips": ["95.85.94.91", "95.85.94.170"]
+				}
+			]
+		},
+		{
+			"id": "wot_na",
+			"name": "Северная Америка",
+			"name_key": "regions.north_america",
+			"alias_name": "NA",
+			"icon": "/Games/444200/276.png",
+			"flag_icon": "/Flags/us.svg",
+			"clusters": [
+				{
+					"id": "C0",
+					"domain": "login0.wotblitz.com",
+					"location": "Чикаго, Иллинойс (США)",
+					"location_key": "locations.chicago_usa",
+					"ips": ["92.223.57.35", "92.223.57.86"]
+				},
+				{
+					"id": "C1",
+					"domain": "login1.wotblitz.com",
+					"location": "Манассас, Вирджиния (США)",
+					"location_key": "locations.manassas_usa",
+					"ips": [""]
+				},
+				{
+					"id": "C2",
+					"domain": "login2.wotblitz.com",
+					"location": "Санта Клара, Калифорния (США)",
+					"location_key": "locations.santaclara_usa",
+					"ips": ["92.223.45.10", "92.223.45.13"]
+				}
+			]
+		}
+	]
 }

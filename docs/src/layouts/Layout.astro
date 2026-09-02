@@ -1,10 +1,12 @@
 ---
-import Navbar from "../components/Navbar/Navbar.js";
-import TopBanner from "../components/TopBanner";
-import "../styles/global.css";
-import "../styles/styles.scss";
+import Navbar from "@/components/Navbar/Navbar.js";
+import TopBanner from "@/components/TopBanner";
 import Footer from "@/components/Footer";
 import LogoImg from "@/assets/clusterbanned.png";
+import Analytics from "@vercel/analytics/astro";
+import SpeedInsights from "@vercel/speed-insights/astro";
+import "@/styles/global.css";
+import "@/styles/styles.scss";
 
 interface Props {
   title?: string;
@@ -41,7 +43,7 @@ const canonicalURL = new URL(cleanPathname, siteUrl);
     <!-- Robots & Sitemap -->
     <meta name="robots" content="index, follow" />
     <meta name="googlebot" content="index, follow" />
-    <link rel="sitemap" type="application/xml" href={`${baseUrl}/sitemap.xml`} />
+    <link rel="sitemap" type="application/xml" href={`${baseUrl}sitemap-index.xml`} />
 
     <title>{title}</title>
     <meta name="description" content={description} />
@@ -64,7 +66,7 @@ const canonicalURL = new URL(cleanPathname, siteUrl);
     <meta property="twitter:image" content={image} />
 
     <!-- Favicon & Fonts -->
-    <link rel="icon" type="image/x-icon" href={`${baseUrl}/favicon.ico`} />
+    <link rel="icon" type="image/x-icon" href={`${baseUrl}favicon.ico`} />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -72,6 +74,10 @@ const canonicalURL = new URL(cleanPathname, siteUrl);
       href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&family=Onest:wght@100..900&display=swap"
       rel="stylesheet"
     />
+
+    <Analytics />
+    <SpeedInsights />
+
     <script is:inline>
       (function () {
         try {
@@ -85,6 +91,7 @@ const canonicalURL = new URL(cleanPathname, siteUrl);
 
     <!-- Google Tag Manager -->
     <script>
+      // @ts-nocheck
       (function (w, d, s, l, i) {
         w[l] = w[l] || [];
         w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });

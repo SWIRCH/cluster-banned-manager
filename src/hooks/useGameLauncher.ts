@@ -1,5 +1,5 @@
-import { launchGame } from "../lib/tauri";
-import type { Game } from "../types/cluster";
+import { launchGame } from "@/lib/tauri"
+import type { Game } from "@/types/cluster"
 
 interface ModalState {
   setTitle: (t: string) => void;

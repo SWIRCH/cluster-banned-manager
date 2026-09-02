@@ -1,6 +1,7 @@
-import clustersDataLocal from "../data/servers.json";
-import { showGlobalError } from "./globalError";
-import { config } from "../utils/config";
+import clustersDataLocal from "@/data/servers.json"
+import { config } from "@/utils/config"
+import { showGlobalError } from "./globalError"
+import { logger } from './logger'
 
 export const LOCAL_CLUSTERS = clustersDataLocal;
 
@@ -9,7 +10,7 @@ const GITHUB_URL =
 
 export async function loadClustersFromGitHub() {
   try {
-    if (config.DEBUG_MODE === true) return null;
+    if (config.DEBUG_MODE === true) return;
 
     const response = await fetch(GITHUB_URL);
 
@@ -21,13 +22,13 @@ export async function loadClustersFromGitHub() {
     return data;
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : String(error);
-    console.error("❌ GitHub load failed:", errorMsg);
+    logger.error("❌ GitHub load failed:", errorMsg);
 
     showGlobalError(
       "Ошибка загрузки данных",
       "Не удалось загрузить список серверов с GitHub. Используется локальная версия.",
       errorMsg,
-      () => window.location.reload(), // кнопка "Повторить"
+      () => window.location.reload(),
     );
 
     return null;
@@ -36,12 +37,12 @@ export async function loadClustersFromGitHub() {
 
 export async function loadClustersFromLocal() {
   try {
-    console.log("🔄 Загрузка локальных данных...");
+    logger.log("🔄 Загрузка локальных данных...");
     const module = await import("../data/servers.json");
-    console.log("✅ Локальные данные загружены");
+    logger.log("✅ Локальные данные загружены");
     return module.default;
   } catch (error) {
-    console.error("❌ Local load failed:", error);
+    logger.error("❌ Local load failed:", error);
     return LOCAL_CLUSTERS;
   }
 }

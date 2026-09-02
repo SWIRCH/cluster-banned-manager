@@ -1,20 +1,20 @@
-import { useState } from "react";
 import {
-  updateFirewallRules,
   clearFirewallRules,
   safeInvoke,
+  updateFirewallRules,
   vpnStart,
   vpnStop,
-} from "../lib/tauri";
-import { useAppStore } from "../store/useAppStore";
-import type { AppSettings } from "../utils/settingsStorage";
-import type { Cluster, Game } from "../types/cluster";
-import type { Selections } from "../types/selections";
+} from "@/lib/tauri"
+import { useAppStore } from "@/store/useAppStore"
+import type { Cluster, Game } from "@/types/cluster"
+import type { Selections } from "@/types/selections"
 import {
   allGameClusters,
   collectBlockedDomains,
   collectBlockedIps,
-} from "../utils/blocking";
+} from "@/utils/blocking"
+import type { AppSettings } from "@/utils/settingsStorage"
+import { useState } from "react"
 
 export function useHostsActions(
   selectedRegionId: string,

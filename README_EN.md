@@ -23,7 +23,7 @@
 > 2. **Android**: Uses an architectural approach based on **VpnService / Local Firewall**, blocking connections to unwanted server IP addresses on the fly without requiring Root access.
 
 > [!IMPORTANT]
-> If you experience high ping or packet loss, check out the [WARP FIX guide](https://swirch.github.io/cluster-banned-manager/docs/en/warp-fix/).
+> If you experience high ping or packet loss, check out the [WARP FIX guide](https://cbmwot.vercel.app/docs/en/warp-fix/).
 
 ## 🌎 Translations
 

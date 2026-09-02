@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import type { Game } from "../types/cluster";
+import type { Game } from "@/types/cluster"
+import { useEffect, useState } from "react"
 
 export function useGamePoster(game: Game | undefined) {
   const getDefaultPoster = (g?: Game) => {

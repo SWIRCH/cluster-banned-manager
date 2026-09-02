@@ -6,6 +6,8 @@ use vpn::vpn_prepare_policy;
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 fn main() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_clipboard_manager::init())
+        .plugin(tauri_plugin_os::init())
         .plugin(
             tauri_plugin_log::Builder::new()
                 .level(tauri_plugin_log::log::LevelFilter::Info)
@@ -299,7 +301,7 @@ async fn ping_server(
     use std::process::Command;
     use std::time::Instant;
 
-    println!("[TAURI] ping_server called for: {}", hostname);
+    // println!("[TAURI] ping_server called for: {}", hostname);
 
     let start = Instant::now();
     let timeout_sec = (timeout_ms.unwrap_or(600) as f64 / 1000.0).ceil() as u64;
@@ -419,7 +421,7 @@ fn parse_ping_time(output: &str) -> Option<u64> {
 // Команда 2: Проверка consistency hosts
 #[tauri::command]
 fn check_hosts_consistency(selections: serde_json::Value) -> Result<serde_json::Value, String> {
-    println!("[TAURI] check_hosts_consistency called");
+    // println!("[TAURI] check_hosts_consistency called");
 
     match read_hosts_file_text() {
         Ok(text) => {
@@ -456,7 +458,7 @@ fn check_hosts_consistency(selections: serde_json::Value) -> Result<serde_json::
 // Команда: Проверить, запущен ли процесс с правами записи в hosts (проверка привилегий)
 #[tauri::command]
 fn check_elevation() -> Result<serde_json::Value, String> {
-    println!("[TAURI] check_elevation called");
+    // println!("[TAURI] check_elevation called");
     let path = hosts_paths()
         .iter()
         .find(|p| std::path::Path::new(p).exists())
@@ -540,10 +542,10 @@ fn update_hosts_block(
         }
     }
 
-    println!(
-        "[TAURI] update_hosts_block called with: {:?} region: {:?}",
-        blocked_domains, region_str
-    );
+    // println!(
+    //     "[TAURI] update_hosts_block called with: {:?} region: {:?}",
+    //     blocked_domains, region_str
+    // );
 
     // Find a hosts file path we can read (prefer the first existing), or default to the Windows path
     let path = hosts_paths()
@@ -789,10 +791,10 @@ async fn update_firewall_rules(
     blocked_domains: Vec<String>,
     enable: bool, // true = блокировать, false = разблокировать
 ) -> Result<String, String> {
-    println!("[TAURI] update_firewall_rules CALLED");
-    println!("  region_id: '{}'", region_id);
-    println!("  blocked_domains: {:?}", blocked_domains);
-    println!("  enable: {}", enable);
+    // println!("[TAURI] update_firewall_rules CALLED");
+    // println!("  region_id: '{}'", region_id);
+    // println!("  blocked_domains: {:?}", blocked_domains);
+    // println!("  enable: {}", enable);
 
     // Если параметры пустые, вернем ошибку сразу
     if region_id.is_empty() {
@@ -804,10 +806,10 @@ async fn update_firewall_rules(
     {
         use serde_json::Value;
 
-        println!(
-            "[TAURI] update_firewall_rules called for region: {}, enable: {}",
-            region_id, enable
-        );
+        // println!(
+        //     "[TAURI] update_firewall_rules called for region: {}, enable: {}",
+        //     region_id, enable
+        // );
 
         // Получаем данные о кластерах из файла
         let clusters_data: Value = get_clusters_with_fallback().await;
@@ -1164,7 +1166,7 @@ fn launch_game(appid: String) -> Result<String, String> {
 // Check if a process with a name substring is running
 #[tauri::command]
 fn is_process_running(name: String) -> Result<bool, String> {
-    println!("[TAURI] is_process_running called for: {}", name);
+    // println!("[TAURI] is_process_running called for: {}", name);
     let mut sys = sysinfo::System::new_all();
     sys.refresh_processes();
     let needle = name.to_lowercase();

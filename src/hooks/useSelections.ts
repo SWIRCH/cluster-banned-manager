@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react";
+import type { Game } from "@/types/cluster"
+import type { Selections } from "@/types/selections"
 import {
+  clearSelections,
   loadSelections,
   saveSelections,
-  clearSelections,
-} from "../utils/selectionStorage";
-import type { Selections } from "../types/selections";
-import type { Game } from "../types/cluster";
+} from "@/utils/selectionStorage"
+import { useEffect, useState } from "react"
 
 export function useSelections(game: Game) {
   const [selections, setSelections] = useState<Selections>({});
