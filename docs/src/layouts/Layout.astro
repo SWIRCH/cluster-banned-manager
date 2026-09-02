@@ -26,8 +26,8 @@ const {
   onlyImgNavbarLogo = false,
 } = Astro.props;
 
-const siteUrl = Astro.site?.origin || "https://swirch.github.io";
-const cleanPathname = Astro.url.pathname.replace(/^\/docs/, '');
+const siteUrl = Astro.site?.origin || "https://cbmwot.vercel.app/";
+const cleanPathname = Astro.url.pathname.replace(/^\/docs/, "");
 const canonicalURL = new URL(cleanPathname, siteUrl);
 ---
 
@@ -37,7 +37,7 @@ const canonicalURL = new URL(cleanPathname, siteUrl);
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="google-site-verification" content="i8IEBQf3N9tIo243C1ipdwOuZW4HelUk2fYLlF1tV28" />
-    
+
     <!-- Robots & Sitemap -->
     <meta name="robots" content="index, follow" />
     <meta name="googlebot" content="index, follow" />
@@ -84,11 +84,17 @@ const canonicalURL = new URL(cleanPathname, siteUrl);
     </script>
 
     <!-- Google Tag Manager -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-5D999WBW');
+    <script>
+      (function (w, d, s, l, i) {
+        w[l] = w[l] || [];
+        w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
+        var f = d.getElementsByTagName(s)[0],
+          j = d.createElement(s),
+          dl = l != "dataLayer" ? "&l=" + l : "";
+        j.async = true;
+        j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
+        f.parentNode.insertBefore(j, f);
+      })(window, document, "script", "dataLayer", "GTM-5D999WBW");
     </script>
     <!-- End Google Tag Manager -->
 
@@ -203,8 +209,13 @@ const canonicalURL = new URL(cleanPathname, siteUrl);
 
   <body class="dark">
     <!-- Google Tag Manager (noscript) -->
-    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5D999WBW"
-    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <noscript
+      ><iframe
+        src="https://www.googletagmanager.com/ns.html?id=GTM-5D999WBW"
+        height="0"
+        width="0"
+        style="display:none;visibility:hidden"></iframe></noscript
+    >
     <!-- End Google Tag Manager (noscript) -->
 
     <div id="page-preloader" aria-busy="true" aria-live="polite">
@@ -271,7 +282,7 @@ const canonicalURL = new URL(cleanPathname, siteUrl);
 </script>
 
 <script>
-  import Lenis from "lenis"
+  import Lenis from "lenis";
 
   if (typeof window !== "undefined") {
     window.history.scrollRestoration = "manual";

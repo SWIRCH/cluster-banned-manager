@@ -20,11 +20,11 @@ export default defineConfig({
     mdx(),
     sitemap({
       filter: (page) => {
-        if (page === "https://swirch.github.io/cluster-banned-manager/") {
+        if (page === "https://cbmwot.vercel.app") {
           return true;
         }
 
-        return page.includes("/cluster-banned-manager/docs/ru/") || page.includes("/cluster-banned-manager/docs/en/");
+        return page.includes("/docs/ru/") || page.includes("/docs/en/");
       },
 
       i18n: {
@@ -36,8 +36,8 @@ export default defineConfig({
       },
     }),
   ],
-  site: "https://swirch.github.io",
-  base: "/cluster-banned-manager",
+  site: "https://cbmwot.vercel.app",
+  // base: "/cluster-banned-manager",
 
   markdown: {
     processor: unifiedProcessor,

@@ -1,5 +1,5 @@
 User-agent: *
-Allow: /cluster-banned-manager/
-Disallow: /cluster-banned-manager/assets/
+Allow: /
+Disallow: /assets/
 
-Sitemap: https://swirch.github.io/cluster-banned-manager/sitemap-index.xml
+Sitemap: https://cbmwot.vercel.app/sitemap-index.xml
