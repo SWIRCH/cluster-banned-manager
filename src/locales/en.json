@@ -52,6 +52,12 @@
 		}
 	},
 	"modals": {
+		"clear": {
+			"title": "Clear Hosts{{firewall}}",
+			"description": "This will remove all sections and rules added by the application from the hosts file and firewall.{{backup}} Are you sure?",
+			"backup": " A backup will be created automatically.",
+			"loading": "Updating data..."
+		},
 		"admin_privileges": {
 			"title": "Требуются права администратора",
 			"description": "Приложение не обладает правами для изменения системного файла hosts. Чтобы использовать функциональность блокировки/разблокировки серверов, запустите приложение с правами администратора.",
@@ -78,12 +84,61 @@
 		"save_and_close": "Save and close",
 		"diagnostic": "Diagnostic",
 		"copy": "Copy",
-		"is_copy": "Copied"
+		"is_copy": "Copied",
+		"ok": "OK",
+		"retry": "Retry",
+		"cancel": "Cancel",
+		"confirm": "Confirm"
+	},
+	"updater": {
+		"initializing": {
+			"title": "Initializing...",
+			"description": "Loading application components"
+		},
+		"checking": {
+			"title": "Checking for updates...",
+			"description": "Looking for available updates"
+		},
+		"available": {
+			"title": "Update v{{version}} available",
+			"download": "A new version is ready to download",
+			"install": "A new version is ready to install"
+		},
+		"downloading": { "title": "Downloading update..." },
+		"downloaded": {
+			"title": "Update downloaded!",
+			"description": "Preparing to install..."
+		},
+		"installing": { "title": "Installing update..." },
+		"completed": {
+			"title": "Update installed!",
+			"description": "The application will restart in a few seconds"
+		},
+		"error": { "title": "Error", "description": "An error occurred" },
+		"ready": { "title": "Ready!", "description": "Application loaded" },
+		"loading": {
+			"title": "Loading...",
+			"description": "Initializing application"
+		},
+		"wait": "Please wait",
+		"skip": "Skip",
+		"download_apk": "Download APK",
+		"install": "Install",
+		"later": "Later"
 	},
 	"errors": {
+		"hide_details": "Hide details",
+		"show_details": "Show details",
 		"tauri": {
 			"unavailable": "Tauri is unavailable — please run the desktop application"
 		}
+	},
+	"vpn": {
+		"off": "Blocking is off",
+		"needs_apply": "Tap to apply changes",
+		"loading": "Connecting...",
+		"on": "Blocking is on",
+		"error": "Connection error"
 	},
 	"regions": {
 		"russian": "Tanks Blitz",

@@ -25,7 +25,7 @@ import { langFormat } from '@/utils/langForamter'
 import { useSettings } from '@/hooks/useSettings'
 import { getInitialLanguage } from '@/lib/i18n'
 import { defaultSettings } from '@/utils/settingsStorage'
-import { writeText, readText } from '@tauri-apps/plugin-clipboard-manager'
+import { writeText } from '@tauri-apps/plugin-clipboard-manager'
 
 type SettingsModalProps = {
 	open: boolean

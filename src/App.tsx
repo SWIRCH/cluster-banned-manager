@@ -126,9 +126,14 @@ function AppContent() {
 		game?.regions?.find(c => c.id === selectedRegionId) ?? defaultRegion
 	const selectedRegionClusters = selectedRegion?.clusters ?? []
 
-	const { settings, updateSetting, loading: settingsLoading } = useSettings()
-	const { selections, updateSelection, selectCluster, clearAllSelections } =
-		useSelections(game)
+	const { settings, updateSettings, loading: settingsLoading } = useSettings()
+	const {
+		selections,
+		updateSelection,
+		selectCluster,
+		clearAllSelections,
+		persistSelections
+	} = useSelections(game, settings, updateSettings, settingsLoading)
 	const {
 		hostsMismatch,
 		mismatchDomains,
@@ -258,14 +263,14 @@ function AppContent() {
 
 	const handleApplyHosts = async (domains?: string[]) => {
 		const result = await applyHostsUpdate(domains, currentVpnStatus === 'On')
-		if (!isMobile || !result.success) {
+		if (result.success) {
+			infoModal.showInfo(result.title, result.message)
+		} else {
 			showGlobalError(result.title, result.message, result.details)
-			if (isMobile) {
-				window.setTimeout(hideGlobalError, 3000)
-			}
 		}
 		setConfirmOpen(false)
 		if (result.success) {
+			await persistSelections(selections)
 			await checkHostsConsistency()
 		}
 	}
@@ -306,7 +311,8 @@ function AppContent() {
 		setClearConfirmOpen(false)
 
 		if (result.success) {
-			await clearAllSelections()
+			const defaults = await clearAllSelections()
+			await persistSelections(defaults)
 			await checkHostsConsistency()
 			await pingClusters(selectedRegionId)
 			await checkGameRunning()

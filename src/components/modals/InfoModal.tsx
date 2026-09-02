@@ -1,4 +1,5 @@
 import Modal from './Modal'
+import { useTranslation } from 'react-i18next'
 
 type InfoModalProps = {
 	open: boolean
@@ -15,6 +16,8 @@ export default function InfoModal({
 	message,
 	isError = false
 }: InfoModalProps) {
+	const { t } = useTranslation()
+
 	return (
 		<Modal
 			open={open}
@@ -33,7 +36,7 @@ export default function InfoModal({
 					className="steam-btn bg-yellow-400 text-black px-4 py-2 rounded"
 					onClick={onClose}
 				>
-					ОК
+					{t('buttons.ok')}
 				</button>
 			</div>
 		</Modal>

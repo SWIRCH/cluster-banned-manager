@@ -2,172 +2,148 @@ import { logger } from '@/utils/logger'
 
 // 1. Проверяем, запущено ли приложение внутри WebView Tauri
 export const isTauri = (): boolean => {
-  return typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
-};
+	return typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window
+}
 
 // 2. Универсальный безопасный invoke с поддержкой браузерных заглушек
 export async function safeInvoke<T = any>(
-  cmd: string,
-  args?: Record<string, any>,
+	cmd: string,
+	args?: Record<string, any>
 ): Promise<T> {
-  if (typeof window === "undefined") {
-    throw new Error("Window is not defined");
-  }
+	if (typeof window === 'undefined') {
+		throw new Error('Window is not defined')
+	}
 
-  // Если мы внутри Tauri — динамически импортируем родной invoke
-  if (isTauri()) {
-    try {
-      const { invoke } = await import("@tauri-apps/api/core");
-      return await invoke<T>(cmd, args);
-    } catch (err) {
-      logger.error(`[TAURI Error] Command '${cmd}' failed:`, err);
-      throw err;
-    }
-  }
+	// Если мы внутри Tauri — динамически импортируем родной invoke
+	if (isTauri()) {
+		try {
+			const { invoke } = await import('@tauri-apps/api/core')
+			return await invoke<T>(cmd, args)
+		} catch (err) {
+			logger.error(`[TAURI Error] Command '${cmd}' failed:`, err)
+			throw err
+		}
+	}
 
-  // Если мы в обычном браузере — возвращаем заглушки (Mock)
-  console.warn(`[BROWSER MOCK] Executing '${cmd}'`, args);
-  return getMockResponse<T>(cmd, args);
+	// Если мы в обычном браузере — возвращаем заглушки (Mock)
+	console.warn(`[BROWSER MOCK] Executing '${cmd}'`, args)
+	return getMockResponse<T>(cmd, args)
 }
 
-// Псевдоним для совместимости
-export const directInvoke = safeInvoke;
-
 export type VpnState =
-  | "off"
-  | "starting"
-  | "on"
-  | "stopping"
-  | "error"
-  | "needsPermission"
-  | "unsupported";
+	| 'off'
+	| 'starting'
+	| 'on'
+	| 'stopping'
+	| 'error'
+	| 'needsPermission'
+	| 'unsupported'
 
 export type VpnStatus = {
-  state: VpnState;
-  domains: string[];
-};
+	state: VpnState
+	domains: string[]
+}
 
 function normalizeVpnStatus(status: VpnStatus): VpnStatus {
-  let domains = status.domains;
-  if (typeof domains === "string") {
-    try {
-      const parsed = JSON.parse(domains);
-      domains = Array.isArray(parsed) ? parsed : [];
-    } catch {
-      domains = [];
-    }
-  }
-  return { ...status, domains };
+	let domains = status.domains
+	if (typeof domains === 'string') {
+		try {
+			const parsed = JSON.parse(domains)
+			domains = Array.isArray(parsed) ? parsed : []
+		} catch {
+			domains = []
+		}
+	}
+	return { ...status, domains }
 }
 
 export async function vpnStart(domains: string[], ips: string[] = []) {
-  const status = await safeInvoke<VpnStatus>("plugin:cluster-vpn|start", {
-    payload: { domains, ips },
-  });
-  return normalizeVpnStatus(status);
+	const status = await safeInvoke<VpnStatus>('plugin:cluster-vpn|start', {
+		payload: { domains, ips }
+	})
+	return normalizeVpnStatus(status)
 }
 
 export async function vpnStop() {
-  const status = await safeInvoke<VpnStatus>("plugin:cluster-vpn|stop");
-  return normalizeVpnStatus(status);
+	const status = await safeInvoke<VpnStatus>('plugin:cluster-vpn|stop')
+	return normalizeVpnStatus(status)
 }
 
 export async function vpnStatus() {
-  const status = await safeInvoke<VpnStatus>("plugin:cluster-vpn|status");
-  return normalizeVpnStatus(status);
+	const status = await safeInvoke<VpnStatus>('plugin:cluster-vpn|status')
+	return normalizeVpnStatus(status)
 }
 
 // 3. Таблица заглушек для браузерной верстки
 function getMockResponse<T>(cmd: string, _args?: Record<string, any>): T {
-  switch (cmd) {
-    case "test_tauri":
-      return "OK (Browser Mock)" as T;
-    case "is_process_running":
-      return false as T;
-    case "get_firewall_rules":
-      return [] as T;
-    case "update_firewall_rules":
-    case "update_cluster_rules":
-    case "clear_firewall_rules":
-    case "launch_game":
-    case "kill_process":
-      return true as T;
-    case "plugin:cluster-vpn|start":
-    case "plugin:cluster-vpn|stop":
-    case "plugin:cluster-vpn|status":
-      return { state: "unsupported", domains: [] } as T;
-    default:
-      return null as T;
-  }
+	switch (cmd) {
+		case 'test_tauri':
+			return 'OK (Browser Mock)' as T
+		case 'is_process_running':
+			return false as T
+		case 'get_firewall_rules':
+			return [] as T
+		case 'update_firewall_rules':
+		case 'clear_firewall_rules':
+		case 'launch_game':
+		case 'kill_process':
+			return true as T
+		case 'plugin:cluster-vpn|start':
+		case 'plugin:cluster-vpn|stop':
+		case 'plugin:cluster-vpn|status':
+			return { state: 'unsupported', domains: [] } as T
+		default:
+			return null as T
+	}
 }
 
 // --- Экспортируемые функции для приложения ---
 
 export async function diagnoseTauri() {
-  const result: any = {
-    timestamp: new Date().toISOString(),
-    userAgent:
-      typeof navigator !== "undefined" ? navigator.userAgent : "unknown",
-    hasWindow: typeof window !== "undefined",
-    isTauriEnvironment: isTauri(),
-    hasTauriInternals: !!(window as any)?.__TAURI_INTERNALS__,
-    hasTauriGlobal: !!(window as any)?.__TAURI__,
-  };
+	const result: any = {
+		timestamp: new Date().toISOString(),
+		userAgent:
+			typeof navigator !== 'undefined' ? navigator.userAgent : 'unknown',
+		hasWindow: typeof window !== 'undefined',
+		isTauriEnvironment: isTauri(),
+		hasTauriInternals: !!(window as any)?.__TAURI_INTERNALS__,
+		hasTauriGlobal: !!(window as any)?.__TAURI__
+	}
 
-  try {
-    const testResult = await safeInvoke("test_tauri");
-    result.testInvoke = { success: true, result: testResult };
-  } catch (error) {
-    result.testInvoke = { success: false, error: String(error) };
-  }
+	try {
+		const testResult = await safeInvoke('test_tauri')
+		result.testInvoke = { success: true, result: testResult }
+	} catch (error) {
+		result.testInvoke = { success: false, error: String(error) }
+	}
 
-  return result;
+	return result
 }
 
 export async function launchGame(appid: string | number) {
-  return safeInvoke("launch_game", { appid: appid.toString() });
+	return safeInvoke('launch_game', { appid: appid.toString() })
 }
 
 export async function isProcessRunning(name: string) {
-  return safeInvoke("is_process_running", { name });
+	return safeInvoke('is_process_running', { name })
 }
 
 export async function killProcess(name: string) {
-  return safeInvoke("kill_process", { name });
+	return safeInvoke('kill_process', { name })
 }
 
 export async function updateFirewallRules(
-  regionId: string,
-  blockedDomains: string[],
-  enable: boolean,
+	regionId: string,
+	blockedDomains: string[],
+	enable: boolean
 ) {
-  return safeInvoke("update_firewall_rules", {
-    regionId,
-    blockedDomains,
-    enable,
-  });
-}
-
-export async function updateClusterRules(
-  regionId: string,
-  blockedDomains: string[],
-  enable: boolean,
-  useHosts: boolean,
-  useFirewall: boolean,
-) {
-  return safeInvoke("update_cluster_rules", {
-    region_id: regionId,
-    blocked_domains: blockedDomains,
-    enable,
-    use_hosts: useHosts,
-    use_firewall: useFirewall,
-  });
-}
-
-export async function getFirewallRules() {
-  return safeInvoke("get_firewall_rules");
+	return safeInvoke('update_firewall_rules', {
+		regionId,
+		blockedDomains,
+		enable
+	})
 }
 
 export async function clearFirewallRules() {
-  return safeInvoke("clear_firewall_rules");
+	return safeInvoke('clear_firewall_rules')
 }

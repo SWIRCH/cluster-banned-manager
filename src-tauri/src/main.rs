@@ -805,6 +805,7 @@ async fn update_firewall_rules(
     #[cfg(windows)]
     {
         use serde_json::Value;
+        use std::net::ToSocketAddrs;
 
         // println!(
         //     "[TAURI] update_firewall_rules called for region: {}, enable: {}",
@@ -817,13 +818,16 @@ async fn update_firewall_rules(
         let mut results = Vec::new();
         let mut total_ips_blocked = 0;
 
-        if let Value::Array(regions) = &clusters_data["clusters"] {
+        let regions = clusters_data.get("regions");
+        if let Some(Value::Array(regions)) = regions {
             for region_data in regions {
                 if region_data["id"].as_str() == Some(&region_id) {
                     if let Value::Array(clusters) = &region_data["clusters"] {
                         for cluster in clusters {
                             if let Some(domain) = cluster["domain"].as_str() {
-                                let should_process = blocked_domains.contains(&domain.to_string());
+                                let should_process = blocked_domains
+                                    .iter()
+                                    .any(|blocked| blocked.eq_ignore_ascii_case(domain));
 
                                 if should_process {
                                     if let Value::Array(ips_array) = &cluster["ips"] {
@@ -864,11 +868,42 @@ async fn update_firewall_rules(
         }
 
         if results.is_empty() {
-            Ok(format!(
-                "No firewall rules {} for region {}",
-                if enable { "added" } else { "removed" },
-                region_id
-            ))
+            let mut fallback_results = Vec::new();
+            for domain in &blocked_domains {
+                let addresses = format!("{domain}:443")
+                    .to_socket_addrs()
+                    .map(|resolved| {
+                        resolved
+                            .map(|address| address.ip().to_string())
+                            .collect::<Vec<_>>()
+                    })
+                    .unwrap_or_default();
+                let ips: Vec<String> = addresses
+                    .into_iter()
+                    .filter(|ip| ip.parse::<std::net::Ipv4Addr>().is_ok())
+                    .collect();
+                if !ips.is_empty() {
+                    match block_with_firewall(domain.clone(), ips.clone(), enable) {
+                        Ok(message) => fallback_results.push(message),
+                        Err(error) => fallback_results.push(format!(
+                            "Failed to {} {}: {}",
+                            if enable { "block" } else { "unblock" },
+                            domain,
+                            error
+                        )),
+                    }
+                }
+            }
+
+            if fallback_results.is_empty() {
+                Ok(format!(
+                    "No firewall rules {} for region {} (no matching domains or IPs)",
+                    if enable { "added" } else { "removed" },
+                    region_id
+                ))
+            } else {
+                Ok(fallback_results.join("\n"))
+            }
         } else {
             let summary = format!(
                 "{} {} IPs across {} domains",
@@ -1467,7 +1502,8 @@ async fn clear_firewall_rules() -> Result<String, String> {
         // Это нужно на случай, если парсинг не сработал
         let clusters_data: serde_json::Value = get_clusters_with_fallback().await;
 
-        if let serde_json::Value::Array(regions) = &clusters_data["clusters"] {
+        let regions = clusters_data.get("regions");
+        if let Some(serde_json::Value::Array(regions)) = regions {
             for region_data in regions {
                 if let serde_json::Value::Array(clusters) = &region_data["clusters"] {
                     for cluster in clusters {
