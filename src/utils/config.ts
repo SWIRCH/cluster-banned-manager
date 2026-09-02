@@ -2,7 +2,7 @@ import { isTauri } from '../lib/tauri'
 
 export const config = {
 	AUTHOR: 'aysi',
-	AUTHOR_LINK: 'https://swirch.github.io/cluster-banned-manager/',
+	AUTHOR_LINK: 'https://cbmwot.vercel.app/',
 	UPDATER_URL:
 		'https://github.com/SWIRCH/cluster-banned-manager/releases/latest/download/latest.json',
 	GITHUB_URL: 'https://github.com/SWIRCH/cluster-banned-manager/',
@@ -12,8 +12,7 @@ export const config = {
 	VERSION: '0.1.7',
 	TAURI_VERSION: '2.0.0',
 	BREACH: 'main',
-	WARP_FIX_LINK:
-		'https://swirch.github.io/cluster-banned-manager/docs/warp-fix/',
+	WARP_FIX_LINK: 'https://cbmwot.vercel.app/docs/warp-fix/',
 	DEBUG_MODE: true
 }
 

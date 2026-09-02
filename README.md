@@ -23,7 +23,7 @@
 > 2. **Android**: Использован архитектурный подход на базе **VpnService / Локального файрвола**, блокирующий подключение к IP-адресам нежелательных серверов на лету без необходимости получения Root-прав.
 
 > [!IMPORTANT]
-> Если у вас есть проблемы с пингом или высокий loss, прочитайте статью [WARP FIX](https://swirch.github.io/cluster-banned-manager/docs/ru/warp-fix/)
+> Если у вас есть проблемы с пингом или высокий loss, прочитайте статью [WARP FIX](https://cbmwot.vercel.app/docs/ru/warp-fix/)
 
 ## 🌎 Переводы/Translations
 
