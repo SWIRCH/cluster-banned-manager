@@ -2,4 +2,4 @@ User-agent: *
 Allow: /cluster-banned-manager/
 Disallow: /cluster-banned-manager/assets/
 
-Sitemap: https://swirch.github.io/cluster-banned-manager/sitemap.xml
+Sitemap: https://swirch.github.io/cluster-banned-manager/sitemap-index.xml

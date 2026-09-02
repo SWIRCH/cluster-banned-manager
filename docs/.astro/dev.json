@@ -1,22 +1,14 @@
 {
-	"pid": 29024,
+	"pid": 24176,
 	"port": 4321,
 	"url": "http://localhost:4321",
 	"urls": {
 		"local": [
 			"http://localhost:4321/"
 		],
-		"network": [
-			"http://172.19.0.1:4321/",
-			"http://26.3.109.104:4321/",
-			"http://192.168.0.100:4321/"
-		],
-		"networkInterfaceNames": [
-			"throne-tun",
-			"Radmin VPN",
-			"Ethernet"
-		]
+		"network": [],
+		"networkInterfaceNames": []
 	},
 	"background": false,
-	"startedAt": "2026-08-31T20:36:19.253Z"
+	"startedAt": "2026-09-02T02:43:21.156Z"
 }
