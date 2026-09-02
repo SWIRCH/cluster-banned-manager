@@ -1,5 +1,5 @@
-import type { Cluster, Game } from "../types/cluster";
-import type { Selections } from "../types/selections";
+import type { Cluster, Game } from "../types/cluster"
+import type { Selections } from "../types/selections"
 
 export function collectBlockedDomains(
   game: Game | null | undefined,
@@ -25,7 +25,7 @@ export function collectBlockedDomains(
   }
 
   const result = Array.from(domains).sort();
-  console.log("[blocking] Total blocked domains:", result);
+  // console.log("[blocking] Total blocked domains:", result);
   return result;
 }
 

@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { isProcessRunning, killProcess } from "../lib/tauri";
+import { isProcessRunning, killProcess } from "@/lib/tauri"
+import { useEffect, useState } from "react"
 
 const GAME_PROCESS_NAMES = ["wotblitz", "blitz", "worldoftanksblitz"];
 

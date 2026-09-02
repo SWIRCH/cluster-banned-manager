@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef } from "react";
-import { safeInvoke } from "../lib/tauri";
-import type { PingInfo, PingMap } from "../types/ping";
-import type { Region } from "../types/cluster";
+import { safeInvoke } from "@/lib/tauri"
+import type { Region } from "@/types/cluster"
+import type { PingInfo, PingMap } from "@/types/ping"
+import { useEffect, useRef, useState } from "react"
 
 const PING_TIMEOUT_MS = 2000;
 const PING_ATTEMPT_DELAY_MS = 120;

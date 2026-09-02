@@ -1,5 +1,6 @@
-import { useAppStore } from "../store/useAppStore";
-import { isTauri, safeInvoke } from "./tauri";
+import { logger } from '@/utils/logger'
+import { useAppStore } from "../store/useAppStore"
+import { isTauri, safeInvoke } from "./tauri"
 
 export const syncVpnStatus = async () => {
   if (!isTauri()) return;
@@ -25,7 +26,7 @@ if (typeof window !== "undefined" && isTauri()) {
   syncVpnStatus();
 
   window.addEventListener("focus", () => {
-    console.log("[VPN] Window focused, syncing...");
+    logger.log("[VPN] Window focused, syncing...");
     syncVpnStatus();
   });
 

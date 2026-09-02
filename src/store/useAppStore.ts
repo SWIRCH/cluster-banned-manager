@@ -1,5 +1,5 @@
-import { create } from "zustand";
-import { Game } from "../types";
+import { create } from "zustand"
+import { Game } from "../types"
 
 interface AppState {
   // Region & System
@@ -7,6 +7,8 @@ interface AppState {
   selectedRegionId: string;
   adminMounts: boolean;
   diagnosticInfo: string | null;
+
+  isSetup: boolean;
 
   // Mobile & Vpn
   vpnStatus: "On" | "Off" | "Loading" | "Error" | "NeedsApply";
@@ -29,6 +31,8 @@ interface AppState {
   setSelectedRegionId: (id: string) => void;
   setAdminMounts: (isAdmin: boolean) => void;
   setDiagnosticInfo: (info: string | null) => void;
+
+  setIsSetup: (setup: boolean) => void;
 
   setVpnStatus: (
     status: "On" | "Off" | "Loading" | "Error" | "NeedsApply",
@@ -53,6 +57,8 @@ export const useAppStore = create<AppState>((set) => ({
   adminMounts: false,
   diagnosticInfo: null,
 
+  isSetup: false,
+
   vpnStatus: "Off",
   vpnDomains: [],
   vpnBaselineDomains: null,
@@ -71,6 +77,8 @@ export const useAppStore = create<AppState>((set) => ({
   setSelectedRegionId: (id) => set({ selectedRegionId: id }),
   setAdminMounts: (isAdmin) => set({ adminMounts: isAdmin }),
   setDiagnosticInfo: (info) => set({ diagnosticInfo: info }),
+
+  setIsSetup: (setup) => set({ isSetup: setup }),
 
   setVpnStatus: (status) => set({ vpnStatus: status }),
   setVpnDomains: (domains) => set({ vpnDomains: domains }),

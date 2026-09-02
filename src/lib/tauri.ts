@@ -1,3 +1,5 @@
+import { logger } from '@/utils/logger'
+
 // 1. Проверяем, запущено ли приложение внутри WebView Tauri
 export const isTauri = (): boolean => {
   return typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
@@ -18,7 +20,7 @@ export async function safeInvoke<T = any>(
       const { invoke } = await import("@tauri-apps/api/core");
       return await invoke<T>(cmd, args);
     } catch (err) {
-      console.error(`[TAURI Error] Command '${cmd}' failed:`, err);
+      logger.error(`[TAURI Error] Command '${cmd}' failed:`, err);
       throw err;
     }
   }

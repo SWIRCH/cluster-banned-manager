@@ -1,0 +1,111 @@
+{
+	"common": {
+		"discrepancies": "Discrepancies",
+		"time": "Time",
+		"select_server": "Select server",
+		"selective_blocking": "Selective blocking",
+		"important": "Внимание"
+	},
+	"system": {
+		"hosts": {
+			"right": "Hosts file is intact",
+			"checking": "Checking hosts file...",
+			"updateBlocked": "Update blocks",
+			"updateFor": "Update hosts for",
+			"hosts_is_fine": "The hosts is fine",
+			"confirm_update_hosts": {
+				"title": "Confirm to update hosts",
+				"description": "",
+				"add_records_info": "Будут добавлены записи типа <codeTag>0.0.0.0 domain</codeTag> для следующих доменов в регионе <regionTag>{{region}}</regionTag>:"
+			}
+		}
+	},
+	"setup": {
+		"welcome": "🎉 Welcome!",
+		"welcome.description": "Thank you for installing the application. Let's quickly set up the core preferences for you. You can change these settings at any time by clicking the gear icon in the left sidebar.",
+		"backup_count_one": "{{count}} copy",
+		"backup_count_other": "{{count}} copies",
+		"buttons": {
+			"start_setup": "Start setup"
+		},
+		"step_2_title": "Step {{current}} of {{total}}: Settings",
+		"step_2_description": "Configure core system preferences.",
+		"step_3_title": "Step {{current}} of {{total}}: Language",
+		"step_3_description": "Select the application interface language."
+	},
+	"ads": {
+		"warp-fix": "High ping or packet loss?"
+	},
+	"settings": {
+		"title": "Настройки приложения",
+		"description": "Здесь вы можете настроить параметры приложения.",
+		"use_firewall": "Use firewall",
+		"firewall_about": "Blocks connections at the network level. Works even if the game uses IP addresses directly. Requires administrator privileges.",
+		"use_backups": "Create backups",
+		"backups_about": "After cleaning, it creates a .bak file in the hosts folder.",
+		"backups_count": "Backup count",
+		"language_interface": "Interface language",
+		"debug_and_diagnostic": "Debug and diagnostic",
+		"buttons": {
+			"settings": "Settings",
+			"debug": "Debug"
+		}
+	},
+	"modals": {
+		"admin_privileges": {
+			"title": "Требуются права администратора",
+			"description": "Приложение не обладает правами для изменения системного файла hosts. Чтобы использовать функциональность блокировки/разблокировки серверов, запустите приложение с правами администратора.",
+			"on_close": "Инструкция"
+		},
+		"blocking_all_confirm": {
+			"title": "Подтвердите блокировку всех серверов",
+			"description": "Вы собираетесь заблокировать <strong>все</strong> серверы региона <strong>{{region}}</strong>. Это приведёт к тому, что игра не сможет подключаться к серверам этого региона — вы фактически отключите доступ к игре в этом регионе."
+		}
+	},
+	"sidebar": {
+		"check_status": "Checking status",
+		"settings": "Settings",
+		"clear_blocks": "Clear blocks",
+		"refresh": "Refresh"
+	},
+	"buttons": {
+		"save": "Save",
+		"play": "Play",
+		"close": "Close",
+		"back": "Back",
+		"continue": "Continue",
+		"finish_and_save": "Finish and save",
+		"save_and_close": "Save and close",
+		"diagnostic": "Diagnostic",
+		"copy": "Copy",
+		"is_copy": "Copied"
+	},
+	"errors": {
+		"tauri": {
+			"unavailable": "Tauri is unavailable — please run the desktop application"
+		}
+	},
+	"regions": {
+		"russian": "Tanks Blitz",
+		"europe": "Europe",
+		"asia": "Asia",
+		"north_america": "North America"
+	},
+	"locations": {
+		"unknown": "Unknown Location",
+		"mosrentgen_moscow": "Mosrentgen (Moscow)",
+		"dolgoprudny_moscow": "Dolgoprudny (Moscow)",
+		"krasnoyarsk": "Krasnoyarsk",
+		"yekaterinburg": "Yekaterinburg",
+		"moscow": "Moscow",
+		"amsterdam_netherlands": "Amsterdam (Netherlands)",
+		"frankfurt_germany": "Frankfurt am Main (Germany)",
+		"warsaw_poland": "Warsaw (Poland)",
+		"almaty_kazakhstan": "Almaty (Kazakhstan)",
+		"singapore": "Singapore",
+		"tokyo_japan": "Tokyo (Japan)",
+		"chicago_usa": "Chicago, Illinois (USA)",
+		"manassas_usa": "Manassas, Virginia (USA)",
+		"santaclara_usa": "Santa Clara, California (USA)"
+	}
+}

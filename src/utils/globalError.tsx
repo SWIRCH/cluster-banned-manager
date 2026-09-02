@@ -1,7 +1,7 @@
 // src/utils/globalError.ts
-import { createRoot } from "react-dom/client";
-import { ErrorModal } from "../App/components/Modals";
-import { config } from "./config";
+import { createRoot } from "react-dom/client"
+import { ErrorModal } from "../components/modals"
+import { logger } from './logger'
 
 let errorModalRoot: any = null;
 let errorModalContainer: HTMLDivElement | null = null;
@@ -22,9 +22,7 @@ export function showGlobalError(
   details?: string,
   onRetry?: () => void,
 ) {
-  if (config.DEBUG_MODE) {
-    console.log("🔴🔴🔴 showGlobalError ВЫЗВАН!", { title, message });
-  }
+  logger.log("🔴🔴🔴 showGlobalError ВЫЗВАН!", { title, message });
 
   const container = createErrorModalContainer();
 

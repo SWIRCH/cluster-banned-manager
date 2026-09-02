@@ -1,0 +1,99 @@
+{
+	"common": {
+		"discrepancies": "Несоответствия",
+		"time": "Время",
+		"choose_server": "Выбрать сервер",
+		"selective_blocking": "Выборочная блокировка"
+	},
+	"system": {
+		"hosts": {
+			"right": "Hosts в порядке",
+			"checking": "Проверка hosts-файла...",
+			"updateBlocked": "Обновить блок",
+			"updateFor": "Обновить hosts для",
+			"hosts_is_fine": "Hosts в порядке",
+			"confirm_update_hosts": {
+				"title": "Confirm to update hosts",
+				"add_records_info": "Будут добавлены записи типа <codeTag>0.0.0.0 {{domain}}</codeTag> для следующих доменов в регионе <regionTag>{{region}}</regionTag>:"
+			}
+		}
+	},
+	"setup": {
+		"welcome": "🎉 Добро пожаловать!",
+		"welcome.description": "Спасибо за установку приложения. Давайте быстро настроим основные параметры под вас. Настройки можно будет поменять в любое время в левом баре нажав на шестерёнку.",
+		"backup_count_one": "{{count}} копия",
+		"backup_count_few": "{{count}} копии",
+		"backup_count_many": "{{count}} копий",
+		"buttons": {
+			"start_setup": "Начать настройку"
+		},
+		"step_2_title": "Шаг {{current}} из {{total}}: Параметры",
+		"step_2_description": "Укажите основные системные настройки.",
+		"step_3_title": "Шаг {{current}} из {{total}}: Язык",
+		"step_3_description": "Выберите язык интерфейса приложения."
+	},
+	"ads": {
+		"warp-fix": "Высокий пинг или loss?"
+	},
+	"settings": {
+		"title": "Настройки приложения",
+		"description": "Здесь вы можете настроить параметры приложения.",
+		"use_firewall": "Использовать брандмауэр",
+		"firewall_about": "Блокирует подключения на уровне сети. Работает даже если игра использует IP напрямую. Требует прав администратора.",
+		"use_backups": "Создавать резервные копии",
+		"backups_about": "После очистки создаёт файл .bak в папке с hosts.",
+		"backups_count": "Количество бэкапов",
+		"language_interface": "Язык интерфейса",
+		"debug_and_diagnostic": "Отладка и диагностика",
+		"buttons": {
+			"settings": "Настройки",
+			"debug": "Отладка"
+		}
+	},
+	"sidebar": {
+		"check_status": "Проверить статус",
+		"settings": "Настройки",
+		"clear_blocks": "Очистить блокировки",
+		"refresh": "Обновить"
+	},
+	"buttons": {
+		"save": "Save",
+		"play": "Играть",
+		"close": "Закрыть",
+		"back": "Назад",
+		"continue": "Продолжить",
+		"finish_and_save": "Завершить и сохранить",
+		"save_and_close": "Сохранить и закрыть",
+		"diagnostic": "Диагностика",
+		"copy": "Копировать",
+		"is_copy": "Скопировано"
+	},
+	"errors": {
+		"tauri": {
+			"unavailable": "Tauri недоступен — запустите desktop-приложение"
+		}
+	},
+	"regions": {
+		"russian": "Tanks Blitz",
+		"europe": "Европа",
+		"asia": "Азия",
+		"north_america": "Северная Америка"
+	},
+	"locations": {
+		"unknown": "Unknown Location",
+		"mosrentgen_moscow": "Мосрентген (Москва)",
+		"dolgoprudny_moscow": "Долгопрудный (Москва)",
+		"krasnoyarsk": "Красноярск",
+		"yekaterinburg": "Екатеринбург",
+		"moscow": "Москва",
+		"amsterdam_netherlands": "Амстердам (Нидерланды)",
+		"frankfurt_germany": "Франкфурт-на-Майне (Германия)",
+		"warsaw_poland": "Варшава (Польша)",
+		"almaty_kazakhstan": "Алматы (Казахстан)",
+		"singapore": "Сингапур",
+		"tokyo_japan": "Токио (Япония)",
+		"chicago_usa": "Чикаго, Иллинойс (США)",
+		"manassas_usa": "Манассас, Вирджиния (США)",
+		"santaclara_usa": "Санта Клара, Калифорния (США)"
+	}
+}

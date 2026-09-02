@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
-import { safeInvoke } from "../lib/tauri";
-import type { Selections } from "../types/selections";
-import type { Cluster } from "../types/cluster";
+import { safeInvoke } from "@/lib/tauri"
+import type { Cluster } from "@/types/cluster"
+import type { Selections } from "@/types/selections"
+import { useEffect, useState } from "react"
 
 export function useHosts(
   selectedRegionId: string,

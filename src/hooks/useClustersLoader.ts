@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
+import type { Game } from "@/types/cluster"
 import {
   LOCAL_CLUSTERS,
   loadClustersFromGitHub,
   loadClustersFromLocal,
-} from "../utils/clustersLoader";
-import type { Game } from "../types/cluster";
+} from "@/utils/clustersLoader"
+import { useEffect, useState } from "react"
 
 export function useClustersLoader() {
   const [clustersData, setClustersData] = useState<Game>(LOCAL_CLUSTERS);
