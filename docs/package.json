@@ -35,6 +35,8 @@
     "@tabler/icons-react": "^3.46.0",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.5",
+    "@vercel/analytics": "^2.0.1",
+    "@vercel/speed-insights": "^2.0.0",
     "astro": "^7.2.7",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

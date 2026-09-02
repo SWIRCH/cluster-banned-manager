@@ -37,7 +37,7 @@ export default defineConfig({
     }),
   ],
   site: "https://cbmwot.vercel.app",
-  // base: "/cluster-banned-manager",
+  base: "/",
 
   markdown: {
     processor: unifiedProcessor,
