@@ -133,8 +133,7 @@ function AppContent() {
 		selectCluster,
 		clearAllSelections,
 		persistSelections
-	} =
-		useSelections(game, settings, updateSettings, settingsLoading)
+	} = useSelections(game, settings, updateSettings, settingsLoading)
 	const {
 		hostsMismatch,
 		mismatchDomains,

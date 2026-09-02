@@ -91,16 +91,35 @@
 		"confirm": "Confirm"
 	},
 	"updater": {
-		"initializing": { "title": "Initializing...", "description": "Loading application components" },
-		"checking": { "title": "Checking for updates...", "description": "Looking for available updates" },
-		"available": { "title": "Update v{{version}} available", "download": "A new version is ready to download", "install": "A new version is ready to install" },
+		"initializing": {
+			"title": "Initializing...",
+			"description": "Loading application components"
+		},
+		"checking": {
+			"title": "Checking for updates...",
+			"description": "Looking for available updates"
+		},
+		"available": {
+			"title": "Update v{{version}} available",
+			"download": "A new version is ready to download",
+			"install": "A new version is ready to install"
+		},
 		"downloading": { "title": "Downloading update..." },
-		"downloaded": { "title": "Update downloaded!", "description": "Preparing to install..." },
+		"downloaded": {
+			"title": "Update downloaded!",
+			"description": "Preparing to install..."
+		},
 		"installing": { "title": "Installing update..." },
-		"completed": { "title": "Update installed!", "description": "The application will restart in a few seconds" },
+		"completed": {
+			"title": "Update installed!",
+			"description": "The application will restart in a few seconds"
+		},
 		"error": { "title": "Error", "description": "An error occurred" },
 		"ready": { "title": "Ready!", "description": "Application loaded" },
-		"loading": { "title": "Loading...", "description": "Initializing application" },
+		"loading": {
+			"title": "Loading...",
+			"description": "Initializing application"
+		},
 		"wait": "Please wait",
 		"skip": "Skip",
 		"download_apk": "Download APK",

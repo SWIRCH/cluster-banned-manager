@@ -293,8 +293,8 @@ export default function LoadingScreen({
 							strokeWidth={2}
 						/>
 					),
-						title: t('updater.loading.title'),
-						description: t('updater.loading.description'),
+					title: t('updater.loading.title'),
+					description: t('updater.loading.description'),
 					showSpinner: true,
 					showButtons: false,
 					progress: 0
