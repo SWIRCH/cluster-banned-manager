@@ -1,0 +1,49 @@
+name: Windows Tests
+
+on:
+  push:
+    branches: [main, master, dev]
+    paths:
+      - 'src-tauri/**/*.rs'
+      - 'src-tauri/Cargo.toml'
+      - 'src-tauri/Cargo.lock'
+      - '.github/workflows/windows-test.yml'
+  pull_request:
+    branches: [main, master]
+    paths:
+      - 'src-tauri/**/*.rs'
+      - 'src-tauri/Cargo.toml'
+      - 'src-tauri/Cargo.lock'
+      - '.github/workflows/windows-test.yml'
+
+jobs:
+  test:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: src-tauri
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create frontend placeholder
+        working-directory: .
+        shell: bash
+        run: mkdir -p dist && echo '<!doctype html><html></html>' > dist/index.html
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - name: cargo check
+        run: cargo check --all-targets
+
+      - name: cargo test
+        run: cargo test
+
+      - name: cargo fmt --check
+        run: cargo fmt --check
+
+      - name: clippy
+        run: cargo clippy -- -D warnings

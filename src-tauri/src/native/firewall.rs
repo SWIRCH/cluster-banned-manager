@@ -74,6 +74,7 @@ pub fn add_rule(_name: &str, _ips: &[String]) -> AppResult<()> {
 }
 
 /// Удалить правило по имени. Отсутствие правила — не ошибка.
+#[cfg(windows)]
 pub fn delete_rule(name: &str) -> AppResult<bool> {
     let out = process::run_hidden(
         "netsh",
