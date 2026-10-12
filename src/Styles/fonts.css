@@ -1,0 +1,173 @@
+@font-face {
+  src: url("/Fonts/Play/Play-Bold.ttf");
+  font-family: "Play";
+  font-weight: 600;
+  font-style: bold;
+}
+
+@font-face {
+  src: url("/Fonts/Play/Play-Regular.ttf");
+  font-family: "Play";
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* ===== Inter (24pt — оптимален для UI) ===== */
+@font-face {
+  font-family: "Inter";
+  src: url("/Fonts/Inter/Inter_24pt-Thin.ttf") format("truetype");
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Inter";
+  src: url("/Fonts/Inter/Inter_24pt-ThinItalic.ttf") format("truetype");
+  font-weight: 100;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("/Fonts/Inter/Inter_24pt-ExtraLight.ttf") format("truetype");
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Inter";
+  src: url("/Fonts/Inter/Inter_24pt-ExtraLightItalic.ttf") format("truetype");
+  font-weight: 200;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("/Fonts/Inter/Inter_24pt-Light.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Inter";
+  src: url("/Fonts/Inter/Inter_24pt-LightItalic.ttf") format("truetype");
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("/Fonts/Inter/Inter_24pt-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Inter";
+  src: url("/Fonts/Inter/Inter_24pt-Italic.ttf") format("truetype");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("/Fonts/Inter/Inter_24pt-Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Inter";
+  src: url("/Fonts/Inter/Inter_24pt-MediumItalic.ttf") format("truetype");
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("/Fonts/Inter/Inter_24pt-SemiBold.ttf") format("truetype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Inter";
+  src: url("/Fonts/Inter/Inter_24pt-SemiBoldItalic.ttf") format("truetype");
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("/Fonts/Inter/Inter_24pt-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Inter";
+  src: url("/Fonts/Inter/Inter_24pt-BoldItalic.ttf") format("truetype");
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("/Fonts/Inter/Inter_24pt-ExtraBold.ttf") format("truetype");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Inter";
+  src: url("/Fonts/Inter/Inter_24pt-ExtraBoldItalic.ttf") format("truetype");
+  font-weight: 800;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("/Fonts/Inter/Inter_24pt-Black.ttf") format("truetype");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("/Fonts/Inter/Inter_24pt-BlackItalic.ttf") format("truetype");
+  font-weight: 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Google Sans Flex";
+  src: url("/Fonts/Google_Sans_Flex/GoogleSansFlex-VariableFont_GRAD,ROND,opsz,slnt,wdth,wght.ttf")
+    format("truetype-variations");
+  font-weight: 100 200 300 400 500 600 700 800 900;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Onest";
+  src: url("/Fonts/Onest/Onest-VariableFont_wght.ttf")
+    format("truetype-variations");
+  font-weight: 100 200 300 400 500 600 700 800 900;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Сonsolas";
+  src: url("/Fonts/Сonsolas/consolas.ttf") format("truetype-variations");
+  font-weight: 100 200 300 400 500 600 700 800 900;
+  font-style: normal;
+}

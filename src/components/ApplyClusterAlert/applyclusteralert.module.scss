@@ -1,0 +1,63 @@
+@use "../../Styles/variables" as var;
+
+.apply-cluster-alert {
+  position: absolute;
+  font-family: var(--font-second);
+  font-weight: 400;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  z-index: 1000;
+
+  & > div {
+    position: relative;
+    padding: 15px 20px;
+    margin-bottom: 1em;
+    border-radius: var(--radius-lg);
+    left: var.$sidebarWidth;
+    width: 690px;
+    background-color: color-mix(
+      in srgb,
+      var(--color-bg-elevated-2) 80%,
+      transparent
+    );
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 20px 0px rgba(0, 0, 0, 0.4);
+    // padding: 20px;
+  }
+
+  @media (min-width: var.$screenSm) {
+    display: none;
+  }
+}
+
+.steam-btn-2 {
+  color: var(--color-fg);
+  background: linear-gradient(
+    to right,
+    var(--color-brand-from) 50%,
+    var(--color-brand-to) 100%
+  );
+  text-shadow: 0px 0px 3px rgba(0, 0, 0, 0.4);
+  text-transform: uppercase;
+  background-size: 200%;
+  background-position: right 0;
+  border: none;
+  transition: background-position 300ms ease-in;
+
+  &:hover {
+    text-transform: uppercase;
+    position: relative;
+    background: linear-gradient(
+      to right,
+      var(--color-brand-from) 50%,
+      var(--color-brand-to) 100%
+    );
+    cursor: pointer;
+    background-size: 200%;
+    background-position: 0 0;
+    transition: background-position 300ms ease-in;
+  }
+}

@@ -1,5 +1,14 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "fonts";
+
+#root {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
 
 /* 1. Увеличиваем общую ширину скроллбара (8px плашка + 5px отступ = 13px) */
 ::-webkit-scrollbar {
@@ -9,15 +18,13 @@
 
 /* 2. Фон дорожки */
 ::-webkit-scrollbar-track {
-  background: #10101500;
+  background: transparent;
 }
 
 /* 3. Ползунок с отступом слева */
 ::-webkit-scrollbar-thumb {
   background-color: rgba(255, 255, 255, 0.12);
-  /* Используем прозрачный border слева в 5px, чтобы сделать отступ */
   border-left: 5px solid transparent;
-  /* Заставляем фон не заходить под border */
   background-clip: padding-box;
   border-radius: 8px;
   transition: background-color 0.2s ease;
@@ -42,7 +49,87 @@
   background: #101015;
 }
 
+
+
 @custom-variant dark (&:is(.dark *));
+
+@theme static {
+  /* ===== Fonts ===== */
+  --font-sans: 'Play', sans-serif;
+  --font-mono: 'Consolas';
+  --font-spec: 'Motiva Sans', sans-serif;
+  --font-second: "Google Sans Flex", "Onest", "Inter", sans-serif;
+
+  /* ===== Base / Surface ===== */
+  --color-bg-base: #0d1117;
+  --color-bg-elevated: #101015;
+  --color-bg-elevated-2: #0e1014;
+  --color-bg-surface: #18181b;
+  --color-bg-surface-2: #242830;
+  --color-bg-surface-3: #27272a;
+  --color-bg-surface-4: #2b3037;
+  --color-bg-surface-5: #333338;
+  --color-bg-overlay: rgba(16, 16, 21, 0.9);
+  --color-bg-sidebar: rgb(22 26 30 / 53%);
+  --color-bg-sidebar-decoration: rgb(18 22 27);
+  --color-bg-sidebar-translucent: #2b30378e;
+  --color-bg-navbar-translucent: #2b303763;
+
+  /* ===== Text ===== */
+  --color-fg: #ffffff;
+  --color-fg-muted: #7d8590;
+  --color-fg-subtle: #818181;
+  --color-fg-dim: #a1a1aa;
+  --color-fg-disabled: #71717a;
+  --color-fg-link: #79a3ff;
+  --color-fg-link-hover: #9fb0d6;
+  --color-fg-link-active: #3c7aff;
+
+  /* ===== Borders ===== */
+  --color-border-subtle: rgba(255, 255, 255, 0.1);
+  --color-border-default: #364153;
+  --color-border-strong: #3f3f46;
+  --color-border-hover: #52525b;
+
+  /* ===== State: Success / On ===== */
+  --color-success-bg: #107e38;
+  --color-success-bg-hover: #16a34a;
+  --color-success-fg: #ffffff;
+  --color-success-ring: #4ade80;
+  --color-success-ring-hover: #86efac;
+
+  /* ===== State: Info / Loading ===== */
+  --color-info: #3b82f6;
+
+  /* ===== State: Danger / Error ===== */
+  --color-danger-bg: #450a0a;
+  --color-danger-bg-hover: #7f1d1d;
+  --color-danger-fg: #fda4af;
+  --color-danger-ring: #f43f5e;
+
+  /* ===== State: Warning / NeedsApply ===== */
+  --color-warning-bg: #92400e;
+  --color-warning-fg: #fef3c7;
+  --color-warning-ring: #f59e0b;
+  --color-warning-ring-hover: #fbbf24;
+
+  /* ===== Brand (steam-btn / option-btn) ===== */
+  --color-brand-from: #06bfff;
+  --color-brand-to: #2b74ff;
+
+  /* ===== Special ===== */
+  --color-radio-active: rgba(48, 255, 82, 0.993);
+  --color-radio-label: rgb(103, 240, 85);
+
+  /* ===== Radii ===== */
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
 
 @theme inline {
   --color-accent-black: var(--accent-black);
@@ -70,13 +157,6 @@
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);

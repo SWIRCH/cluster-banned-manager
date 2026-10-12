@@ -3,7 +3,12 @@
     "discrepancies": "Несоответствия",
     "time": "Время",
     "choose_server": "Выбрать сервер",
-    "selective_blocking": "Выборочная блокировка"
+    "selective_blocking": "Выборочная блокировка",
+    "avg_ping": "Средний пинг",
+    "ms": "мс"
+  },
+  "loading": {
+    "search_best_ping": "Выбираем оптимальный"
   },
   "system": {
     "hosts": {
@@ -57,7 +62,7 @@
     "refresh": "Обновить"
   },
   "buttons": {
-    "save": "Save",
+    "save": "Сохранить",
     "play": "Играть",
     "close": "Закрыть",
     "back": "Назад",
@@ -70,7 +75,10 @@
     "ok": "ОК",
     "retry": "Повторить",
     "cancel": "Отмена",
-    "confirm": "Подтвердить"
+    "confirm": "Подтвердить",
+    "allow_all": "Разрешить все",
+    "disallow_all": "Запретить все",
+    "best_ping": "Лучший по пингу"
   },
   "updater": {
     "initializing": {

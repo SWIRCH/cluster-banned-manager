@@ -15,10 +15,10 @@
 				"title": "Cluster Banned Manager",
 				"width": 1200,
 				"height": 580,
-				"minWidth": 799,
-				"minHeight": 580,
+				"minWidth": 820,
+				"minHeight": 520,
 				"maxWidth": 1200,
-				"maxHeight": 580,
+				"maxHeight": 600,
 				"resizable": true,
 				"fullscreen": false
 			}

@@ -23,7 +23,7 @@ export default function Sidebar({
   game,
   selectedRegion,
   onRegionChange,
-  onCheckHosts,
+  // onCheckHosts,
   onSettingsClick,
   onRefreshClick,
   onClearClick,

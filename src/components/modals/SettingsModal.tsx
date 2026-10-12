@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import {
   Field,
   FieldContent,
@@ -16,15 +17,26 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ToggleGroup } from "@/components/ui/toggle-group";
 import { useSettings } from "@/hooks/useSettings";
 import { getInitialLanguage } from "@/lib/i18n";
 import { langFormat } from "@/utils/langForamter";
 import { defaultSettings } from "@/utils/settingsStorage";
 import { writeText } from "@tauri-apps/plugin-clipboard-manager";
 import { AnimatePresence, motion } from "framer-motion";
-import { Check, ChevronLeft, Copy, RefreshCcw } from "lucide-react";
+import {
+  Check,
+  ChevronLeft,
+  Copy,
+  HeartHandshake,
+  Locate,
+  RefreshCcw,
+  ServerCog,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { DialogClose } from "../ui/dialog";
+import { ToggleGroupItem } from "../ui/toggle-group";
 import Modal from "./Modal";
 
 type SettingsModalProps = {
@@ -45,8 +57,12 @@ export default function SettingsModal({
   const { t } = useTranslation();
   const { settings, updateSettings, loading } = useSettings();
   const [copied, setCopied] = useState(false);
-  const [activeTab, setActiveTab] = useState("account");
+  const [activeTab, setActiveTab] = useState("settings");
   const [formData, setFormData] = useState(defaultSettings);
+
+  // Test
+  type syncModeValues = "local" | "hybrid" | "server";
+  const [syncMode, setSyncMode] = useState<syncModeValues>("hybrid");
 
   useEffect(() => {
     if (!loading && settings.isSetup) {
@@ -94,15 +110,24 @@ export default function SettingsModal({
       title={t("settings.title")}
       description={t("settings.description")}
       classNames={{
-        body: `${isMobile ? "w-full h-full p-6 sm:p-4 !rounded-none !pt-4 !px-4" : undefined}`,
+        body: `${isMobile ? "w-full h-full p-6 sm:p-4 !rounded-none !pt-4 !px-4" : ""}`,
       }}
       footer={
-        <button
-          className="option-btn bg-yellow-400 text-black px-4 py-2 rounded font-medium"
-          onClick={onSave}
-        >
-          {t("buttons.save_and_close")}
-        </button>
+        // <button
+        //   className="option-btn bg-yellow-400 text-black px-4 py-2 rounded font-medium font-second! text-shadow-sm"
+        //   onClick={onSave}
+        // >
+        //   {t("buttons.save_and_close")}
+        // </button>
+        <div className="grid grid-cols-2 w-full gap-2">
+          <DialogClose
+            className={"w-full"}
+            render={<Button variant="outline">{t("buttons.cancel")}</Button>}
+          />
+          <Button type="submit" className={"w-full"}>
+            {t("buttons.save")}
+          </Button>
+        </div>
       }
     >
       {!isMobile ? (
@@ -110,7 +135,7 @@ export default function SettingsModal({
           <motion.div
             layout
             transition={{ duration: 0.25, ease: "easeInOut" }}
-            className="p-3 rounded-xl bg-black/10 overflow-hidden"
+            className="overflow-hidden"
           >
             <Tabs
               value={activeTab}
@@ -118,10 +143,10 @@ export default function SettingsModal({
               orientation="vertical"
             >
               <TabsList className={"w-full"}>
-                <TabsTrigger value="account">
+                <TabsTrigger value="settings">
                   {t("settings.buttons.settings")}
                 </TabsTrigger>
-                <TabsTrigger value="password" onClick={onDiagnose}>
+                <TabsTrigger value="debug" onClick={onDiagnose}>
                   {t("settings.buttons.debug")}
                 </TabsTrigger>
               </TabsList>
@@ -135,8 +160,42 @@ export default function SettingsModal({
                     exit={{ opacity: 0, y: -4 }}
                     transition={{ duration: 0.15 }}
                   >
-                    {activeTab === "account" && (
+                    {activeTab === "settings" && (
                       <div className="grid gap-4 py-2">
+                        <Field>
+                          <FieldLabel
+                            htmlFor="language"
+                            className="bg-transparent"
+                          >
+                            {t("settings.language_interface")}
+                          </FieldLabel>
+
+                          <Select
+                            value={formData.lang}
+                            onValueChange={(val) => {
+                              if (!val) return;
+
+                              setFormData((prev) => ({
+                                ...prev,
+                                lang: val,
+                              }));
+                            }}
+                          >
+                            <SelectTrigger id="language" className={"w-full"}>
+                              <SelectValue>
+                                {langFormat(formData.lang)}
+                              </SelectValue>
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="ru" title="russian">
+                                Русский (Russian)
+                              </SelectItem>
+                              <SelectItem value="en">
+                                English (Английский)
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </Field>
                         <FieldGroup className="w-full">
                           <FieldLabel htmlFor="switch-use-firewall">
                             <Field orientation="horizontal">
@@ -225,47 +284,87 @@ export default function SettingsModal({
                           )}
                         </AnimatePresence>
 
-                        <div>
-                          <div className="grid">
-                            <div className="grid gap-2">
-                              <Label htmlFor="language">
-                                {t("settings.language_interface")}
-                              </Label>
-                              <Select
-                                value={formData.lang}
-                                onValueChange={(val) => {
-                                  if (!val) return;
+                        <Field>
+                          <FieldLabel className="bg-transparent">
+                            Синхронизация
+                          </FieldLabel>
+                          <ToggleGroup
+                            value={[syncMode]}
+                            onValueChange={(value) =>
+                              value[0] &&
+                              setSyncMode(value[0] as syncModeValues)
+                            }
+                            variant="outline"
+                            className={"grid grid-cols-3 gap-2"}
+                            spacing={2}
+                            size="lg"
+                          >
+                            <ToggleGroupItem
+                              value="local"
+                              aria-label="Light"
+                              className="flex w-full h-16 flex-col items-center justify-center rounded-xl bg-muted/50"
+                            >
+                              <span className="leading-none font-light">
+                                <Locate className="size-6" />
+                              </span>
+                              <span className="text-xs text-muted-foreground">
+                                Локальный
+                              </span>
+                            </ToggleGroupItem>
+                            <ToggleGroupItem
+                              value="hybrid"
+                              aria-label="Normal"
+                              className="flex w-full h-16 flex-col items-center justify-center rounded-xl"
+                            >
+                              <span className="text-2xl leading-none font-normal">
+                                <HeartHandshake className="size-6" />
+                              </span>
+                              <span className="text-xs text-muted-foreground">
+                                Гибридный
+                              </span>
+                            </ToggleGroupItem>
+                            <ToggleGroupItem
+                              value="server"
+                              aria-label="Medium"
+                              className="flex w-full h-16 flex-col items-center justify-center rounded-xl"
+                            >
+                              <span className="text-2xl leading-none font-medium">
+                                <ServerCog className="size-6" />
+                              </span>
+                              <span className="text-xs text-muted-foreground">
+                                Сервер
+                              </span>
+                            </ToggleGroupItem>
+                          </ToggleGroup>
+                          <FieldDescription>
+                            {syncMode === "local" && (
+                              <p>
+                                Вы выбрали локальный подход, мы будем брать файл
+                                кластера с вашего пк.
+                              </p>
+                            )}
 
-                                  setFormData((prev) => ({
-                                    ...prev,
-                                    lang: val,
-                                  }));
-                                }}
-                              >
-                                <SelectTrigger
-                                  id="language"
-                                  className={"w-full"}
-                                >
-                                  <SelectValue>
-                                    {langFormat(formData.lang)}
-                                  </SelectValue>
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="ru" title="russian">
-                                    Русский (Russian)
-                                  </SelectItem>
-                                  <SelectItem value="en">
-                                    English (Английский)
-                                  </SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </div>
-                          </div>
-                        </div>
+                            {syncMode === "hybrid" && (
+                              <p>
+                                Вы выбрали гибридный подход, мы будем обновлять
+                                файл кластера с репозитории github. В случае
+                                если она будет не доступна вы включим локальную
+                                копию.
+                              </p>
+                            )}
+
+                            {syncMode === "server" && (
+                              <p>
+                                Вы выбрали серверный подход, мы будем брать файл
+                                кластера только с репозитории github.
+                              </p>
+                            )}
+                          </FieldDescription>
+                        </Field>
                       </div>
                     )}
 
-                    {activeTab === "password" && (
+                    {activeTab === "debug" && (
                       <div className="py-2 flex flex-col gap-3">
                         <div className="flex items-center justify-between">
                           <span className="text-sm font-medium">

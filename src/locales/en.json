@@ -4,7 +4,12 @@
     "time": "Time",
     "select_server": "Select server",
     "selective_blocking": "Selective blocking",
-    "important": "Внимание"
+    "important": "Important",
+    "avg_ping": "Avg",
+    "ms": "ms"
+  },
+  "loading": {
+    "search_best_ping": "Looking for best ping..."
   },
   "system": {
     "hosts": {
@@ -88,7 +93,10 @@
     "ok": "OK",
     "retry": "Retry",
     "cancel": "Cancel",
-    "confirm": "Confirm"
+    "confirm": "Confirm",
+    "allow_all": "Allow all",
+    "disallow_all": "Disallow all",
+    "best_ping": "Best ping"
   },
   "updater": {
     "initializing": {

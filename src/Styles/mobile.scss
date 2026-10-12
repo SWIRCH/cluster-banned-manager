@@ -1,26 +1,19 @@
-@font-face {
-  src: url("/Fonts/Inter/Inter_24pt-Regular.ttf");
-  font-family: "Inter-Regular";
-  font-weight: 600;
-  font-style: bold;
-}
-
 body.platform-mobile {
   height: 100dvh;
   overflow: hidden;
   padding-left: 0px;
-  font-family: "Inter-Regular";
+  font-family: var(--font-second);
 
   .font-semibold {
-    font-family: "Play";
+    font-family: var(--font-sans);
   }
 
   .ban-clusters-2-container {
-    font-family: "Play";
+    font-family: var(--font-sans);
   }
 
   .cluster-menu {
-    font-family: "Play";
+    font-family: var(--font-sans);
   }
 
   #layer-ingame {
@@ -62,21 +55,15 @@ body.platform-mobile {
       flex: 1 1 0%;
       min-height: 0;
       max-height: none !important;
-      overflow-y: auto !important;
+      overflow-y: auto;
       scrollbar-width: none;
+      scrollbar-gutter: stable;
+      padding-bottom: 2.2em;
 
       &::-webkit-scrollbar {
         display: none;
       }
     }
-  }
-
-  #layer-ingame .scrollbarYAuto {
-    max-height: 100%;
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(43, 48, 55, 0.6) transparent;
-    scrollbar-gutter: stable;
   }
 
   .whilecard-title {
@@ -98,9 +85,9 @@ body.platform-mobile {
     left: 0;
     right: 0;
     z-index: 50;
-    background-color: rgba(16, 16, 21, 0.9);
+    background-color: var(--color-bg-overlay);
     backdrop-filter: blur(12px);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid var(--color-border-subtle);
     padding-top: 5px;
     padding-left: 24px;
     padding-right: 24px;
@@ -109,7 +96,6 @@ body.platform-mobile {
 
   .mobile-top-bar-container {
     padding-top: calc(5px + env(safe-area-inset-top, 48px));
-    // padding-top: 12px;
 
     .region-named {
       line-height: 21px;
@@ -121,7 +107,7 @@ body.platform-mobile {
     display: flex;
     align-items: center;
     gap: 5px;
-    background: #242830;
+    background: var(--color-bg-surface-2);
     padding: 3px 10px;
     border-radius: 1000px;
 
@@ -198,7 +184,7 @@ body.platform-mobile {
       transform-origin: center center;
 
       .ring-path {
-        stroke: #3b82f6;
+        stroke: var(--color-info);
         stroke-linecap: round;
         stroke-dasharray: 339;
         stroke-dashoffset: 0;
@@ -214,8 +200,8 @@ body.platform-mobile {
       width: 110px;
       height: 110px;
       border-radius: 50%;
-      background: #333338;
-      color: #a1a1aa;
+      background: var(--color-bg-surface-5);
+      color: var(--color-fg-dim);
       transition:
         background 0.3s ease,
         color 0.3s ease,
@@ -225,65 +211,47 @@ body.platform-mobile {
       outline: none;
 
       &[data-state="Off"] {
-        background: #27272a;
-        color: #71717a;
-        box-shadow: 0 0 0 1px #3f3f46;
-
-        // &:hover {
-        //   background: #3f3f46;
-        //   color: #f4f4f5;
-        //   box-shadow: 0 0 0 1px #52525b;
-        // }
+        background: var(--color-bg-surface-3);
+        color: var(--color-fg-disabled);
+        box-shadow: 0 0 0 1px var(--color-border-strong);
       }
 
       &[data-state="On"] {
-        background: #107e38;
-        color: #ffffff;
+        background: var(--color-success-bg);
+        color: var(--color-success-fg);
         box-shadow:
           0 0 24px rgba(34, 197, 94, 0.45),
-          0 0 0 2px #4ade80;
-
-        // &:hover {
-        //   background: #16a34a;
-        //   box-shadow:
-        //     0 0 30px rgba(34, 197, 94, 0.65),
-        //     0 0 0 2px #86efac;
-        // }
+          0 0 0 2px var(--color-success-ring);
       }
 
       &[data-state="Loading"] {
-        background: #18181b;
-        color: #3b82f6;
-        box-shadow: 0 0 0 1px #27272a;
+        background: var(--color-bg-surface);
+        color: var(--color-info);
+        box-shadow: 0 0 0 1px var(--color-bg-surface-3);
         cursor: wait;
       }
 
       &[data-state="Error"] {
-        background: #450a0a;
-        color: #fda4af;
+        background: var(--color-danger-bg);
+        color: var(--color-danger-fg);
         box-shadow:
           0 0 20px rgba(244, 63, 94, 0.3),
-          0 0 0 1.5px #f43f5e;
-
-        // &:hover {
-        //   background: #7f1d1d;
-        //   color: #fda4af;
-        // }
+          0 0 0 1.5px var(--color-danger-ring);
       }
 
       &[data-state="NeedsApply"] {
-        background: #92400e;
-        color: #fef3c7;
+        background: var(--color-warning-bg);
+        color: var(--color-warning-fg);
         box-shadow:
           0 0 20px rgba(251, 191, 36, 0.35),
-          0 0 0 2px #f59e0b;
+          0 0 0 2px var(--color-warning-ring);
 
         &:hover {
-          background: #92400e;
-          color: #fef3c7;
+          background: var(--color-warning-bg);
+          color: var(--color-warning-fg);
           box-shadow:
             0 0 25px rgba(251, 191, 36, 0.5),
-            0 0 0 2px #fbbf24;
+            0 0 0 2px var(--color-warning-ring-hover);
         }
       }
     }
@@ -305,22 +273,6 @@ body.platform-mobile {
     100% {
       stroke-dashoffset: 310;
     }
-  }
-
-  #layer-ingame .scrollbarYAuto {
-    max-height: none !important;
-    overflow-y: auto;
-    scrollbar-width: none;
-    scrollbar-gutter: stable;
-    padding-bottom: 2.2em;
-
-    &::-webkit-scrollbar {
-      display: none;
-    }
-  }
-
-  #layer-ingame .scrollbarYAuto::-webkit-scrollbar {
-    display: none;
   }
 
   .mobile-modal {

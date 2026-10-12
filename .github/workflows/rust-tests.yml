@@ -1,20 +1,20 @@
-name: Windows Tests
+name: Rust Tests
 
 on:
   push:
-    branches: [main, master, dev]
+    branches: [main, master]
     paths:
       - 'src-tauri/**/*.rs'
       - 'src-tauri/Cargo.toml'
       - 'src-tauri/Cargo.lock'
-      - '.github/workflows/windows-test.yml'
+      - '.github/workflows/rust-tests.yml'
   pull_request:
     branches: [main, master]
     paths:
       - 'src-tauri/**/*.rs'
       - 'src-tauri/Cargo.toml'
       - 'src-tauri/Cargo.lock'
-      - '.github/workflows/windows-test.yml'
+      - '.github/workflows/rust-tests.yml'
 
 jobs:
   test:

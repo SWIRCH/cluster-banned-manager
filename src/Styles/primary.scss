@@ -1,29 +1,24 @@
-@font-face {
-  src: url("/Fonts/Play-Bold.ttf");
-  font-family: "Play";
-  font-weight: 600;
-  font-style: bold;
-}
-
-@font-face {
-  src: url("/Fonts/Play-Regular.ttf");
-  font-family: "Play";
-  font-weight: 400;
-  font-style: normal;
-}
+@use "./variables" as var;
 
 html,
 body {
   padding: 0;
   margin: 0;
   user-select: none;
+  height: 100%;
+  overflow: hidden;
 }
 
 body {
-  font-family: "Play";
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: var(--font-sans);
   font-weight: 400;
-  background: #0d1117;
-  color: #fff;
+  background: var(--color-bg-base);
+  color: var(--color-fg);
   padding-left: 4em;
   overflow: hidden;
 }
@@ -51,7 +46,7 @@ h2 {
 }
 
 small {
-  color: #7d8590;
+  color: var(--color-fg-muted);
 }
 
 .dropdownButton {
@@ -72,7 +67,7 @@ small {
   flex-direction: column;
   align-items: start;
   gap: 5px;
-  background: #2b30378e;
+  background: color-mix(in srgb, var(--color-bg-surface-4) 56%, transparent);
   backdrop-filter: blur(10px);
   border-radius: 10px;
   padding: 5px 10px;
@@ -95,7 +90,7 @@ small {
   gap: 8px;
   padding: 8px 16px;
   border-radius: 6px;
-  color: white !important;
+  color: var(--color-fg) !important;
   transition: 0.15s;
 
   &:hover {
@@ -106,12 +101,12 @@ small {
 
 .link {
   cursor: pointer;
-  color: #79a3ff;
+  color: var(--color-fg-link);
 }
 
 .sidebar-tooltip {
   background: rgb(22 26 30 / 53%);
-  color: #fff;
+  color: var(--color-fg);
 }
 
 .sidebar {
@@ -123,7 +118,7 @@ small {
   padding-right: 0;
   padding-top: 0;
   padding-bottom: 0;
-  background: rgb(22 26 30 / 53%);
+  background: var(--color-bg-sidebar);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -131,18 +126,18 @@ small {
 
   .hr-bordered-top {
     width: 30px;
-    color: #364153;
+    color: var(--color-border-default);
     outline: none;
   }
 
   &::before {
     content: "";
     position: absolute;
-    top: -1px;
+    top: -2px;
     right: -30px;
     width: 30px;
     height: 30px;
-    background-color: rgb(22 26 30 / 53%);
+    background-color: var(--color-bg-sidebar-decoration);
     transform: rotate(180deg);
     clip-path: path("M 30 30 L 30 0 C 30 22, 18 28, 8 28 C 3 28, 0 30, 0 30 Z");
   }
@@ -154,7 +149,7 @@ small {
     right: -30px;
     width: 30px;
     height: 30px;
-    background-color: rgb(22 26 30 / 53%);
+    background-color: var(--color-bg-sidebar-decoration);
     rotate: 180deg;
     transform: scaleY(-1);
     clip-path: path("M 30 30 L 30 0 C 30 22, 18 28, 8 28 C 3 28, 0 30, 0 30 Z");
@@ -203,12 +198,12 @@ small {
 
       &:hover {
         border-radius: 100%;
-        box-shadow: 0 0 0 2px #9fb0d6;
+        box-shadow: 0 0 0 2px var(--color-fg-link-hover);
       }
 
       .active {
         border-radius: 100%;
-        box-shadow: 0 0 0 2px #3c7aff;
+        box-shadow: 0 0 0 2px var(--color-fg-link-active);
 
         .flag-icon {
           width: 18px;
@@ -235,7 +230,7 @@ small {
   padding-right: 1.2em;
   padding-top: 0.35em;
   padding-bottom: 0.35em;
-  background: #2b303763;
+  background: color-mix(in srgb, var(--color-bg-surface-4) 39%, transparent);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -275,22 +270,28 @@ small {
 }
 
 .gameButtons {
-  position: absolute;
+  position: sticky;
   width: 100%;
   left: 0;
   bottom: -2px;
-  //   background: #00000041;
-  //   backdrop-filter: blur(2px);
   overflow: hidden;
   border-bottom: 10px;
 }
 
 #layer-ingame {
+  height: 100%; /* ← было 100dvh */
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
   .inGameContainer {
     display: flex;
-    margin: 1em 1em;
+    padding: 1em;
     margin-bottom: 0;
     gap: 1.2em;
+    flex: 1 1 0%;
+    min-height: 0;
   }
 
   .inGamePoster {
@@ -308,18 +309,11 @@ small {
       position: relative;
       width: 100%;
       height: 100%;
+      display: flex;
+      align-items: end;
       background-size: cover;
       background-position: center;
       border-radius: 10px;
-
-      // &::before {
-      //   content: "";
-      //   position: absolute;
-      //   width: 100%;
-      //   height: 100%;
-      //   border-radius: 10px;
-      //   background: #00000041;
-      // }
 
       & > div {
         z-index: 20;
@@ -335,20 +329,70 @@ small {
         z-index: -1 !important;
       }
     }
+
+    @media (max-width: var.$screenSm) {
+      & {
+        display: none !important;
+      }
+    }
   }
 
   .inGameOption {
     width: 100%;
     display: flex;
     flex-direction: column;
+    flex: 1 1 0%;
+    min-height: 0;
+  }
+
+  .whilecard {
+    flex: 1 1 0%;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+
+    .title {
+      font-family: var(--font-second);
+      font-weight: 400;
+      font-size: var(--text-lg);
+      width: 100%;
+      padding: 3px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .action-bar {
+      display: flex;
+      gap: 10px;
+      font-family: var(--font-second);
+    }
+
+    .content {
+      width: 100%;
+      padding-top: 0.15em;
+      padding-left: 0.3em;
+      flex: 1 1 0%;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+    }
   }
 
   .scrollbarYAuto {
-    max-height: 385px;
+    flex: 1 1 0%;
+    min-height: 0;
+    max-height: 100%;
     overflow-y: auto;
     scrollbar-width: thin;
-    scrollbar-color: rgba(43, 48, 55, 0.6) transparent;
+    scrollbar-color: transparent transparent;
     scrollbar-gutter: stable;
+    transition: scrollbar-color 0.2s ease;
+
+    &.is-scrollable:hover,
+    &.is-scrollable:focus-within {
+      scrollbar-color: rgba(43, 48, 55, 0.6) transparent;
+    }
 
     &::-webkit-scrollbar {
       width: 2px;
@@ -359,30 +403,87 @@ small {
       border-radius: 999px;
     }
     &::-webkit-scrollbar-thumb {
-      background: rgba(43, 48, 55, 0.6);
+      background: transparent;
       border-radius: 999px;
       border: 1px solid rgba(0, 0, 0, 0);
       background-clip: padding-box;
+      transition: background 0.2s ease;
     }
-    &::-webkit-scrollbar-thumb:hover {
+    &.is-scrollable:hover::-webkit-scrollbar-thumb,
+    &.is-scrollable:focus-within::-webkit-scrollbar-thumb {
+      background: rgba(43, 48, 55, 0.6);
+    }
+    &.is-scrollable:hover::-webkit-scrollbar-thumb:hover {
       background: rgba(43, 48, 55, 0.85);
     }
   }
+}
 
-  .whilecard {
-    .title {
-      width: 100%;
-      background: #2b303763;
-      padding: 3px 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+.ban-clusters-2-container {
+  .cluster > div {
+    position: relative;
+    overflow: hidden;
+    transition: 0.2s;
+
+    & > div {
+      z-index: 10;
     }
 
-    .content {
-      width: 100%;
-      padding-top: 0.15em;
-      padding-left: 0.3em;
+    &.ok {
+      background-color: rgba(255, 255, 255, 0.03);
+
+      &:hover {
+        box-shadow: inset 0 0 0 1.5px
+          color-mix(in srgb, var(--color-gray-600) 60%, transparent);
+
+        &:before {
+          background-color: color-mix(
+            in srgb,
+            var(--color-gray-400) 30%,
+            transparent
+          );
+        }
+      }
+    }
+
+    &.loss {
+      background-color: rgba(255, 0, 0, 0.11);
+
+      &:hover {
+        box-shadow: inset 0 0 0 1.5px
+          color-mix(in srgb, var(--color-red-500) 70%, transparent);
+
+        &:before {
+          background-color: color-mix(
+            in srgb,
+            var(--color-red-600) 40%,
+            transparent
+          );
+        }
+      }
+    }
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -50px;
+      width: 60px;
+      height: 100%;
+      background-color: color-mix(in srgb, var(--color-white) 10%, transparent);
+      border-radius: 100%;
+      filter: blur(30px);
+      z-index: -1;
+      transition: 0.25s;
+    }
+
+    &:hover {
+      transition: 0.15s;
+
+      &::before {
+        width: 130px;
+        transition: 0.5s;
+      }
     }
   }
 }
@@ -395,8 +496,8 @@ small {
 hr.vertical {
   width: 1px;
   height: 20px;
-  color: #7d8590;
-  background: #7d8590;
+  color: var(--color-fg-muted);
+  background: var(--color-fg-muted);
   margin: 0 10px;
 }
 
@@ -416,7 +517,7 @@ hr.vertical {
   cursor: pointer;
   position: relative;
   font-size: 16px;
-  color: #ffffff;
+  color: var(--color-fg);
 }
 
 .SelectInteractRadio label::before {
@@ -445,16 +546,16 @@ hr.vertical {
   right: 0;
   top: -1px;
   font-size: 16px;
-  color: rgb(103, 240, 85);
+  color: var(--color-radio-label);
   display: none;
 }
 
 .SelectInteractRadio input[type="radio"]:checked + label::after {
-  display: block; /* Показываем галочку */
+  display: block;
 }
 
 .SelectInteractRadio input[type="radio"]:checked + label::before {
-  background: rgba(48, 255, 82, 0.993);
+  background: var(--color-radio-active);
   animation: SelectOptionAnim1 normal 1s;
 }
 
@@ -468,10 +569,14 @@ hr.vertical {
   font-size: 18px;
   letter-spacing: 0.03em;
   text-align: center;
-  color: #fff;
+  color: var(--color-fg);
   position: relative;
-  font-family: "Motiva Sans", Sans-serif;
-  background: linear-gradient(to right, #06bfff 50%, #2b74ff 100%);
+  font-family: var(--font-spec);
+  background: linear-gradient(
+    to right,
+    var(--color-brand-from) 50%,
+    var(--color-brand-to) 100%
+  );
   background-size: 200%;
   background-position: right 0;
   transition: background-position 300ms ease-in;
@@ -481,7 +586,11 @@ hr.vertical {
   display: block;
   text-transform: uppercase;
   position: relative;
-  background: linear-gradient(to right, #06bfff 50%, #2b74ff 100%);
+  background: linear-gradient(
+    to right,
+    var(--color-brand-from) 50%,
+    var(--color-brand-to) 100%
+  );
   background-size: 200%;
   background-position: 0 0;
   transition: background-position 300ms ease-in;
@@ -489,7 +598,11 @@ hr.vertical {
 }
 
 .steam-btn:disabled {
-  background: linear-gradient(to right, #06c1ff7a 50%, #2b75ff6b 100%);
+  background: linear-gradient(
+    to right,
+    color-mix(in srgb, var(--color-brand-from) 48%, transparent) 50%,
+    color-mix(in srgb, var(--color-brand-to) 42%, transparent) 100%
+  );
 }
 
 .option-btn {
@@ -504,10 +617,14 @@ hr.vertical {
   font-size: 14px;
   letter-spacing: 0.03em;
   text-align: center;
-  color: #fff;
+  color: var(--color-fg);
   position: relative;
-  font-family: "Motiva Sans", Sans-serif;
-  background: linear-gradient(to right, #06bfff 50%, #2b74ff 100%);
+  font-family: var(--font-spec);
+  background: linear-gradient(
+    to right,
+    var(--color-brand-from) 50%,
+    var(--color-brand-to) 100%
+  );
   background-size: 200%;
   background-position: right 0;
   transition: background-position 300ms ease-in;
@@ -519,7 +636,11 @@ hr.vertical {
   align-items: center;
   text-transform: uppercase;
   position: relative;
-  background: linear-gradient(to right, #06bfff 50%, #2b74ff 100%);
+  background: linear-gradient(
+    to right,
+    var(--color-brand-from) 50%,
+    var(--color-brand-to) 100%
+  );
   background-size: 200%;
   background-position: 0 0;
   transition: background-position 300ms ease-in;
@@ -545,5 +666,5 @@ hr.vertical {
 }
 
 .text-muted {
-  color: #818181;
+  color: var(--color-fg-subtle);
 }

@@ -2,7 +2,6 @@ import { useAppStore } from "@/store/useAppStore";
 import { AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 
-import ClusterMenu from "./components/ClusterMenu";
 import GamePoster from "./components/GamePoster";
 import LoadingScreen from "./components/LoadingScreen";
 import SelectiveBlocking from "./components/SelectiveBlocking";
@@ -34,7 +33,6 @@ import {
 
 import { collectBlockedDomains } from "@/utils/blocking";
 import { config } from "@/utils/config";
-import { openWarpFixPingLoss } from "@/utils/opener";
 import { getSavedRegionId, saveRegionId } from "@/utils/regionStorage";
 import {
   diagnoseTauri,
@@ -45,7 +43,7 @@ import {
 import "@/lib/vpnListener";
 import type { Game } from "@/types/cluster";
 import { logger } from "@/utils/logger";
-import { useTranslation } from "react-i18next";
+import ApplyClusterAlert from "./components/ApplyClusterAlert/ApplyClusterAlert";
 import MobileBottomBar from "./components/mobile/BottomBar";
 import MobileTopBar from "./components/mobile/TopBar";
 import TurnVpnButton from "./components/mobile/TurnVpnButton";
@@ -60,6 +58,7 @@ import("@/styles/desktop.scss");
 function AppContent() {
   const { clustersData, isLoading: clustersLoading } = useClustersLoader();
   const [isLoadingScreen, setIsLoadingScreen] = useState(clustersLoading);
+  // const [viewApplyClusterAlert, setViewApplyClusterAlert] = useState(false);
   const game = clustersData as Game;
 
   const infoModal = useInfoModal();
@@ -140,6 +139,8 @@ function AppContent() {
     selectCluster,
     clearAllSelections,
     persistSelections,
+    clearRegionSelections,
+    selectAllClustersInRegion,
   } = useSelections(game, settings, updateSettings, settingsLoading);
   const {
     hostsMismatch,
@@ -257,12 +258,20 @@ function AppContent() {
   }, [allBlockedDomainsKey, isMobile, setVpnDirty, vpnBaselineDomains]);
 
   const vpnNeedsApply = isMobile && vpnDirty;
-  const selectedDomain =
-    Object.keys(regionMap).find((k) => regionMap[k]) ??
-    selectedRegionClusters[0]?.domain;
+  // const selectedDomain =
+  //   Object.keys(regionMap).find((k) => regionMap[k]) ??
+  //   selectedRegionClusters[0]?.domain;
 
   const handleSelectCluster = (domain: string) => {
     selectCluster(selectedRegionId, domain, selectedRegionClusters);
+  };
+
+  const handleDisableClusters = () => {
+    clearRegionSelections(selectedRegionId);
+  };
+
+  const handleEnableClusters = () => {
+    selectAllClustersInRegion(selectedRegionId, selectedRegionClusters);
   };
 
   const handleToggleCluster = (domain: string, checked: boolean) => {
@@ -374,7 +383,7 @@ function AppContent() {
     },
   };
 
-  const { t } = useTranslation();
+  // const { t } = useTranslation();
 
   return (
     <>
@@ -401,23 +410,34 @@ function AppContent() {
               className={`inGameContainer ${isMobile ? "flex flex-1 min-h-0 flex-col pb-16" : undefined}`}
             >
               {!isMobile && (
-                <GamePoster
-                  posterUrl={posterUrl}
-                  tauriAvailable={tauriAvailable}
-                  hostsMismatch={hostsMismatch}
-                  gameRunning={gameRunning}
-                  onPlayClick={handlePlayClick}
-                  onUpdateClick={handleUpdateClick}
-                  selectedRegion={selectedRegion}
-                  lastTauriError={lastTauriError}
-                  mismatchDomains={mismatchDomains}
-                />
+                <>
+                  <GamePoster
+                    posterUrl={posterUrl}
+                    tauriAvailable={tauriAvailable}
+                    hostsMismatch={hostsMismatch}
+                    gameRunning={gameRunning}
+                    onPlayClick={handlePlayClick}
+                    onUpdateClick={handleUpdateClick}
+                    selectedRegion={selectedRegion}
+                    lastTauriError={lastTauriError}
+                    mismatchDomains={mismatchDomains}
+                  />
+
+                  {/* Если маленькая ширина */}
+                  <ApplyClusterAlert
+                    hostsMismatch={hostsMismatch}
+                    onUpdateClick={handleUpdateClick}
+                    selectedRegion={selectedRegion}
+                    lastTauriError={lastTauriError}
+                    mismatchDomains={mismatchDomains}
+                  />
+                </>
               )}
 
               <div
                 className={`inGameOption ${isMobile ? "flex-1 min-h-0" : undefined}`}
               >
-                {!isMobile && (
+                {/* {!isMobile && (
                   <div className="whilecard">
                     <div className="whilecard-title flex justify-between items-center space-y-1 rounded-xl bg-white/5 p-1 sm:p-2">
                       <h3>{t("common.select_server")}</h3>
@@ -442,7 +462,7 @@ function AppContent() {
                       </div>
                     </div>
                   </div>
-                )}
+                )} */}
 
                 {isMobile && (
                   <TurnVpnButton
@@ -456,6 +476,10 @@ function AppContent() {
                   clusters={selectedRegionClusters}
                   checkedMap={regionMap}
                   onToggle={handleToggleCluster}
+                  onSelect={handleSelectCluster}
+                  onDisableAll={handleDisableClusters}
+                  onEnableAll={handleEnableClusters}
+                  hostsMismatch={hostsMismatch}
                   pings={pings}
                   isMobile={isMobile}
                 />
