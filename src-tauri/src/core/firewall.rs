@@ -30,7 +30,7 @@ pub fn apply_for_domain(domain: &str, ips: &[String], enable: bool) -> AppResult
             let mut ok = 0usize;
             for ip in ips {
                 let ip_name = fw::ip_rule_name(domain, ip);
-                if fw::add_rule(&ip_name, &[ip.clone()]).is_ok() {
+                if fw::add_rule(&ip_name, std::slice::from_ref(ip)).is_ok() {
                     ok += 1;
                 }
             }

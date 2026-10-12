@@ -268,10 +268,7 @@ fn remove_domains(
 fn clear_all_blocks(content: &mut String) -> usize {
     let mut removed = 0;
     let mut position = 0;
-    loop {
-        let Some(rel) = content[position..].find(START_MARKER) else {
-            break;
-        };
+    while let Some(rel) = content[position..].find(START_MARKER) {
         let start = position + rel;
 
         let Some(rel_end) = content[start..].find(END_MARKER) else {

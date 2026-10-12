@@ -6,11 +6,7 @@ use serde_json::json;
 pub fn check_elevation() -> AppResult<serde_json::Value> {
     let path = paths::hosts_path()?;
 
-    match std::fs::OpenOptions::new()
-        .write(true)
-        .append(true)
-        .open(&path)
-    {
+    match std::fs::OpenOptions::new().append(true).open(&path) {
         Ok(_) => Ok(json!({ "isAdmin": true, "path": path.display().to_string() })),
         Err(e) => Ok(json!({
             "isAdmin": false,

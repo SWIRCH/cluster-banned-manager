@@ -9,7 +9,7 @@ pub fn is_running(name: &str) -> bool {
     sys.refresh_processes();
     let needle = name.to_lowercase();
 
-    for (_pid, proc_) in sys.processes() {
+    for proc_ in sys.processes().values() {
         if proc_.name().to_lowercase().contains(&needle) {
             return true;
         }
