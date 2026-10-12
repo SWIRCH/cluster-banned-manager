@@ -28,6 +28,8 @@ reqwest = { version = "0.13", features = ["json", "rustls"] }
 tauri-plugin-updater = "2.9.0"
 tauri-plugin-cluster-vpn = { path = "../tauri-plugin-cluster-vpn" }
 tauri-plugin-clipboard-manager = "2"
+thiserror = "1"
+log = "0.4"
 
 [target.'cfg(windows)'.dependencies]
 winping = "0.10.0"

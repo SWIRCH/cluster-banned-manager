@@ -1,0 +1,26 @@
+name: Tests
+
+on:
+  push:
+    branches: [main, master, dev]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: cargo check
+        working-directory: src-tauri
+        run: cargo check --all-targets
+      - name: cargo test
+        working-directory: src-tauri
+        run: cargo test
+      - name: cargo fmt --check
+        working-directory: src-tauri
+        run: cargo fmt --check
+      - name: clippy
+        working-directory: src-tauri
+        run: cargo clippy -- -D warnings

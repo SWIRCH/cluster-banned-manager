@@ -1,12 +1,8 @@
+use crate::error::{AppError, AppResult};
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeSet;
 
-#[derive(Debug, Deserialize)]
-pub struct VpnPolicyRequest {
-    pub domains: Vec<String>,
-}
-
-#[derive(Debug, Serialize, PartialEq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub struct VpnPolicy {
     pub domains: Vec<String>,
 }
@@ -34,23 +30,18 @@ fn normalize_domain(domain: &str) -> Option<String> {
     Some(normalized)
 }
 
-pub fn build_policy(domains: &[String]) -> Result<VpnPolicy, String> {
+pub fn build_policy(domains: &[String]) -> AppResult<VpnPolicy> {
     let mut normalized = BTreeSet::new();
 
     for domain in domains {
-        let value =
-            normalize_domain(domain).ok_or_else(|| format!("invalid VPN domain: {domain}"))?;
+        let value = normalize_domain(domain)
+            .ok_or_else(|| AppError::Msg(format!("invalid VPN domain: {domain}")))?;
         normalized.insert(value);
     }
 
     Ok(VpnPolicy {
         domains: normalized.into_iter().collect(),
     })
-}
-
-#[tauri::command]
-pub fn vpn_prepare_policy(request: VpnPolicyRequest) -> Result<VpnPolicy, String> {
-    build_policy(&request.domains)
 }
 
 #[cfg(test)]
@@ -71,7 +62,6 @@ mod tests {
     #[test]
     fn rejects_invalid_domains() {
         let error = build_policy(&["bad domain.example".to_string()]).unwrap_err();
-
-        assert!(error.contains("invalid VPN domain"));
+        assert!(error.to_string().contains("invalid VPN domain"));
     }
 }
