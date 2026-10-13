@@ -1,6 +1,6 @@
-import { useAppStore } from "@/store/useAppStore"
-import { config } from "@/utils/config"
-import { openAuthorLink, openGithub } from "@/utils/opener"
+import { useAppStore } from "@/store/useAppStore";
+import { config } from "@/utils/config";
+import { openAuthorLink, openGithub } from "@/utils/opener";
 import {
   ChevronLeft,
   Code2,
@@ -8,11 +8,11 @@ import {
   GitBranch,
   Github,
   User,
-} from "lucide-react"
-import { memo } from "react"
-import Modal from "../Modal"
+} from "lucide-react";
+import { memo } from "react";
+import Modal from "../Modal";
 
-function AboutModalComponent() {
+export default function AboutModalComponent() {
   const isOpen = useAppStore((state) => state.isAboutModalOpen);
   const setIsOpen = useAppStore((state) => state.setIsAboutModalOpen);
   const onClose = () => setIsOpen(false);

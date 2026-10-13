@@ -1,6 +1,6 @@
 import clustersDataLocal from "@/data/servers.json";
 import { config } from "@/utils/config";
-import { showGlobalError } from "./globalError";
+import { showGlobalError } from "../components/system/GlobalError";
 import { logger } from "./logger";
 
 export function normalizeClustersData(data: unknown): GameData {

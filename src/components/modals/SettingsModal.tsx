@@ -124,7 +124,7 @@ export default function SettingsModal({
             className={"w-full"}
             render={<Button variant="outline">{t("buttons.cancel")}</Button>}
           />
-          <Button type="submit" className={"w-full"}>
+          <Button type="submit" className={"w-full"} onClick={onSave}>
             {t("buttons.save")}
           </Button>
         </div>

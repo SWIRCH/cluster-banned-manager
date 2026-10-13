@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Region } from "@/types";
 import { AnimatePresence, motion } from "framer-motion";
-import styles from "./applyclusteralert.module.scss";
+import styles from "./styles.module.scss";
 
 type ApplyClusterAlertProps = {
   selectedRegion: Region | null;
@@ -11,18 +11,6 @@ type ApplyClusterAlertProps = {
   mismatchDomains: string[];
   onUpdateClick: () => void;
 };
-
-// type GamePosterProps = {
-//   posterUrl: string;
-//   tauriAvailable: boolean | null;
-//   hostsMismatch: boolean;
-//   gameRunning: boolean;
-//   onPlayClick: () => void;
-//   onUpdateClick: () => void;
-//   selectedRegion: Region | null;
-//   lastTauriError: string | null;
-//   mismatchDomains: string[];
-// };
 
 export default function ApplyClusterAlert({
   hostsMismatch,

@@ -1,8 +1,9 @@
-export { default as ConfirmModal } from "./ConfirmModal";
+export { default as AdminModal } from "./AdminModal";
 export { default as BlockingAllConfirmModal } from "./BlockingAllConfirmModal";
 export { default as ClearConfirmModal } from "./ClearConfirmModal";
-export { default as InfoModal } from "./InfoModal";
-export { default as SettingsModal } from "./SettingsModal";
-export { default as AdminModal } from "./AdminModal";
+export { default as ConfirmModal } from "./ConfirmModal";
 export { default as ErrorModal } from "./ErrorModal";
-export { AboutModal } from "./mobile/AboutModal";
+export { default as InfoModal } from "./InfoModal";
+export { default as AboutModal } from "./mobile/AboutModal";
+export { default as ChangeRegionModal } from "./mobile/ChangeRegion";
+export { default as SettingsModal } from "./SettingsModal";

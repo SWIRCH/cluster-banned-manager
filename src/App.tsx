@@ -2,10 +2,10 @@ import { useAppStore } from "@/store/useAppStore";
 import { AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 
-import GamePoster from "./components/GamePoster";
-import LoadingScreen from "./components/LoadingScreen";
-import SelectiveBlocking from "./components/SelectiveBlocking";
-import Sidebar from "./components/Sidebar";
+import { ApplyClusterAlert, SelectiveBlocking } from "./components/clusters";
+import GamePoster from "./components/game/GamePoster";
+import Sidebar from "./components/layout/Sidebar";
+import LoadingScreen from "./components/system/LoadingScreen";
 
 import {
   AboutModal,
@@ -43,13 +43,15 @@ import {
 import "@/lib/vpnListener";
 import type { Game } from "@/types/cluster";
 import { logger } from "@/utils/logger";
-import ApplyClusterAlert from "./components/ApplyClusterAlert/ApplyClusterAlert";
-import MobileBottomBar from "./components/mobile/BottomBar";
-import MobileTopBar from "./components/mobile/TopBar";
-import TurnVpnButton from "./components/mobile/TurnVpnButton";
+import MobileBottomBar from "./components/layout/mobile/BottomBar";
+import MobileTopBar from "./components/layout/mobile/TopBar";
 import SetupFirstAppSettings from "./components/modals/SetupFirstAppSettings";
+import {
+  hideGlobalError,
+  showGlobalError,
+} from "./components/system/GlobalError";
+import TurnVpnButton from "./components/vpn/TurnVpnButton";
 import { bootstrapSettings } from "./store/settings.store";
-import { hideGlobalError, showGlobalError } from "./utils/globalError";
 
 // Styles
 import("@/styles/mobile.scss");

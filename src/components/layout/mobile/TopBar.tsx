@@ -1,6 +1,6 @@
-import ChangeRegionModal from "@/components/modals/mobile/ChangeRegion"
-import { useAppStore } from "@/store/useAppStore"
-import { ChevronRight } from "lucide-react"
+import { ChangeRegionModal } from "@/components/modals";
+import { useAppStore } from "@/store/useAppStore";
+import { ChevronRight } from "lucide-react";
 
 export default function MobileTopBar() {
   const game = useAppStore((state) => state.game);
