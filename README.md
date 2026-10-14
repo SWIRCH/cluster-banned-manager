@@ -1,9 +1,9 @@
-# <img src="/public/clusterbanned.png" height="34" /> Cluster Banned Manager
-
-
-[![ClasterBanned](/public/banner-new.png)](https://cbmwot.vercel.app/)
+# <img src="./public/clusterbanned.png" height="34" style="vertical-align: middle;" /> Cluster Banned Manager
 
 <div align="center">
+<a href="https://cbmwot.vercel.app/">
+	<img src="./public/banner-new.png" width="750" alt="ClusterBannedManager" />
+</a>
 
 [![Bun](https://img.shields.io/badge/Bun-f472b8?style=for-the-badge&logo=bun&logoColor=white)](https://bun.sh/)
 [![Rust](https://img.shields.io/badge/Rust-000000?style=for-the-badge&logo=rust&logoColor=white)](https://www.rust-lang.org/)
@@ -18,8 +18,7 @@
 
 **Управление подключением к игровым серверам World of Tanks Blitz и Tanks Blitz.<br /> Блокировка нежелательных кластеров на сетевом уровне для Windows и Android.**
 
-[<img src="/public/github/WindowsDownloadRu.png" width="200" />](https://github.com/SWIRCH/cluster-banned-manager/releases/tag/v0.1.7)
-[<img src="/public/github/AndroidDownloadRu.png" width="200" />](https://github.com/SWIRCH/cluster-banned-manager/releases/download/v0.1.6/app-universal-release.apk)
+[<img src="./public/github/WindowsDownloadRu.png" width="230" style="margin-right: 10px;" />](https://github.com/SWIRCH/cluster-banned-manager/releases/tag/v0.1.7) [<img src="./public/github/AndroidDownloadRu.png" width="230" />](https://github.com/SWIRCH/cluster-banned-manager/releases/download/v0.1.6/app-universal-release.apk)
 
 </div>
 
@@ -64,11 +63,11 @@
 
 ### 🎨 Интерфейс
 
-![ClasterBanned](/public/app_interface_2.png)
+![ClusterBanned](/public/app_interface_2.png)
 
-- **Адаптивный UI** — единый стильный интерфейс под ПК и мобильные устройства.
-- **Мультирегиональность** — поддержка всех серверов WoT Blitz (EU, NA, ASIA) и Tanks Blitz (RU/Lesta).
-- **Статус в реальном времени** — наглядные индикаторы активных подсистем и серверов.
+1. **Адаптивный UI** — единый стильный интерфейс под ПК и мобильные устройства.
+2. **Мультирегиональность** — поддержка всех серверов WoT Blitz (EU, NA, ASIA) и Tanks Blitz (RU/Lesta).
+3. **Статус в реальном времени** — наглядные индикаторы активных подсистем и серверов.
 
 ## Поддерживаемые регионы
 
