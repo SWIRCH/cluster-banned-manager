@@ -1,58 +1,148 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Region } from "@/types";
+import { writeText } from "@tauri-apps/plugin-clipboard-manager";
 import { AnimatePresence, motion } from "framer-motion";
+import { Check, Copy, X } from "lucide-react";
+import { Ref, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import styles from "./styles.module.scss";
 
 type ApplyClusterAlertProps = {
+  ref?: Ref<HTMLDivElement>;
   selectedRegion: Region | null;
   lastTauriError: string | null;
+  allBlockedDomains: string[] | null;
   hostsMismatch: boolean;
   mismatchDomains: string[];
-  onUpdateClick: () => void;
+  onUpdate: () => void;
+  onCancel: () => void;
 };
 
 export default function ApplyClusterAlert({
+  ref,
   hostsMismatch,
-  // mismatchDomains,
-  // onUpdateClick,
-  // lastTauriError,
+  mismatchDomains,
+  selectedRegion,
+  allBlockedDomains,
+  lastTauriError,
+  onUpdate,
+  onCancel,
 }: ApplyClusterAlertProps) {
+  const { t } = useTranslation();
+  const [copiedError, setCopiedError] = useState<boolean>(false);
+
+  const { blocked, unBlocked } = useMemo(() => {
+    const allBlockedSet = new Set(allBlockedDomains);
+    return {
+      blocked: mismatchDomains.filter((d) => allBlockedSet.has(d)),
+      unBlocked: mismatchDomains.filter((d) => !allBlockedSet.has(d)),
+    };
+  }, [allBlockedDomains, mismatchDomains]);
+
+  const handleCopyError = async () => {
+    if (!lastTauriError) return;
+
+    await writeText(
+      typeof lastTauriError === "string"
+        ? lastTauriError
+        : JSON.stringify(lastTauriError, null, 2),
+    );
+
+    setCopiedError(true);
+    setTimeout(() => setCopiedError(false), 2000);
+  };
+
+  const onCloseError = () => {
+    onCancel();
+  };
+
   return (
     <AnimatePresence>
-      {/* {tauriAvailable === true && hostsMismatch === false && (
-                  <motion.div
-                    key="hosts-ok"
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    transition={{ duration: 0.15 }}
-                    className="flex items-center gap-1"
-                  ></motion.div> */}
       {hostsMismatch && (
         <motion.div
+          ref={ref}
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
           transition={{ duration: 0.15 }}
-          className={styles["apply-cluster-alert"]}
+          className={cn(styles["apply-cluster-alert"])}
         >
-          <div className="flex justify-between">
-            <div>
-              <span className="text-amber-300 font-medium">
-                Не применено: 1 изменение
-              </span>
-              <p className="text-gray-300 text-xs">C1 будет заблокирован</p>
+          {!lastTauriError ? (
+            <div className="flex justify-between">
+              <div>
+                <span className="text-amber-300 font-medium">
+                  {t("common.not_applied")}:{" "}
+                  {t("common.change", { count: mismatchDomains.length })}
+                </span>
+                <p className="text-gray-300 text-xs pr-10">
+                  {blocked.length > 0 && (
+                    <>
+                      {blocked.join(" ")}{" "}
+                      {t("system.hosts.will_be_blocked", {
+                        count: blocked.length,
+                      })}
+                    </>
+                  )}
+                  {unBlocked.length > 0 && (
+                    <>
+                      {blocked.length > 0 && <br />}
+                      {unBlocked.join(" ")}{" "}
+                      {t("system.hosts.will_be_unblocked", {
+                        count: unBlocked.length,
+                      })}
+                    </>
+                  )}
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant={"outline"}
+                  className={"p-5"}
+                  onClick={onCancel}
+                >
+                  {t("buttons.cancel")}
+                </Button>
+                <Button
+                  className={cn(styles["steam-btn-2"], "p-5")}
+                  onClick={onUpdate}
+                >
+                  {t("system.hosts.updateBlocked")} (
+                  {selectedRegion?.alias_name})
+                </Button>
+              </div>
             </div>
-            <div className="flex gap-2">
-              <Button variant={"outline"} className={"p-5"}>
-                Отменить
-              </Button>
-              <Button className={cn(styles["steam-btn-2"], "p-5")}>
-                ОБНОВИТЬ БЛОК (RU)
-              </Button>
+          ) : (
+            <div className="flex justify-between">
+              <div className="w-full">
+                <div className="flex justify-between">
+                  <span className="font-medium">{t("errors.default")}</span>
+                  <div className="space-x-1.5">
+                    <Button
+                      size={"xs"}
+                      onClick={handleCopyError}
+                      variant={"outline"}
+                      className={"font-normal"}
+                      disabled={copiedError}
+                    >
+                      {!copiedError ? <Copy /> : <Check />}
+                      {t("buttons.copy")}
+                    </Button>
+                    <Button
+                      size={"icon-xs"}
+                      onClick={onCloseError}
+                      variant={"outline"}
+                    >
+                      <X />
+                    </Button>
+                  </div>
+                </div>
+                <pre className="mt-1.5 text-danger-ring select-text max-h-[75vh] overflow-auto text-xs font-mono">
+                  {lastTauriError}
+                </pre>
+              </div>
             </div>
-          </div>
+          )}
         </motion.div>
       )}
     </AnimatePresence>

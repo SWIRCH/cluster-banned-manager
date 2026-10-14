@@ -171,3 +171,10 @@
   font-weight: 100 200 300 400 500 600 700 800 900;
   font-style: normal;
 }
+
+@font-face {
+  font-family: "Google Sans Code";
+  src: url("/Fonts/Сonsolas/GoogleSansCode-VariableFont_MONO,wght.ttf") format("truetype-variations");
+  font-weight: 100 200 300 400 500 600 700 800 900;
+  font-style: normal;
+}

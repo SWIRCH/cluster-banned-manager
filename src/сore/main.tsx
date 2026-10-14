@@ -1,9 +1,9 @@
-import App from "@/App"
-import '@/lib/i18n'
-import { logger } from '@/utils/logger'
-import "@tauri-apps/api"
-import React from "react"
-import ReactDOM from "react-dom/client"
+import App from "@/App";
+import "@/lib/i18n";
+import { logger } from "@/utils/logger";
+import "@tauri-apps/api";
+import React from "react";
+import ReactDOM from "react-dom/client";
 
 import("@/styles/primary.scss");
 

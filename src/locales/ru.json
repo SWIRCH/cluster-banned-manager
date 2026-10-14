@@ -5,7 +5,12 @@
     "choose_server": "Выбрать сервер",
     "selective_blocking": "Выборочная блокировка",
     "avg_ping": "Средний пинг",
-    "ms": "мс"
+    "ms": "мс",
+    "applied": "Применено",
+    "not_applied": "Не применено",
+    "change_one": "{{count}} изменение",
+    "change_few": "{{count}} изменения",
+    "change_many": "{{count}} изменений"
   },
   "loading": {
     "search_best_ping": "Выбираем оптимальный"
@@ -20,7 +25,13 @@
       "confirm_update_hosts": {
         "title": "Confirm to update hosts",
         "add_records_info": "Будут добавлены записи типа <codeTag>0.0.0.0 domain.com</codeTag> для следующих доменов в регионе <regionTag>{{region}}</regionTag>:"
-      }
+      },
+      "will_be_blocked_one": "будет заблокирован",
+      "will_be_blocked_few": "будут заблокированы",
+      "will_be_blocked_many": "будут заблокированы",
+      "will_be_unblocked_one": "будет разблокирован",
+      "will_be_unblocked_few": "будут разблокированы",
+      "will_be_unblocked_many": "будут разблокированы."
     }
   },
   "setup": {
@@ -117,9 +128,11 @@
     "later": "Позже"
   },
   "errors": {
+    "default": "Ошибка приложения",
     "hide_details": "Скрыть детали",
     "show_details": "Показать детали",
     "tauri": {
+      "default": "Ошибка tauri",
       "unavailable": "Tauri недоступен — запустите desktop-приложение"
     }
   },

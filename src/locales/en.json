@@ -6,7 +6,11 @@
     "selective_blocking": "Selective blocking",
     "important": "Important",
     "avg_ping": "Avg",
-    "ms": "ms"
+    "ms": "ms",
+    "applied": "Applied",
+    "not_applied": "Not applied",
+    "change_one": "{{count}} change",
+    "change_other": "{{count}} changes"
   },
   "loading": {
     "search_best_ping": "Looking for best ping..."
@@ -22,7 +26,11 @@
         "title": "Confirm to update hosts",
         "description": "",
         "add_records_info": "Будут добавлены записи типа <codeTag>0.0.0.0 domain</codeTag> для следующих доменов в регионе <regionTag>{{region}}</regionTag>:"
-      }
+      },
+      "will_be_blocked_one": "It will be blocked",
+      "will_be_blocked_other": "They will be blocked.",
+      "will_be_unblocked_one": "It will be unblocked",
+      "will_be_unblocked_other": "They will be unblocked."
     }
   },
   "setup": {
@@ -135,9 +143,11 @@
     "later": "Later"
   },
   "errors": {
+    "default": "Error application",
     "hide_details": "Hide details",
     "show_details": "Show details",
     "tauri": {
+      "default": "Error tauri",
       "unavailable": "Tauri is unavailable — please run the desktop application"
     }
   },

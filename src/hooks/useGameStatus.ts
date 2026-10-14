@@ -1,12 +1,12 @@
 import { isProcessRunning, killProcess } from "@/lib/tauri"
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 
 const GAME_PROCESS_NAMES = ["wotblitz", "blitz", "worldoftanksblitz"];
 
 export function useGameStatus() {
   const [gameRunning, setGameRunning] = useState(false);
 
-  const checkGameRunning = async () => {
+  const checkGameRunning = useCallback(async () => {
     try {
       for (const n of GAME_PROCESS_NAMES) {
         const res: any = await isProcessRunning(n);
@@ -22,9 +22,9 @@ export function useGameStatus() {
       setGameRunning(false);
       return false;
     }
-  };
+  }, []);
 
-  const killGame = async () => {
+  const killGame = useCallback(async () => {
     for (const n of GAME_PROCESS_NAMES) {
       try {
         await killProcess(n);
@@ -33,7 +33,7 @@ export function useGameStatus() {
       }
     }
     setTimeout(() => checkGameRunning(), 1200);
-  };
+  }, [checkGameRunning]);
 
   useEffect(() => {
     checkGameRunning();

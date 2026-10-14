@@ -1,7 +1,7 @@
 import type { AppSettings } from "@/types/app-settings";
-import type { Game } from "@/types/cluster";
+import type { Cluster, Game } from "@/types/cluster";
 import type { Selections } from "@/types/selections";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 function createDefaultSelections(game: Game): Selections {
   return Object.fromEntries(
@@ -41,67 +41,90 @@ export function useSelections(
 
     const next = normalizeSelections(game, settings.clusterSelections);
     setSelections(next);
-  }, [game, settings.clusterSelections, settingsLoading, updateSettings]);
+  }, [game, settings.clusterSelections, settingsLoading]);
 
-  const updateSelection = (
-    regionId: string,
-    domain: string,
-    checked: boolean,
-  ) => {
-    setSelections((prev) => {
-      const prevRegion = prev[regionId] ?? {};
-      const newRegion = { ...prevRegion, [domain]: checked };
-      const next = { ...prev, [regionId]: newRegion };
-      return next;
-    });
-  };
+  const updateSelection = useCallback(
+    (regionId: string, domain: string, checked: boolean) => {
+      setSelections((prev) => {
+        const prevRegion = prev[regionId] ?? {};
+        const newRegion = { ...prevRegion, [domain]: checked };
+        return { ...prev, [regionId]: newRegion };
+      });
+    },
+    [],
+  );
 
-  const selectCluster = (regionId: string, domain: string, clusters: any[]) => {
-    setSelections((prev) => {
-      const newRegion = Object.fromEntries(
-        clusters.map((c) => [c.domain, c.domain === domain]),
-      );
-      const next = { ...prev, [regionId]: newRegion };
-      return next;
-    });
-  };
+  const selectCluster = useCallback(
+    (regionId: string, domain: string, clusters: Cluster[]) => {
+      setSelections((prev) => {
+        const newRegion = Object.fromEntries(
+          clusters.map((c) => [c.domain, c.domain === domain]),
+        );
+        return { ...prev, [regionId]: newRegion };
+      });
+    },
+    [],
+  );
 
-  const clearRegionSelections = (regionId: string) => {
-    setSelections((prev) => {
-      const next = { ...prev, [regionId]: {} };
+  const clearAllRegionSelections = useCallback(
+    (regionId: string, clusters: Cluster[]) => {
+      setSelections((prev) => {
+        const newRegion = Object.fromEntries(
+          clusters.map((c) => [c.domain, false]),
+        );
+        return { ...prev, [regionId]: newRegion };
+      });
+    },
+    [],
+  );
 
-      return next;
-    });
-  };
+  const selectAllClustersInRegion = useCallback(
+    (regionId: string, clusters: Cluster[]) => {
+      setSelections((prev) => {
+        const newRegion = Object.fromEntries(
+          clusters.map((c) => [c.domain, true]),
+        );
+        return { ...prev, [regionId]: newRegion };
+      });
+    },
+    [],
+  );
 
-  const selectAllClustersInRegion = (regionId: string, clusters: any[]) => {
-    setSelections((prev) => {
-      const newRegion = Object.fromEntries(
-        clusters.map((c) => [c.domain, c.domain === c.domain]),
-      );
-      const next = { ...prev, [regionId]: newRegion };
+  const cancelEditClustersInRegion = useCallback(
+    (regionId: string) => {
+      if (!settings.clusterSelections) return;
 
-      return next;
-    });
-  };
+      const next = settings.clusterSelections[regionId];
 
-  const clearAllSelections = async () => {
+      setSelections((prev) => ({
+        ...prev,
+        [regionId]: next,
+      }));
+    },
+    [settings.clusterSelections],
+  );
+
+  const clearAllSelections = useCallback(async () => {
     const defaults = createDefaultSelections(game);
     setSelections(defaults);
     return defaults;
-  };
+  }, [game]);
 
-  const persistSelections = async (next: Selections) => {
-    await updateSettings({ clusterSelections: next });
-  };
+  const persistSelections = useCallback(
+    async (next: Selections) => {
+      await updateSettings({ clusterSelections: next });
+    },
+    [updateSettings],
+  );
 
   return {
     selections,
     setSelections,
     updateSelection,
     selectCluster,
-    clearRegionSelections,
+    clearAllRegionSelections,
     selectAllClustersInRegion,
+    cancelEditClustersInRegion,
     clearAllSelections,
     persistSelections,
   };

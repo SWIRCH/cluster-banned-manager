@@ -9,14 +9,13 @@
   width: 100%;
   display: flex;
   justify-content: center;
-  z-index: 1000;
+  z-index: 50;
 
   & > div {
     position: relative;
     padding: 15px 20px;
     margin-bottom: 1em;
     border-radius: var(--radius-lg);
-    left: var.$sidebarWidth;
     width: 690px;
     background-color: color-mix(
       in srgb,

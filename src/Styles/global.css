@@ -56,7 +56,7 @@
 @theme static {
   /* ===== Fonts ===== */
   --font-sans: 'Play', sans-serif;
-  --font-mono: 'Consolas';
+  --font-mono: 'Google Sans Code', 'Consolas';
   --font-spec: 'Motiva Sans', sans-serif;
   --font-second: "Google Sans Flex", "Onest", "Inter", sans-serif;
 

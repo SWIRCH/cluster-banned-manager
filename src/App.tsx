@@ -1,8 +1,8 @@
 import { useAppStore } from "@/store/useAppStore";
 import { AnimatePresence } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { ApplyClusterAlert, SelectiveBlocking } from "./components/clusters";
+import { useShallow } from "zustand/shallow";
 import GamePoster from "./components/game/GamePoster";
 import Sidebar from "./components/layout/Sidebar";
 import LoadingScreen from "./components/system/LoadingScreen";
@@ -33,16 +33,14 @@ import {
 
 import { collectBlockedDomains } from "@/utils/blocking";
 import { config } from "@/utils/config";
-import { getSavedRegionId, saveRegionId } from "@/utils/regionStorage";
-import {
-  diagnoseTauri,
-  vpnStatus as getVpnStatus,
-  safeInvoke,
-} from "./lib/tauri";
+import { saveRegionId } from "@/utils/regionStorage";
+import { diagnoseTauri } from "./lib/tauri";
 
 import "@/lib/vpnListener";
-import type { Game } from "@/types/cluster";
+import type { Cluster, Game } from "@/types/cluster";
 import { logger } from "@/utils/logger";
+import { cn } from "cn";
+import { ClusterBlockingPanel } from "./components/clusters";
 import MobileBottomBar from "./components/layout/mobile/BottomBar";
 import MobileTopBar from "./components/layout/mobile/TopBar";
 import SetupFirstAppSettings from "./components/modals/SetupFirstAppSettings";
@@ -51,11 +49,14 @@ import {
   showGlobalError,
 } from "./components/system/GlobalError";
 import TurnVpnButton from "./components/vpn/TurnVpnButton";
-import { bootstrapSettings } from "./store/settings.store";
+import { useAppBootstrap } from "./hooks/useAppBootstrap";
 
 // Styles
 import("@/styles/mobile.scss");
 import("@/styles/desktop.scss");
+
+const EMPTY_CLUSTERS: Cluster[] = [];
+const EMPTY_REGION_MAP: Record<string, boolean> = {};
 
 function AppContent() {
   const { clustersData, isLoading: clustersLoading } = useClustersLoader();
@@ -63,17 +64,16 @@ function AppContent() {
   // const [viewApplyClusterAlert, setViewApplyClusterAlert] = useState(false);
   const game = clustersData as Game;
 
-  const infoModal = useInfoModal();
   const isMobile = useIsMobile();
+  const infoModal = useInfoModal();
+
+  logger.log("Render AppContent");
 
   // Zustand Store
   const {
-    setGame,
     selectedRegionId,
     setSelectedRegionId,
     adminMounts,
-    isSetup,
-    setAdminMounts,
     diagnosticInfo,
     setDiagnosticInfo,
     confirmDomains,
@@ -84,55 +84,39 @@ function AppContent() {
     setSettingsModalOpen,
     setAdminModalOpen,
     setIsSetup,
-    setVpnStatus,
-    setVpnDomains,
     vpnStatus: currentVpnStatus,
     vpnBaselineDomains,
     setVpnBaselineDomains,
     vpnDirty,
     setVpnDirty,
-  } = useAppStore();
-
-  document.body.classList.add(
-    isMobile ? "platform-mobile" : "platform-desktop",
+  } = useAppStore(
+    useShallow((s) => ({
+      selectedRegionId: s.selectedRegionId,
+      setSelectedRegionId: s.setSelectedRegionId,
+      adminMounts: s.adminMounts,
+      diagnosticInfo: s.diagnosticInfo,
+      setDiagnosticInfo: s.setDiagnosticInfo,
+      confirmDomains: s.confirmDomains,
+      setConfirmOpen: s.setConfirmOpen,
+      setClearConfirmOpen: s.setClearConfirmOpen,
+      setBlockingAllConfirmOpen: s.setBlockingAllConfirmOpen,
+      settingsModalOpen: s.settingsModalOpen,
+      setSettingsModalOpen: s.setSettingsModalOpen,
+      setAdminModalOpen: s.setAdminModalOpen,
+      setIsSetup: s.setIsSetup,
+      vpnStatus: s.vpnStatus,
+      vpnBaselineDomains: s.vpnBaselineDomains,
+      setVpnBaselineDomains: s.setVpnBaselineDomains,
+      vpnDirty: s.vpnDirty,
+      setVpnDirty: s.setVpnDirty,
+    })),
   );
-
-  useEffect(() => {
-    setGame(game);
-  }, []);
-
-  useEffect(() => {
-    bootstrapSettings();
-  }, []);
-
-  // Инициализация выбранного региона при загрузке данных
-  useEffect(() => {
-    if (!game?.regions || selectedRegionId) return;
-
-    const savedRegionId = getSavedRegionId();
-    const regionExists = game.regions.some((c) => c.id === savedRegionId);
-
-    if (savedRegionId && regionExists) {
-      setSelectedRegionId(savedRegionId);
-    } else {
-      const defaultRegion =
-        game.regions.find((c) => c.id === "wot_eu") ?? game.regions[0];
-      if (defaultRegion) {
-        setSelectedRegionId(defaultRegion.id);
-      }
-    }
-  }, [game, selectedRegionId, setSelectedRegionId]);
-
-  const handleRegionChange = (regionId: string) => {
-    setSelectedRegionId(regionId);
-    saveRegionId(regionId);
-  };
 
   const defaultRegion =
     game?.regions?.find((c) => c.id === "wot_eu") ?? game?.regions?.[0];
   const selectedRegion =
     game?.regions?.find((c) => c.id === selectedRegionId) ?? defaultRegion;
-  const selectedRegionClusters = selectedRegion?.clusters ?? [];
+  const selectedRegionClusters = selectedRegion?.clusters ?? EMPTY_CLUSTERS;
 
   const { settings, updateSettings, loading: settingsLoading } = useSettings();
   const {
@@ -141,8 +125,9 @@ function AppContent() {
     selectCluster,
     clearAllSelections,
     persistSelections,
-    clearRegionSelections,
+    clearAllRegionSelections,
     selectAllClustersInRegion,
+    cancelEditClustersInRegion,
   } = useSelections(game, settings, updateSettings, settingsLoading);
   const {
     hostsMismatch,
@@ -151,7 +136,7 @@ function AppContent() {
     lastTauriError,
     checkHostsConsistency,
   } = useHosts(selectedRegionId, selections, selectedRegionClusters);
-  const { pings, pingClusters } = usePing(selectedRegion, isMobile);
+  const { pingClusters } = usePing(selectedRegion, isMobile);
   const { gameRunning, checkGameRunning, killGame } = useGameStatus();
   const { applyHostsUpdate, clearCluster, stopVpn, loading } = useHostsActions(
     selectedRegionId,
@@ -163,24 +148,22 @@ function AppContent() {
   );
   const posterUrl = useGamePoster(game);
 
+  useAppBootstrap({
+    game,
+    settingsLoading,
+    settingsIsSetup: settings.isSetup,
+    selections,
+    isMobile,
+  });
+
   useEffect(() => {
-    if (!isMobile) return;
-
-    getVpnStatus()
-      .then((status) => {
-        setVpnStatus(status.state === "on" ? "On" : "Off");
-        setVpnDomains(status.domains);
-      })
-      .catch(() => {
-        setVpnStatus("Off");
-        setVpnDomains([]);
-      });
-  }, [isMobile, setVpnDomains, setVpnStatus]);
-
-  const handleLoadingComplete = () => {
-    logger.log("LoadingScreen разрешил закрытие");
-    setIsLoadingScreen(false);
-  };
+    document.body.classList.add(
+      isMobile ? "platform-mobile" : "platform-desktop",
+    );
+    return () => {
+      document.body.classList.remove("platform-mobile", "platform-desktop");
+    };
+  }, [isMobile]);
 
   useEffect(() => {
     if (!config.DEBUG_MODE) return;
@@ -188,6 +171,7 @@ function AppContent() {
       logger.log(
         "Данные приложения загружены, ожидаем завершения проверки обновлений",
       );
+      logger.log("Selections: ", selections);
     }
   }, [settingsLoading, selections]);
 
@@ -197,43 +181,7 @@ function AppContent() {
     }
   }, [settingsLoading, settings.isSetup, setIsSetup]);
 
-  useEffect(() => {
-    if (settingsLoading) return;
-    (async () => {
-      try {
-        const ev: any = await safeInvoke("check_elevation");
-        logger.log("Elevation: ", ev);
-        if (ev && ev.isAdmin === false) {
-          setAdminMounts(false);
-          if (settings.isSetup || isSetup) {
-            setAdminModalOpen(true);
-          }
-          return;
-        }
-        setAdminMounts(true);
-      } catch (e) {
-        console.debug("check_elevation failed", e);
-      }
-    })();
-  }, [
-    settingsLoading,
-    settings.isSetup,
-    isSetup,
-    setAdminMounts,
-    setAdminModalOpen,
-  ]);
-
-  useEffect(() => {
-    if (isSetup) {
-      safeInvoke("check_elevation").then((ev: any) => {
-        if (ev && ev.isAdmin === false) {
-          setAdminModalOpen(true);
-        }
-      });
-    }
-  }, [isSetup, setAdminModalOpen]);
-
-  const regionMap = selections[selectedRegionId] ?? {};
+  const regionMap = selections[selectedRegionId] ?? EMPTY_REGION_MAP;
   const allBlockedDomains = collectBlockedDomains(game, selections);
   const allBlockedDomainsKey = JSON.stringify(allBlockedDomains);
 
@@ -260,39 +208,66 @@ function AppContent() {
   }, [allBlockedDomainsKey, isMobile, setVpnDirty, vpnBaselineDomains]);
 
   const vpnNeedsApply = isMobile && vpnDirty;
-  // const selectedDomain =
-  //   Object.keys(regionMap).find((k) => regionMap[k]) ??
-  //   selectedRegionClusters[0]?.domain;
 
-  const handleSelectCluster = (domain: string) => {
-    selectCluster(selectedRegionId, domain, selectedRegionClusters);
-  };
+  const handleLoadingComplete = useCallback(() => {
+    setIsLoadingScreen(false);
+  }, []);
 
-  const handleDisableClusters = () => {
-    clearRegionSelections(selectedRegionId);
-  };
+  const handleSelectCluster = useCallback(
+    (domain: string) => {
+      selectCluster(selectedRegionId, domain, selectedRegionClusters);
+    },
+    [selectCluster, selectedRegionId, selectedRegionClusters],
+  );
 
-  const handleEnableClusters = () => {
+  const handleDisableClusters = useCallback(() => {
+    clearAllRegionSelections(selectedRegionId, selectedRegionClusters);
+  }, [clearAllRegionSelections, selectedRegionId]);
+
+  const handleEnableClusters = useCallback(() => {
     selectAllClustersInRegion(selectedRegionId, selectedRegionClusters);
-  };
+  }, [selectAllClustersInRegion, selectedRegionId, selectedRegionClusters]);
 
-  const handleToggleCluster = (domain: string, checked: boolean) => {
-    updateSelection(selectedRegionId, domain, checked);
-  };
+  const handleCancelEditClusters = useCallback(() => {
+    if (settings.clusterSelections)
+      cancelEditClustersInRegion(selectedRegionId);
+  }, [
+    cancelEditClustersInRegion,
+    selectedRegionId,
+    settings.clusterSelections,
+  ]);
 
-  const handleApplyHosts = async (domains?: string[]) => {
-    const result = await applyHostsUpdate(domains, currentVpnStatus === "On");
-    if (result.success) {
-      infoModal.showInfo(result.title, result.message);
-    } else {
-      showGlobalError(result.title, result.message, result.details);
-    }
-    setConfirmOpen(false);
-    if (result.success) {
-      await persistSelections(selections);
-      await checkHostsConsistency();
-    }
-  };
+  const handleToggleCluster = useCallback(
+    (domain: string, checked: boolean) => {
+      updateSelection(selectedRegionId, domain, checked);
+    },
+    [selectedRegionId, updateSelection],
+  );
+
+  const handleApplyHosts = useCallback(
+    async (domains?: string[]) => {
+      const result = await applyHostsUpdate(domains, currentVpnStatus === "On");
+      if (result.success) {
+        infoModal.showInfo(result.title, result.message);
+      } else {
+        showGlobalError(result.title, result.message, result.details);
+      }
+      setConfirmOpen(false);
+      if (result.success) {
+        await persistSelections(selections);
+        await checkHostsConsistency();
+      }
+    },
+    [
+      applyHostsUpdate,
+      checkHostsConsistency,
+      currentVpnStatus,
+      infoModal,
+      persistSelections,
+      selections,
+      setConfirmOpen,
+    ],
+  );
 
   const handleToggleVpn = async () => {
     if (currentVpnStatus === "On") {
@@ -338,15 +313,7 @@ function AppContent() {
     }
   };
 
-  const { handlePlayClick } = useGameLauncher(
-    game,
-    gameRunning,
-    killGame,
-    checkGameRunning,
-    infoModal,
-  );
-
-  const handleUpdateClick = () => {
+  const handleUpdateClick = useCallback(() => {
     const rmap =
       selections[selectedRegionId] ??
       Object.fromEntries(selectedRegionClusters.map((c) => [c.domain, true]));
@@ -356,10 +323,18 @@ function AppContent() {
 
     if (!isMobile) {
       setConfirmOpen(true, blockedDomains);
-    } else {
-      handleApplyHosts();
+      return;
     }
-  };
+
+    void handleApplyHosts();
+  }, [
+    handleApplyHosts,
+    isMobile,
+    selectedRegionClusters,
+    selectedRegionId,
+    selections,
+    setConfirmOpen,
+  ]);
 
   const handleDiagnose = async () => {
     try {
@@ -372,23 +347,60 @@ function AppContent() {
     }
   };
 
-  const sidebarProps = {
-    game,
-    selectedRegion,
-    onRegionChange: handleRegionChange,
-    onCheckHosts: checkHostsConsistency,
-    onSettingsClick: () => setSettingsModalOpen(true),
-    onClearClick: () => setClearConfirmOpen(true),
-    onRefreshClick: async () => {
-      await pingClusters(selectedRegionId);
-      await checkGameRunning();
+  const handleRegionChange = useCallback(
+    (regionId: string) => {
+      setSelectedRegionId(regionId);
+      saveRegionId(regionId);
     },
-  };
+    [setSelectedRegionId],
+  );
+
+  const handleOpenSettings = useCallback(() => {
+    setSettingsModalOpen(true);
+  }, [setSettingsModalOpen]);
+
+  const handleOpenClear = useCallback(() => {
+    setClearConfirmOpen(true);
+  }, [setClearConfirmOpen]);
+
+  const handleRefresh = useCallback(async () => {
+    await pingClusters(selectedRegionId);
+    await checkGameRunning();
+  }, [selectedRegionId, pingClusters, checkGameRunning]);
+
+  const { handlePlayClick } = useGameLauncher(
+    game,
+    gameRunning,
+    killGame,
+    checkGameRunning,
+    infoModal,
+  );
+
+  const sidebarProps = useMemo(
+    () => ({
+      game,
+      selectedRegion,
+      onRegionChange: handleRegionChange,
+      onCheckHosts: checkHostsConsistency,
+      onSettingsClick: handleOpenSettings,
+      onClearClick: handleOpenClear,
+      onRefreshClick: handleRefresh,
+    }),
+    [
+      game,
+      selectedRegion,
+      handleRegionChange,
+      checkHostsConsistency,
+      handleOpenSettings,
+      handleOpenClear,
+      handleRefresh,
+    ],
+  );
 
   // const { t } = useTranslation();
 
-  return (
-    <>
+  if (isLoadingScreen) {
+    return (
       <AnimatePresence mode="wait">
         {isLoadingScreen && (
           <LoadingScreen
@@ -399,158 +411,129 @@ function AppContent() {
           />
         )}
       </AnimatePresence>
+    );
+  }
+
+  return (
+    <>
       <AnimatePresence>
-        {!isLoadingScreen && (
-          <main
-            id="layer-ingame"
-            key="main"
-            className={`${isMobile ? "h-dvh flex flex-col" : undefined}`}
+        <main
+          key="main"
+          className={cn("cbm", isMobile && "h-dvh flex flex-col")}
+        >
+          {isMobile ? <MobileTopBar /> : <Sidebar {...sidebarProps} />}
+
+          <div
+            className={cn(
+              "inGameContainer",
+              isMobile && "flex flex-1 min-h-0 flex-col pb-16",
+            )}
           >
-            {isMobile ? <MobileTopBar /> : <Sidebar {...sidebarProps} />}
+            {!isMobile && (
+              <>
+                <GamePoster
+                  posterUrl={posterUrl}
+                  tauriAvailable={tauriAvailable}
+                  hostsMismatch={hostsMismatch}
+                  gameRunning={gameRunning}
+                  onPlayClick={handlePlayClick}
+                  onUpdateClick={handleUpdateClick}
+                  selectedRegion={selectedRegion}
+                  lastTauriError={lastTauriError}
+                  mismatchDomains={mismatchDomains}
+                />
+              </>
+            )}
 
-            <div
-              className={`inGameContainer ${isMobile ? "flex flex-1 min-h-0 flex-col pb-16" : undefined}`}
-            >
-              {!isMobile && (
-                <>
-                  <GamePoster
-                    posterUrl={posterUrl}
-                    tauriAvailable={tauriAvailable}
-                    hostsMismatch={hostsMismatch}
-                    gameRunning={gameRunning}
-                    onPlayClick={handlePlayClick}
-                    onUpdateClick={handleUpdateClick}
-                    selectedRegion={selectedRegion}
-                    lastTauriError={lastTauriError}
-                    mismatchDomains={mismatchDomains}
-                  />
-
-                  {/* Если маленькая ширина */}
-                  <ApplyClusterAlert
-                    hostsMismatch={hostsMismatch}
-                    onUpdateClick={handleUpdateClick}
-                    selectedRegion={selectedRegion}
-                    lastTauriError={lastTauriError}
-                    mismatchDomains={mismatchDomains}
-                  />
-                </>
+            <div className={cn("inGameOption", isMobile && "flex-1 min-h-0")}>
+              {isMobile && (
+                <TurnVpnButton
+                  hostsMismatch={isMobile ? vpnNeedsApply : hostsMismatch}
+                  onToggle={isMobile ? handleToggleVpn : undefined}
+                  onUpdateClick={handleUpdateClick}
+                />
               )}
 
-              <div
-                className={`inGameOption ${isMobile ? "flex-1 min-h-0" : undefined}`}
-              >
-                {/* {!isMobile && (
-                  <div className="whilecard">
-                    <div className="whilecard-title flex justify-between items-center space-y-1 rounded-xl bg-white/5 p-1 sm:p-2">
-                      <h3>{t("common.select_server")}</h3>
-                      <p className="pe-2 text-[14px] warp-fix-link">
-                        <a
-                          onClick={() => openWarpFixPingLoss()}
-                          target="_blank"
-                          className="link"
-                        >
-                          {t("ads.warp-fix")}
-                        </a>
-                      </p>
-                    </div>
-                    <div className="content">
-                      <div className="ban-clusters-1 mt-1">
-                        <ClusterMenu
-                          clusters={selectedRegionClusters}
-                          selectedDomain={selectedDomain}
-                          onSelect={handleSelectCluster}
-                          pings={pings}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                )} */}
-
-                {isMobile && (
-                  <TurnVpnButton
-                    hostsMismatch={isMobile ? vpnNeedsApply : hostsMismatch}
-                    onToggle={isMobile ? handleToggleVpn : undefined}
-                    onUpdateClick={handleUpdateClick}
-                  />
-                )}
-
-                <SelectiveBlocking
-                  clusters={selectedRegionClusters}
-                  checkedMap={regionMap}
-                  onToggle={handleToggleCluster}
-                  onSelect={handleSelectCluster}
-                  onDisableAll={handleDisableClusters}
-                  onEnableAll={handleEnableClusters}
-                  hostsMismatch={hostsMismatch}
-                  pings={pings}
-                  isMobile={isMobile}
-                />
-              </div>
+              <ClusterBlockingPanel
+                clusters={selectedRegionClusters}
+                checkedMap={regionMap}
+                allBlockedDomains={allBlockedDomains}
+                hostsMismatch={hostsMismatch}
+                onCancel={handleCancelEditClusters}
+                onToggle={handleToggleCluster}
+                onSelect={handleSelectCluster}
+                onDisableAll={handleDisableClusters}
+                onEnableAll={handleEnableClusters}
+                selectedRegion={selectedRegion}
+                lastTauriError={lastTauriError}
+                mismatchDomains={mismatchDomains}
+                onUpdate={handleUpdateClick}
+              />
             </div>
+          </div>
 
-            {isMobile ? <MobileBottomBar {...sidebarProps} /> : undefined}
+          {isMobile ? <MobileBottomBar {...sidebarProps} /> : undefined}
 
-            {/* Начальная настройка при первом входе */}
-            <SetupFirstAppSettings />
+          {/* Начальная настройка при первом входе */}
+          <SetupFirstAppSettings />
 
-            {/* Modals */}
-            <ConfirmModal
-              onConfirm={() => handleApplyHosts(confirmDomains)}
-              domains={confirmDomains}
-              clusters={selectedRegionClusters}
-              regionName={
-                selectedRegion?.alias_name ?? selectedRegion?.name ?? ""
-              }
-              onBlockingAllConfirm={() => setBlockingAllConfirmOpen(true)}
-            />
+          {/* Modals */}
+          <ConfirmModal
+            onConfirm={() => handleApplyHosts(confirmDomains)}
+            domains={confirmDomains}
+            clusters={selectedRegionClusters}
+            regionName={
+              selectedRegion?.alias_name ?? selectedRegion?.name ?? ""
+            }
+            onBlockingAllConfirm={() => setBlockingAllConfirmOpen(true)}
+          />
 
-            <BlockingAllConfirmModal
-              onConfirm={async () => {
-                setBlockingAllConfirmOpen(false);
-                await handleApplyHosts(confirmDomains);
-              }}
-              regionName={
-                selectedRegion?.alias_name ?? selectedRegion?.name ?? ""
-              }
-            />
+          <BlockingAllConfirmModal
+            onConfirm={async () => {
+              setBlockingAllConfirmOpen(false);
+              await handleApplyHosts(confirmDomains);
+            }}
+            regionName={
+              selectedRegion?.alias_name ?? selectedRegion?.name ?? ""
+            }
+          />
 
-            <ClearConfirmModal
-              onConfirm={handleClearCluster}
-              useFirewall={settings.useFirewall}
-              useBackup={settings.useBackup}
-              loading={loading}
-            />
+          <ClearConfirmModal
+            onConfirm={handleClearCluster}
+            useFirewall={settings.useFirewall}
+            useBackup={settings.useBackup}
+            loading={loading}
+          />
 
-            <InfoModal
-              open={infoModal.open}
-              onClose={infoModal.closeInfo}
-              title={infoModal.title}
-              message={infoModal.message}
-              isError={infoModal.isError}
-            />
+          <InfoModal
+            open={infoModal.open}
+            onClose={infoModal.closeInfo}
+            title={infoModal.title}
+            message={infoModal.message}
+            isError={infoModal.isError}
+          />
 
-            <SettingsModal
-              open={settingsModalOpen}
-              onClose={() => setSettingsModalOpen(false)}
-              onDiagnose={handleDiagnose}
-              diagnosticInfo={diagnosticInfo}
-              isMobile={isMobile}
-            />
+          <SettingsModal
+            open={settingsModalOpen}
+            onClose={() => setSettingsModalOpen(false)}
+            onDiagnose={handleDiagnose}
+            diagnosticInfo={diagnosticInfo}
+            isMobile={isMobile}
+          />
 
-            <AdminModal
-              onShowInstructions={() => {
-                setAdminModalOpen(false);
-                infoModal.showInfo(
-                  "Как запустить с правами администратора",
-                  "Запустите приложение от имени администратора (ПКМ → Запуск от имени администратора) или создайте ярлык, в котором в свойствах выберите запуск от имени администратора. После этого нажмите 'Повторить'.",
-                  false,
-                );
-              }}
-            />
+          <AdminModal
+            onShowInstructions={() => {
+              setAdminModalOpen(false);
+              infoModal.showInfo(
+                "Как запустить с правами администратора",
+                "Запустите приложение от имени администратора (ПКМ → Запуск от имени администратора) или создайте ярлык, в котором в свойствах выберите запуск от имени администратора. После этого нажмите 'Повторить'.",
+                false,
+              );
+            }}
+          />
 
-            {isMobile && <AboutModal />}
-          </main>
-        )}
+          {isMobile && <AboutModal />}
+        </main>
       </AnimatePresence>
     </>
   );

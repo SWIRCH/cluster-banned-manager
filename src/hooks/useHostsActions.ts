@@ -14,6 +14,7 @@ import {
   collectBlockedIps,
 } from "@/utils/blocking";
 import { useState } from "react";
+import { useShallow } from "zustand/shallow";
 
 export function useHostsActions(
   selectedRegionId: string,
@@ -25,7 +26,14 @@ export function useHostsActions(
 ) {
   const [loading, setLoading] = useState(false);
   const { setVpnStatus, setVpnDomains, setVpnBaselineDomains, setVpnDirty } =
-    useAppStore();
+    useAppStore(
+      useShallow((s) => ({
+        setVpnStatus: s.setVpnStatus,
+        setVpnDomains: s.setVpnDomains,
+        setVpnBaselineDomains: s.setVpnBaselineDomains,
+        setVpnDirty: s.setVpnDirty,
+      })),
+    );
 
   const getBlockedDomains = () => {
     if (isMobile) {

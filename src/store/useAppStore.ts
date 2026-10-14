@@ -1,5 +1,5 @@
-import { create } from "zustand"
-import { Game } from "../types"
+import { create } from "zustand";
+import { Game } from "../types";
 
 interface AppState {
   // Region & System
@@ -9,6 +9,7 @@ interface AppState {
   diagnosticInfo: string | null;
 
   isSetup: boolean;
+  isMobile: boolean;
 
   // Mobile & Vpn
   vpnStatus: "On" | "Off" | "Loading" | "Error" | "NeedsApply";
@@ -33,6 +34,7 @@ interface AppState {
   setDiagnosticInfo: (info: string | null) => void;
 
   setIsSetup: (setup: boolean) => void;
+  setIsMobile: (mobile: boolean) => void;
 
   setVpnStatus: (
     status: "On" | "Off" | "Loading" | "Error" | "NeedsApply",
@@ -58,6 +60,7 @@ export const useAppStore = create<AppState>((set) => ({
   diagnosticInfo: null,
 
   isSetup: false,
+  isMobile: false,
 
   vpnStatus: "Off",
   vpnDomains: [],
@@ -79,6 +82,7 @@ export const useAppStore = create<AppState>((set) => ({
   setDiagnosticInfo: (info) => set({ diagnosticInfo: info }),
 
   setIsSetup: (setup) => set({ isSetup: setup }),
+  setIsMobile: (mobile) => set({ isMobile: mobile }),
 
   setVpnStatus: (status) => set({ vpnStatus: status }),
   setVpnDomains: (domains) => set({ vpnDomains: domains }),

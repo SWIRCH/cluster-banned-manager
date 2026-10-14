@@ -8,7 +8,8 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "devtools": "react-devtools"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",
@@ -51,6 +52,7 @@
     "autoprefixer": "^10.5.4",
     "daisyui": "^5.7.22",
     "postcss": "^8.5.26",
+    "react-devtools": "8.0.0",
     "sass-embedded": "^1.103.1",
     "tailwind": "^4.0.0",
     "tailwindcss": "^4.3.3",

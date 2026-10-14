@@ -1,7 +1,9 @@
-import { safeInvoke } from "@/lib/tauri"
-import type { Region } from "@/types/cluster"
-import type { PingInfo, PingMap } from "@/types/ping"
-import { useEffect, useRef, useState } from "react"
+import { safeInvoke } from "@/lib/tauri";
+import { usePingStore } from "@/store/usePingStore";
+import type { Region } from "@/types/cluster";
+import type { PingInfo } from "@/types/ping";
+import { IDLE_PING } from "@/types/ping";
+import { useCallback, useEffect, useRef } from "react";
 
 const PING_TIMEOUT_MS = 2000;
 const PING_ATTEMPT_DELAY_MS = 120;
@@ -9,50 +11,42 @@ const PING_REFRESH_INTERVAL_MS = 15 * 60 * 1000;
 const PING_BUDGET_MS = 20_000;
 
 export function usePing(selectedRegion: Region | null, isMobile = false) {
-  const [pings, setPings] = useState<PingMap>({});
+  const patchPings = usePingStore((s) => s.patchPings);
+  const mergePings = usePingStore((s) => s.mergePings);
   const pingRunIdRef = useRef(0);
+  const pendingRef = useRef<Record<string, Partial<PingInfo>>>({});
+  const rafRef = useRef<number | null>(null);
+  const selectedRegionRef = useRef(selectedRegion);
+  const isMobileRef = useRef(isMobile);
 
-  const updateStats = (domain: string, infoPartial: Partial<PingInfo>) => {
-    setPings((prev) => {
-      const prevInfo = prev[domain] ?? {
-        last: null,
-        avg: null,
-        attempts: 0,
-        successes: 0,
-        lossPercent: 0,
-        status: "idle",
-      };
-      const next: PingInfo = {
-        last: infoPartial.last !== undefined ? infoPartial.last : prevInfo.last,
-        avg: infoPartial.avg !== undefined ? infoPartial.avg : prevInfo.avg,
-        attempts:
-          infoPartial.attempts !== undefined
-            ? infoPartial.attempts
-            : prevInfo.attempts,
-        successes:
-          infoPartial.successes !== undefined
-            ? infoPartial.successes
-            : prevInfo.successes,
-        lossPercent:
-          infoPartial.lossPercent !== undefined
-            ? infoPartial.lossPercent
-            : prevInfo.lossPercent,
-        status: infoPartial.status ?? prevInfo.status,
-        lastError:
-          infoPartial.lastError !== undefined
-            ? infoPartial.lastError
-            : prevInfo.lastError,
-      };
-      return { ...prev, [domain]: next };
-    });
-  };
+  selectedRegionRef.current = selectedRegion;
+  isMobileRef.current = isMobile;
 
-  const pingClusters = async (regionId?: string) => {
+  const flushPingUpdates = useCallback(() => {
+    rafRef.current = null;
+    const pending = pendingRef.current;
+    pendingRef.current = {};
+    if (Object.keys(pending).length === 0) return;
+    patchPings(pending);
+  }, [patchPings]);
+
+  const updateStats = useCallback(
+    (domain: string, infoPartial: Partial<PingInfo>) => {
+      pendingRef.current[domain] = {
+        ...pendingRef.current[domain],
+        ...infoPartial,
+      };
+      if (rafRef.current == null) {
+        rafRef.current = requestAnimationFrame(flushPingUpdates);
+      }
+    },
+    [flushPingUpdates],
+  );
+
+  const pingClusters = useCallback(async (_regionId?: string) => {
     const runId = ++pingRunIdRef.current;
-    // Используем переданный regionId или текущий selectedRegion
-    const region = regionId
-      ? selectedRegion // Если передан regionId, используем текущий selectedRegion
-      : selectedRegion;
+    const region = selectedRegionRef.current;
+    const mobile = isMobileRef.current;
 
     if (!region) {
       console.warn("[usePing] No region selected");
@@ -65,18 +59,22 @@ export function usePing(selectedRegion: Region | null, isMobile = false) {
       return;
     }
 
-    const attempts = isMobile ? 2 : 3;
-    const concurrency = isMobile
+    const attempts = mobile ? 2 : 3;
+    const concurrency = mobile
       ? Math.min(8, Math.max(1, targets.length))
       : Math.min(4, Math.max(1, targets.length));
-    const attemptDelay = isMobile ? 0 : PING_ATTEMPT_DELAY_MS;
+    const attemptDelay = mobile ? 0 : PING_ATTEMPT_DELAY_MS;
     const budgetDeadline = Date.now() + PING_BUDGET_MS;
 
-    // Сбрасываем состояние перед новым пингом
-    targets.forEach((cluster) => {
-      if (runId === pingRunIdRef.current) {
-        updateStats(cluster.domain, { status: "loading" });
+    mergePings((prev) => {
+      const next = { ...prev };
+      for (const cluster of targets) {
+        next[cluster.domain] = {
+          ...(next[cluster.domain] ?? IDLE_PING),
+          status: "loading",
+        };
       }
+      return next;
     });
 
     const tasks = targets.map((cluster) => async () => {
@@ -92,8 +90,6 @@ export function usePing(selectedRegion: Region | null, isMobile = false) {
 
       let successes = 0;
       let totalMs = 0;
-
-      // Получаем IP-адреса кластера для пинга
       const addresses = cluster.ips?.filter((ip) => ip && ip.trim()) ?? [];
 
       for (let i = 0; i < attempts; i++) {
@@ -175,25 +171,31 @@ export function usePing(selectedRegion: Region | null, isMobile = false) {
       });
 
     await Promise.all(workers);
-  };
+    if (rafRef.current != null) {
+      cancelAnimationFrame(rafRef.current);
+      flushPingUpdates();
+    }
+  }, [flushPingUpdates, mergePings, updateStats]);
 
   useEffect(() => {
     if (!selectedRegion) return;
 
-    // Запускаем пинг сразу
     pingClusters();
 
-    // И каждые PING_REFRESH_INTERVAL_MS
     const id = setInterval(() => pingClusters(), PING_REFRESH_INTERVAL_MS);
 
     return () => {
       pingRunIdRef.current++;
+      if (rafRef.current != null) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+      pendingRef.current = {};
       clearInterval(id);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedRegion?.id, isMobile]);
+  }, [selectedRegion?.id, isMobile, pingClusters]);
 
-  return { pings, pingClusters };
+  return { pingClusters };
 }
 
 function readPingMs(res: any): number | null {

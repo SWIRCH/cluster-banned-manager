@@ -1,18 +1,22 @@
 # <img src="/public/clusterbanned.png" height="34" /> Cluster Banned Manager
 
-![ClasterBanned](/public/banner.png)
+
+[![ClasterBanned](/public/banner-new.png)](https://cbmwot.vercel.app/)
 
 <div align="center">
-  
-![Tauri](https://img.shields.io/badge/Tauri-2.0-FFC131?style=for-the-badge&logo=tauri&logoColor=white)
-![Bun](https://img.shields.io/badge/Bun-f472b8?style=for-the-badge&logo=bun&logoColor=White)
-![Rust](https://img.shields.io/badge/Rust-000000?style=for-the-badge&logo=rust&logoColor=white)
-![React](https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black)
-![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
-![Windows](https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white)
-![Android](https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white)
+
+[![Tauri](https://img.shields.io/badge/Tauri-2.0-FFC131?style=for-the-badge&logo=tauri&logoColor=white)](https://v2.tauri.app/)
+[![Bun](https://img.shields.io/badge/Bun-f472b8?style=for-the-badge&logo=bun&logoColor=white)](https://bun.sh/)
+[![Rust](https://img.shields.io/badge/Rust-000000?style=for-the-badge&logo=rust&logoColor=white)](https://www.rust-lang.org/)
+[![React](https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Windows](https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white)](https://www.microsoft.com/windows/)
+[![Android](https://img.shields.io/badge/Android-34A853?style=for-the-badge&logo=android&logoColor=white)](https://www.android.com/)
 
 **Управление подключением к игровым серверам World of Tanks Blitz и Tanks Blitz.<br> Блокировка нежелательных кластеров на сетевом уровне для Windows и Android.**
+
+[<img src="/public/github/WindowsDownloadRu.png" height="57" />](https://github.com/SWIRCH/cluster-banned-manager/releases/tag/v0.1.7)
+[<img src="/public/github/AndroidDownloadRu.png" height="57" />](https://github.com/SWIRCH/cluster-banned-manager/releases/download/v0.1.6/app-universal-release.apk)
 
 </div>
 
@@ -57,10 +61,10 @@
 
 ### 🎨 Интерфейс
 
-![ClasterBanned](/public/app_interface_1.png)
+![ClasterBanned](/public/app_interface_2.png)
 
 - **Адаптивный UI** — единый стильный интерфейс под ПК и мобильные устройства.
-- **Мультирегиональность** — поддержка всех серверов WoT Blitz (EU, NA, APAC) и Tanks Blitz (RU/Lesta).
+- **Мультирегиональность** — поддержка всех серверов WoT Blitz (EU, NA, ASIA) и Tanks Blitz (RU/Lesta).
 - **Статус в реальном времени** — наглядные индикаторы активных подсистем и серверов.
 
 ## Поддерживаемые регионы

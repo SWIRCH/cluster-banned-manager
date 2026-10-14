@@ -1,48 +1,44 @@
-import { Button } from "@/components/ui/button";
+import { useAppStore } from "@/store/useAppStore";
+import { usePingStore } from "@/store/usePingStore";
 import type { Cluster } from "@/types/cluster";
-import type { PingMap } from "@/types/ping";
-import { logger } from "@/utils/logger";
-import { Check } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { cn } from "cn";
+import { memo, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Spinner } from "../ui/spinner";
-import ClusterList from "./ClusterList";
-// import type { Selections } from "@/types/selections";
+import { ClusterActionBar } from ".";
+import ClusterList from "./List";
+import { BestPingObject } from "./type/ping.type";
 
 type SelectiveBlockingProps = {
   clusters: Cluster[];
   checkedMap: Record<string, boolean>;
-  pings: PingMap;
-  isMobile: boolean;
   hostsMismatch: boolean;
+  topOffset?: number;
   onToggle: (domain: string, checked: boolean) => void;
   onSelect: (domain: string) => void;
   onDisableAll: () => void;
   onEnableAll: () => void;
 };
 
-type BestPingObject = {
-  bestDomain: Cluster;
-  bestPing: number;
-};
-
-export default function SelectiveBlocking({
+function SelectiveBlocking({
   clusters,
   checkedMap,
-  pings,
-  isMobile,
   hostsMismatch,
+  topOffset = 0,
   onToggle,
   onSelect,
   onDisableAll,
   onEnableAll,
 }: SelectiveBlockingProps) {
+  const isMobile = useAppStore((s) => s.isMobile);
+  const pings = usePingStore((s) => s.pings);
   const [stableBestPing, setStableBestPing] = useState<BestPingObject | null>(
     null,
   );
-  const domainSet = new Set(clusters.map((c) => c.domain));
-  const pingsObject = Object.entries(pings);
-  const regionPings = pingsObject
+  const domainSet = useMemo(
+    () => new Set(clusters.map((c) => c.domain)),
+    [clusters],
+  );
+  const regionPings = Object.entries(pings)
     .filter(([k]) => domainSet.has(k))
     .map(([, v]) => v);
 
@@ -78,11 +74,12 @@ export default function SelectiveBlocking({
 
   const { t } = useTranslation();
 
-  logger.log(best);
-
   return (
     <div
-      className={`whilecard ${isMobile && "mt-0 flex-1 min-h-0 flex flex-col"}`}
+      className={cn(
+        "whilecard",
+        isMobile && "mt-0 flex-1 min-h-0 flex flex-col",
+      )}
     >
       {!isMobile && (
         <div className="px-2">
@@ -98,54 +95,26 @@ export default function SelectiveBlocking({
               </div>
             )}
           </div>
-          <div className="action-bar">
-            <Button
-              variant={"outline"}
-              className={"rounded-full px-3"}
-              onClick={() => onEnableAll()}
-            >
-              {t("buttons.allow_all")}
-            </Button>
-            <Button
-              variant={"outline"}
-              className={"rounded-full px-3"}
-              onClick={() => onDisableAll()}
-            >
-              {t("buttons.disallow_all")}
-            </Button>
 
-            {stableBestPing?.bestDomain ? (
-              <Button
-                variant={"outline"}
-                className={
-                  "group rounded-full border-blue-400! text-blue-400 hover:border-blue-300! hover:text-blue-300"
-                }
-                onClick={() => onSelect(stableBestPing.bestDomain.domain)}
-              >
-                <Check className="text-blue-400 group-hover:text-blue-300" />
-                {t("buttons.best_ping")}: {stableBestPing.bestDomain.id}
-              </Button>
-            ) : (
-              <Button
-                variant={"outline"}
-                className={"rounded-full "}
-                disabled={true}
-              >
-                <Spinner />
-                {t("loading.search_best_ping")}
-              </Button>
-            )}
-          </div>
+          <ClusterActionBar
+            bestPing={stableBestPing}
+            onSelect={onSelect}
+            onEnableAll={onEnableAll}
+            onDisableAll={onDisableAll}
+          />
         </div>
       )}
       <div
-        className={`content p-0 relative ${isMobile && "flex-1 min-h-0 flex flex-col"}`}
+        className={cn(
+          `content p-0 relative`,
+          isMobile && "flex-1 min-h-0 flex flex-col",
+        )}
       >
         <ClusterList
           clusters={clusters}
           checkedMap={checkedMap}
           onToggle={onToggle}
-          pings={pings}
+          topOffset={topOffset}
           isMobile={isMobile}
           hostsMismatch={hostsMismatch}
         />
@@ -153,3 +122,5 @@ export default function SelectiveBlocking({
     </div>
   );
 }
+
+export default memo(SelectiveBlocking);

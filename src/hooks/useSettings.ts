@@ -1,4 +1,4 @@
-import { useSettingsStore } from "@/store/settings.store";
+import { useSettingsStore } from "@/store/useSettingsStore";
 
 export function useSettings() {
   const settings = useSettingsStore((s) => s.settings);

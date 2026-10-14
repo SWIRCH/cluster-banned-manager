@@ -1,5 +1,6 @@
 import type { Game, Region } from "@/types/cluster";
 import { Ban, LucideIcon, RefreshCcw, Settings2 } from "lucide-react";
+import { memo } from "react";
 import { useTranslation } from "react-i18next";
 import { Tooltip } from "react-tooltip";
 
@@ -19,7 +20,7 @@ type NavigateItemType = {
   onClick: () => void;
 };
 
-export default function Sidebar({
+export default memo(function Sidebar({
   game,
   selectedRegion,
   onRegionChange,
@@ -125,4 +126,4 @@ export default function Sidebar({
       />
     </div>
   );
-}
+});
