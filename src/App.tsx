@@ -40,6 +40,7 @@ import "@/lib/vpnListener";
 import type { Cluster, Game } from "@/types/cluster";
 import { logger } from "@/utils/logger";
 import { cn } from "cn";
+import { useTranslation } from "react-i18next";
 import { ClusterBlockingPanel } from "./components/clusters";
 import MobileBottomBar from "./components/layout/mobile/BottomBar";
 import MobileTopBar from "./components/layout/mobile/TopBar";
@@ -246,6 +247,15 @@ function AppContent() {
 
   const handleApplyHosts = useCallback(
     async (domains?: string[]) => {
+      if (settings.useFirewall && !isMobile && !adminMounts) {
+        showGlobalError(
+          t("errors.admin_mounts.title"),
+          t("errors.admin_mounts.description"),
+          t("errors.admin_mounts.details"),
+        );
+        return;
+      }
+
       const result = await applyHostsUpdate(domains, currentVpnStatus === "On");
       if (result.success) {
         infoModal.showInfo(result.title, result.message);
@@ -294,9 +304,9 @@ function AppContent() {
   const handleClearCluster = async () => {
     if (!isMobile && !adminMounts) {
       showGlobalError(
-        "Ошибка прав администратора",
-        "Для очистки блокировок требуется запуск приложения с правами администратора.",
-        "Пожалуйста, закройте приложение и запустите его от имени администратора.",
+        t("errors.admin_mounts.title"),
+        t("errors.admin_mounts.description"),
+        t("errors.admin_mounts.details"),
       );
       return;
     }
@@ -397,7 +407,7 @@ function AppContent() {
     ],
   );
 
-  // const { t } = useTranslation();
+  const { t } = useTranslation();
 
   if (isLoadingScreen) {
     return (
@@ -525,8 +535,8 @@ function AppContent() {
             onShowInstructions={() => {
               setAdminModalOpen(false);
               infoModal.showInfo(
-                "Как запустить с правами администратора",
-                "Запустите приложение от имени администратора (ПКМ → Запуск от имени администратора) или создайте ярлык, в котором в свойствах выберите запуск от имени администратора. После этого нажмите 'Повторить'.",
+                t("modals.how_to_open_app_admin_privilege.title"),
+                t("modals.how_to_open_app_admin_privilege.description"),
                 false,
               );
             }}

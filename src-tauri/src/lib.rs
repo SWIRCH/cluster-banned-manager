@@ -3,23 +3,21 @@ pub mod core;
 pub mod error;
 pub mod native;
 
+use crate::core::clusters::cleanup_blocks;
 use tauri::Builder;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    if std::env::args().any(|a| a == "--cleanup") {
+        let result = tauri::async_runtime::block_on(cleanup_blocks(true));
+        std::process::exit(if result.is_ok() { 0 } else { 1 });
+    }
+
     Builder::default()
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_os::init())
         .plugin(
             tauri_plugin_log::Builder::new()
-                // .target(tauri_plugin_log::Target::new(
-                //     tauri_plugin_log::TargetKind::Webview,
-                // ))
-                // .target(tauri_plugin_log::Target::new(
-                //     tauri_plugin_log::TargetKind::LogDir {
-                //         file_name: Some("logs".to_string()),
-                //     },
-                // ))
                 .level(log::LevelFilter::Info)
                 .build(),
         )
@@ -33,6 +31,7 @@ pub fn run() {
             commands::hosts::read_blocked_domains,
             commands::hosts::check_hosts_consistency,
             commands::hosts::update_hosts_block,
+            commands::cluster::get_clusters,
             commands::cluster::clear_cluster_blocks,
             commands::cluster::update_cluster_rules,
             commands::firewall::update_firewall_rules,

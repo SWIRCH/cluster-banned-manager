@@ -33,6 +33,7 @@ log = "0.4"
 
 [target.'cfg(windows)'.dependencies]
 winping = "0.10.0"
+is_elevated = "0.1"
 
 [features]
 default = ["custom-protocol"]

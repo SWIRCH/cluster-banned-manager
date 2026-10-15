@@ -1,13 +1,15 @@
 use crate::core::{clusters, firewall};
 use crate::error::AppResult;
+use tauri::AppHandle;
 
 #[tauri::command]
 pub async fn update_firewall_rules(
+    app: AppHandle,
     region_id: String,
     blocked_domains: Vec<String>,
     enable: bool,
 ) -> AppResult<String> {
-    let data = clusters::load().await;
+    let data = clusters::load(&app).await;
     tauri::async_runtime::spawn_blocking(move || {
         firewall::update_for_region(&data, &region_id, &blocked_domains, enable)
     })

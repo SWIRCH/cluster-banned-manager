@@ -88,7 +88,7 @@ function isObject(value: unknown): value is Record<string, unknown> {
 export const LOCAL_CLUSTERS = normalizeClustersData(clustersDataLocal);
 
 const GITHUB_URL =
-  "https://raw.githubusercontent.com/SWIRCH/cluster-banned-manager/refs/heads/main/src/data/servers.json";
+  "https://raw.githubusercontent.com/SWIRCH/cluster-banned-manager/main/src/data/servers.json";
 
 export async function loadClustersFromGitHub() {
   try {

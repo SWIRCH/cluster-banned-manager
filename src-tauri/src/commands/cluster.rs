@@ -1,9 +1,17 @@
+use crate::core::clusters::cleanup_blocks;
 use crate::core::{clusters, firewall, hosts, settings};
 use crate::error::AppResult;
 use serde_json::json;
+use tauri::AppHandle;
+
+#[tauri::command]
+pub async fn get_clusters(app: AppHandle) -> AppResult<serde_json::Value> {
+    Ok(clusters::load(&app).await)
+}
 
 #[tauri::command]
 pub async fn update_cluster_rules(
+    app: AppHandle,
     region_id: String,
     blocked_domains: Vec<String>,
     enable: bool,
@@ -36,7 +44,7 @@ pub async fn update_cluster_rules(
 
     // 2. firewall
     let firewall_result = if use_firewall {
-        let data = clusters::load().await;
+        let data = clusters::load(&app).await;
         let region = region_id.clone();
         let domains = blocked_domains.clone();
 
@@ -65,28 +73,5 @@ pub async fn update_cluster_rules(
 
 #[tauri::command]
 pub async fn clear_cluster_blocks() -> AppResult<String> {
-    let settings = settings::load()?; // ← один раз, оба поля
-    let backup = settings.use_backup;
-    let use_firewall = settings.use_firewall;
-
-    let mut messages = Vec::new();
-
-    // 1. hosts — всегда
-    match hosts::apply(hosts::HostsOp::ClearAll, backup) {
-        Ok(r) => messages.push(r.message),
-        Err(e) => messages.push(format!("Hosts cleanup error: {e}")),
-    }
-
-    // 2. firewall — только если включён в настройках
-    if use_firewall {
-        match tauri::async_runtime::spawn_blocking(firewall::clear_all).await {
-            Ok(Ok(msg)) => messages.push(msg),
-            Ok(Err(e)) => messages.push(format!("Firewall cleanup error: {e}")),
-            Err(e) => messages.push(format!("Firewall worker error: {e}")),
-        }
-    } else {
-        messages.push("Firewall cleanup skipped (disabled in settings)".into());
-    }
-
-    Ok(messages.join("\n"))
+    cleanup_blocks(false).await
 }

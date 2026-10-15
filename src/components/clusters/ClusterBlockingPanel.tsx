@@ -1,4 +1,3 @@
-import { useAppStore } from "@/store/useAppStore";
 import type { Cluster, Region } from "@/types/cluster";
 import { memo } from "react";
 import { ApplyClusterAlert, SelectiveBlocking } from "./";
@@ -36,25 +35,20 @@ function ClusterBlockingPanel({
   onUpdate,
   onCancel,
 }: ClusterBlockingPanelProps) {
-  const isMobile = useAppStore((s) => s.isMobile);
-
   const [alertRef, alertHeight] = useElementHeight<HTMLDivElement>();
-  const showAlert = hostsMismatch && !isMobile;
 
   return (
     <div className="relative flex-1 min-h-0 flex flex-col">
-      {showAlert && selectedRegion && (
-        <ApplyClusterAlert
-          ref={alertRef}
-          hostsMismatch={hostsMismatch}
-          selectedRegion={selectedRegion}
-          allBlockedDomains={allBlockedDomains}
-          lastTauriError={lastTauriError}
-          mismatchDomains={mismatchDomains}
-          onUpdate={onUpdate}
-          onCancel={onCancel}
-        />
-      )}
+      <ApplyClusterAlert
+        ref={alertRef}
+        hostsMismatch={hostsMismatch}
+        selectedRegion={selectedRegion}
+        allBlockedDomains={allBlockedDomains}
+        lastTauriError={lastTauriError}
+        mismatchDomains={mismatchDomains}
+        onUpdate={onUpdate}
+        onCancel={onCancel}
+      />
 
       <SelectiveBlocking
         clusters={clusters}

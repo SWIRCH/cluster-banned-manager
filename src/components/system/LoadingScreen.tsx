@@ -98,11 +98,12 @@ export default function LoadingScreen({
         setErrorMessage("Не удалось открыть ссылку на скачивание");
       }
     } else {
-      // Desktop: автоматическое скачивание, установка и перезапуск
       if (!desktopUpdateInfo) return;
 
       try {
+        // TODO: Сделать проверку нужен ли мердж локального server.json. (@utils/ensureClusters)
         setAppStatus("downloading");
+
         await desktopUpdateInfo.download();
 
         setAppStatus("downloaded");

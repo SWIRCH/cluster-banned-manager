@@ -1,49 +1,46 @@
-import type { Game } from "@/types/cluster"
-import {
-  LOCAL_CLUSTERS,
-  loadClustersFromGitHub,
-  loadClustersFromLocal,
-} from "@/utils/clustersLoader"
-import { useEffect, useState } from "react"
+import type { Game } from "@/types/cluster";
+import { LOCAL_CLUSTERS } from "@/utils/clustersLoader";
+import { invoke } from "@tauri-apps/api/core";
+import { useEffect, useState } from "react";
+import { useSettings } from "./useSettings";
 
 export function useClustersLoader() {
   const [clustersData, setClustersData] = useState<Game>(LOCAL_CLUSTERS);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | undefined>(undefined);
+  const { settings } = useSettings();
 
   useEffect(() => {
+    let cancelled = false;
+
     async function loadClusters() {
       setIsLoading(true);
       setLoadError(undefined);
 
       try {
-        // Пробуем загрузить с GitHub
-        const data = await loadClustersFromGitHub();
-        if (data) {
-          setClustersData(data);
-          return;
-        }
-      } catch (err) {
-        console.warn("GitHub load failed:", err);
-      }
+        const data = await invoke<Game>("get_clusters");
 
-      // Если GitHub не доступен - пробуем локальный динамический импорт
-      try {
-        const localData = await loadClustersFromLocal();
-        if (localData) {
-          setClustersData(localData);
-          return;
+        // Rust при полном провале вернёт {} — это не валидные данные
+        if (!Array.isArray(data?.regions)) {
+          throw new Error("invalid clusters data");
         }
+        if (!cancelled) setClustersData(data);
       } catch (err) {
-        console.warn("Local load failed:", err);
+        console.warn("Clusters load failed:", err);
+        // Остаются начальные LOCAL_CLUSTERS
+        if (!cancelled) {
+          setLoadError("Failed to load clusters data, using fallback");
+        }
+      } finally {
+        if (!cancelled) setIsLoading(false);
       }
-
-      // Если всё плохо - оставляем начальные LOCAL_CLUSTERS
-      setLoadError("Failed to load clusters data, using fallback");
     }
 
-    loadClusters().finally(() => setIsLoading(false));
-  }, []);
+    loadClusters();
+    return () => {
+      cancelled = true;
+    };
+  }, [settings.syncMode]);
 
   return { clustersData, isLoading, loadError };
 }

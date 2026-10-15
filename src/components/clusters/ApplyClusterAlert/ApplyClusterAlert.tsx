@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { useIsMobile } from "@/hooks";
 import { cn } from "@/lib/utils";
 import { Region } from "@/types";
 import { writeText } from "@tauri-apps/plugin-clipboard-manager";
@@ -10,7 +11,7 @@ import styles from "./styles.module.scss";
 
 type ApplyClusterAlertProps = {
   ref?: Ref<HTMLDivElement>;
-  selectedRegion: Region | null;
+  selectedRegion?: Region | null;
   lastTauriError: string | null;
   allBlockedDomains: string[] | null;
   hostsMismatch: boolean;
@@ -31,6 +32,8 @@ export default function ApplyClusterAlert({
 }: ApplyClusterAlertProps) {
   const { t } = useTranslation();
   const [copiedError, setCopiedError] = useState<boolean>(false);
+  const isMobile = useIsMobile();
+  const showAlert = hostsMismatch && !isMobile;
 
   const { blocked, unBlocked } = useMemo(() => {
     const allBlockedSet = new Set(allBlockedDomains);
@@ -59,13 +62,19 @@ export default function ApplyClusterAlert({
 
   return (
     <AnimatePresence>
-      {hostsMismatch && (
+      {showAlert && selectedRegion && hostsMismatch && (
         <motion.div
+          key="apply-alert"
           ref={ref}
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.95 }}
-          transition={{ duration: 0.15 }}
+          initial={{ opacity: 0, y: 12, scale: 0.97 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{
+            opacity: 0,
+            y: 12,
+            scale: 0.97,
+            transition: { duration: 0.15, ease: "easeIn" },
+          }}
+          transition={{ duration: 0.15, ease: "easeOut" }}
           className={cn(styles["apply-cluster-alert"])}
         >
           {!lastTauriError ? (

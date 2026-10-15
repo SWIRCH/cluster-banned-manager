@@ -5,30 +5,45 @@ import { usePingStore } from "@/store/usePingStore";
 import type { Cluster } from "@/types/cluster";
 import { Checkbox } from "@headlessui/react";
 import { AnimatePresence, motion, Variants } from "framer-motion";
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
-const cardVariants: Variants = {
-  hidden: {
-    opacity: 0,
-    y: -12,
+const listVariants: Variants = {
+  hidden: { opacity: 1 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.09, // 5 карточек ≈ 0.45 с от первой до последней
+      delayChildren: 0.05,
+    },
   },
-  visible: (i: number) => ({
+  exit: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.03,
+      staggerDirection: -1, // уходят в обратном порядке: снизу вверх
+    },
+  },
+};
+
+const itemVariants: Variants = {
+  hidden: { opacity: 0, y: 18, scale: 0.96 },
+  visible: {
     opacity: 1,
     y: 0,
+    scale: 1,
     transition: {
-      delay: i * 0.22,
-      duration: 0.35,
-      ease: "easeOut",
+      type: "spring",
+      stiffness: 260,
+      damping: 24,
+      mass: 0.8,
     },
-  }),
+  },
   exit: {
     opacity: 0,
-    y: 10,
-    transition: {
-      duration: 0.25,
-      ease: "easeIn",
-    },
+    y: -6, // вверх, а не вниз: нижний край не вылезает за контейнер
+    scale: 0.98,
+    transition: { duration: 0.14, ease: "easeIn" },
   },
 };
 
@@ -38,17 +53,16 @@ type ClusterListProps = {
   topOffset?: number | string;
   isMobile?: boolean;
   hostsMismatch: boolean;
+  regionKey?: string; // id региона, если есть
   onToggle?: (domain: string, checked: boolean) => void;
 };
 
 const ClusterRow = memo(function ClusterRow({
   cluster,
-  index,
   isChecked,
   onToggle,
 }: {
   cluster: Cluster;
-  index: number;
   isChecked: boolean;
   onToggle?: (domain: string, checked: boolean) => void;
 }) {
@@ -56,15 +70,7 @@ const ClusterRow = memo(function ClusterRow({
   const ping = usePingStore((s) => s.pings[cluster.domain]);
 
   return (
-    <motion.div
-      key={cluster.domain}
-      custom={index}
-      variants={cardVariants}
-      initial="hidden"
-      animate="visible"
-      exit="exit"
-      className="cluster w-full mt-2"
-    >
+    <motion.div variants={itemVariants} className="cluster w-full mt-2">
       <div
         onClick={() => onToggle && onToggle(cluster.domain, !isChecked)}
         className={cn(
@@ -139,12 +145,22 @@ function ClusterList({
   onToggle,
   topOffset,
   hostsMismatch,
+  regionKey,
 }: ClusterListProps) {
   const isMobile = useAppStore((s) => s.isMobile);
   const { ref, hasOverflow } = useOverflowScroll<HTMLDivElement>();
 
+  // Ключ меняется при смене региона, и тогда проигрывается exit → enter
+  const listKey = useMemo(
+    () => regionKey ?? clusters.map((c) => c.domain).join("|"),
+    [regionKey, clusters],
+  );
+
+  const spacerHeight =
+    typeof topOffset === "number" ? `${topOffset}px` : (topOffset ?? 0);
+
   return (
-    <div className={"ban-clusters-2 mt-1 flex-1 min-h-0 flex flex-col"}>
+    <div className="ban-clusters-2 mt-1 flex-1 min-h-0 flex flex-col">
       <div
         ref={ref}
         className={cn(
@@ -153,31 +169,30 @@ function ClusterList({
           hasOverflow ? "is-scrollable" : "",
         )}
       >
-        <AnimatePresence>
-          {clusters.map((c, index) => (
-            <ClusterRow
-              key={c.domain}
-              cluster={c}
-              index={index}
-              isChecked={!!checkedMap[c.domain]}
-              onToggle={onToggle}
-            />
-          ))}
+        <AnimatePresence mode="wait" initial>
+          <motion.div
+            key={listKey}
+            variants={listVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+          >
+            {clusters.map((c) => (
+              <ClusterRow
+                key={c.domain}
+                cluster={c}
+                isChecked={!!checkedMap[c.domain]}
+                onToggle={onToggle}
+              />
+            ))}
+          </motion.div>
         </AnimatePresence>
 
-        <AnimatePresence>
-          {hostsMismatch && (
-            <motion.div
-              className="apply-alert-space hidden max-[900px]:block"
-              layout
-              initial={{ height: 0 }}
-              animate={{ height: topOffset + "px" }}
-              exit={{ height: 0 }}
-              transition={{ duration: 0.3, ease: "easeInOut" }}
-              style={{ overflow: "hidden" }}
-            />
-          )}
-        </AnimatePresence>
+        <div
+          aria-hidden
+          className="apply-alert-space hidden max-[900px]:block shrink-0 overflow-hidden transition-[height] duration-300 ease-in-out"
+          style={{ height: hostsMismatch ? spacerHeight : 0 }}
+        />
       </div>
     </div>
   );

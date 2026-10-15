@@ -3,12 +3,22 @@ use crate::native::paths;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Default)]
+#[serde(rename_all = "camelCase")]
+pub enum SyncMode {
+    #[default]
+    Hybrid,
+    Local,
+    Server,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default, rename_all = "camelCase")]
 pub struct Settings {
     pub use_firewall: bool,
     pub use_backup: bool,
     pub backup_count: u32,
+    pub sync_mode: SyncMode,
 
     #[serde(flatten)]
     pub extra: HashMap<String, serde_json::Value>,
@@ -20,6 +30,7 @@ impl Default for Settings {
             use_firewall: true,
             use_backup: false,
             backup_count: 5,
+            sync_mode: SyncMode::Hybrid,
             extra: HashMap::new(),
         }
     }
@@ -57,6 +68,7 @@ mod tests {
         assert!(s.use_firewall);
         assert!(!s.use_backup);
         assert_eq!(s.backup_count, 5);
+        assert_eq!(s.sync_mode, SyncMode::Hybrid);
     }
 
     #[test]
@@ -65,6 +77,7 @@ mod tests {
         assert!(s.use_backup);
         assert!(s.use_firewall); // дефолт
         assert_eq!(s.backup_count, 5); // дефолт
+        assert_eq!(s.sync_mode, SyncMode::Hybrid);
     }
 
     #[test]
@@ -73,12 +86,13 @@ mod tests {
             use_firewall: false,
             use_backup: true,
             backup_count: 10,
+            sync_mode: SyncMode::Hybrid,
             extra: HashMap::new(),
         };
         let json = serde_json::to_string(&s).unwrap();
         let back: Settings = serde_json::from_str(&json).unwrap();
-        assert_eq!(back.use_firewall, false);
-        assert_eq!(back.use_backup, true);
+        assert!(!back.use_firewall);
+        assert!(back.use_backup);
         assert_eq!(back.backup_count, 10);
     }
 }

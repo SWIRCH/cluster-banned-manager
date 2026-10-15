@@ -85,7 +85,7 @@ export default function ConfirmModal({
 
       <div className="flex justify-end gap-2">
         <button className="btn bg-white/10 px-4 py-2 rounded" onClick={onClose}>
-          Отмена
+          {t("buttons.cancel")}
         </button>
         <button
           className={`steam-btn px-4 py-2 rounded ${
@@ -100,7 +100,7 @@ export default function ConfirmModal({
             }
           }}
         >
-          Подтвердить
+          {t("buttons.confirm")}
         </button>
       </div>
     </Modal>

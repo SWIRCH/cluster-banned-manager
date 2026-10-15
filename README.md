@@ -1,13 +1,8 @@
 <!-- # <img src="./public/clusterbanned.png" height="34" style="vertical-align: middle;" /> Cluster Banned Manager -->
 
-
-
 <div align="center">
 
 [![ClusterBannedManager](./public/banner-new.png)](https://cbmwot.vercel.app/)
-
-<!-- <img src="./public/clusterbanned.png" alt="Twittergram" height="180" align="right"/> -->
-
 
 [![Bun](https://shieldcn.dev/badge/bun-f472b8.svg?logo=bun&size=sm&variant=branded&font=geist)](https://bun.sh/)
 [![Tauri](https://shieldcn.dev/badge/tauri-fcbf30.svg?logo=tauri&size=sm&variant=branded&logoColor=black&font=geist)](https://v2.tauri.app/)
@@ -25,7 +20,7 @@
 
 </div>
 
-<h2 align="center" id="cbm">
+<h2 id="cbm">
 	<img src="https://api.iconify.design/lucide/message-circle-question-mark.svg?color=white" width="24" height="24" alt="icon" /> 
   Что такое CBM?
 </h2>
@@ -42,7 +37,7 @@ Cluster Banned Manager (CBM) — это кроссплатформенный и�
 > Столкнулись с высоким пингом или потерей пакетов?
 > Прочитайте [руководство WARP FIX](https://cbmwot.vercel.app/docs/ru/warp-fix/) — там описан рабочий способ решения проблемы.
 
-<h2 align="center" id="toc">
+<h2 id="toc">
   <img src="https://api.iconify.design/lucide/list.svg?color=white" width="24" height="24" alt="icon" /> 
   Содержание
 </h2>
@@ -55,7 +50,7 @@ Cluster Banned Manager (CBM) — это кроссплатформенный и�
 - [Поддержка проекта](#support)
 - [Лицензирование](#license)
 
-<h2 align="center" id="features">
+<h2 id="features">
   <img 
     src="https://api.iconify.design/lucide/layers.svg?color=white" 
     width="24" 
@@ -87,7 +82,7 @@ Cluster Banned Manager (CBM) — это кроссплатформенный и�
 2. **Мультирегиональность** — поддержка всех серверов WoT Blitz (EU, NA, ASIA) и Tanks Blitz (RU/Lesta).
 3. **Статус в реальном времени** — наглядные индикаторы активных подсистем и серверов.
 
-<h2 align="center" id="regions">
+<h2 id="regions">
   <img src="https://api.iconify.design/lucide/globe.svg?color=white" width="24" height="24" alt="icon" /> 
   Поддерживаемые регионы
 </h2>
@@ -99,7 +94,7 @@ Cluster Banned Manager (CBM) — это кроссплатформенный и�
 | <img src="https://flagcdn.io/flags/4x3/jp.svg" width="42" /> | **Азия**             | 3 сервера  | Сингапур, Токио                       | [Список IP](/src/data/servers.json) |
 | <img src="https://flagcdn.io/flags/4x3/us.svg" width="42" /> | **Северная Америка** | 3 сервера  | Чикаго, Вирджиния, Калифорния         | [Список IP](/src/data/servers.json) |
 
-<h2 align="center" id="usage">
+<h2 id="usage">
   <img src="https://api.iconify.design/lucide/gauge.svg?color=white" width="24" height="24" alt="icon" /> 
   Использование
 </h2>
@@ -117,7 +112,7 @@ Cluster Banned Manager (CBM) — это кроссплатформенный и�
 > [!IMPORTANT]
 > Белый индикатор в списке у сервера означает, что он включен и доступен для подключения.
 
-<h2 align="center" id="build">
+<h2 id="build">
   <img src="https://api.iconify.design/lucide/boxes.svg?color=white" width="24" height="24" alt="icon" /> 
   Собираем приложение сами
 </h2>
@@ -144,7 +139,7 @@ bun tauri dev
 bun tauri build
 ```
 
-<h2 align="center" id="tech">
+<h2 id="tech">
   <img src="https://api.iconify.design/lucide/layers.svg?color=white" width="24" height="24" alt="icon" /> 
   Технологии
 </h2>
@@ -162,9 +157,8 @@ bun tauri build
 2. **TypeScript** - типизированный JavaScript
 3. **Tailwind CSS** - утилитарный CSS-фреймворк
 4. **Framer Motion** - библиотека анимаций
-5. **Headless UI** - доступные UI-компоненты
 
-<h2 align="center" id="support">
+<h2 id="support">
   <img src="https://api.iconify.design/lucide/heart.svg?color=white" width="24" height="24" alt="icon" /> 
   Поддержка проекта
 </h2>
@@ -172,7 +166,7 @@ bun tauri build
 Вы можете поддержать проект, поставив :star: этому репозиторию (сверху справа этой страницы) 
 
 
-<h2 align="center" id="license">
+<h2 id="license">
   <img src="https://api.iconify.design/lucide/scale.svg?color=white" width="24" height="24" alt="icon" /> 
   Лицензирование
 </h2>

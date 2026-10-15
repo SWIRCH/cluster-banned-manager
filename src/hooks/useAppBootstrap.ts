@@ -9,6 +9,8 @@ import { logger } from "@/utils/logger";
 import { getSavedRegionId } from "@/utils/regionStorage";
 
 import type { Game } from "@/types/cluster";
+import { Elevation } from "@/types/system";
+import { ensureClusters } from "@/utils/ensureClusters";
 
 interface UseAppBootstrapParams {
   game: Game;
@@ -60,19 +62,24 @@ export function useAppBootstrap({
     })),
   );
 
-  // Запись game в стор
   useEffect(() => {
+    // Запись game в store
     setGame(game);
-  }, []);
 
-  // Bootstrap настроек
-  useEffect(() => {
+    // Bootstrap настроек
     bootstrapSettings();
-  }, []);
 
-  // Устанавливаем глобальный isMobile
-  useEffect(() => {
+    // Устанавливаем глобальный isMobile
     setIsMobile(isMobile);
+
+    // Merge файла кластеров
+    (async () => {
+      try {
+        await ensureClusters();
+      } catch (err) {
+        logger.error("Не удалось синхронизировать кластеры:", err);
+      }
+    })();
   }, []);
 
   // Инициализация выбранного региона
@@ -107,7 +114,8 @@ export function useAppBootstrap({
 
     (async () => {
       try {
-        const ev: any = await safeInvoke("check_elevation");
+        const ev: Elevation = await safeInvoke("check_elevation");
+
         logger.log("Elevation: ", ev);
 
         if (ev && ev.isAdmin === false) {

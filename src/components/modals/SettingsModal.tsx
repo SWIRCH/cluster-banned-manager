@@ -20,7 +20,9 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ToggleGroup } from "@/components/ui/toggle-group";
 import { useSettings } from "@/hooks/useSettings";
 import { getInitialLanguage } from "@/lib/i18n";
+import { SyncModeType } from "@/types/app-settings";
 import { langFormat } from "@/utils/langForamter";
+import { logger } from "@/utils/logger";
 import { defaultSettings } from "@/utils/settingsStorage";
 import { writeText } from "@tauri-apps/plugin-clipboard-manager";
 import { AnimatePresence, motion } from "framer-motion";
@@ -60,10 +62,6 @@ export default function SettingsModal({
   const [activeTab, setActiveTab] = useState("settings");
   const [formData, setFormData] = useState(defaultSettings);
 
-  // Test
-  type syncModeValues = "local" | "hybrid" | "server";
-  const [syncMode, setSyncMode] = useState<syncModeValues>("hybrid");
-
   useEffect(() => {
     if (!loading && settings.isSetup) {
       setFormData({
@@ -71,6 +69,7 @@ export default function SettingsModal({
         useBackup: settings.useBackup ?? false,
         backupCount: settings.backupCount ?? 5,
         lang: settings.lang ?? getInitialLanguage(),
+        syncMode: settings.syncMode ?? "hybrid",
       });
     }
   }, [onClose, loading, settings]);
@@ -102,6 +101,10 @@ export default function SettingsModal({
       return null;
     }
   })();
+
+  useEffect(() => {
+    logger.log("FormData: ", formData);
+  }, [formData]);
 
   return (
     <Modal
@@ -289,11 +292,15 @@ export default function SettingsModal({
                             Синхронизация
                           </FieldLabel>
                           <ToggleGroup
-                            value={[syncMode]}
-                            onValueChange={(value) =>
-                              value[0] &&
-                              setSyncMode(value[0] as syncModeValues)
-                            }
+                            value={[formData.syncMode]}
+                            onValueChange={(val) => {
+                              if (!val[0]) return;
+
+                              return setFormData((prev) => ({
+                                ...prev,
+                                syncMode: val[0] as SyncModeType,
+                              }));
+                            }}
                             variant="outline"
                             className={"grid grid-cols-3 gap-2"}
                             spacing={2}
@@ -308,7 +315,7 @@ export default function SettingsModal({
                                 <Locate className="size-6" />
                               </span>
                               <span className="text-xs text-muted-foreground">
-                                Локальный
+                                {t("settings.sync_mode.local")}
                               </span>
                             </ToggleGroupItem>
                             <ToggleGroupItem
@@ -320,7 +327,7 @@ export default function SettingsModal({
                                 <HeartHandshake className="size-6" />
                               </span>
                               <span className="text-xs text-muted-foreground">
-                                Гибридный
+                                {t("settings.sync_mode.hybrid")}
                               </span>
                             </ToggleGroupItem>
                             <ToggleGroupItem
@@ -332,32 +339,21 @@ export default function SettingsModal({
                                 <ServerCog className="size-6" />
                               </span>
                               <span className="text-xs text-muted-foreground">
-                                Сервер
+                                {t("settings.sync_mode.server")}
                               </span>
                             </ToggleGroupItem>
                           </ToggleGroup>
                           <FieldDescription>
-                            {syncMode === "local" && (
-                              <p>
-                                Вы выбрали локальный подход, мы будем брать файл
-                                кластера с вашего пк.
-                              </p>
+                            {formData.syncMode === "local" && (
+                              <p>{t("settings.sync_mode.local_text")}</p>
                             )}
 
-                            {syncMode === "hybrid" && (
-                              <p>
-                                Вы выбрали гибридный подход, мы будем обновлять
-                                файл кластера с репозитории github. В случае
-                                если она будет не доступна вы включим локальную
-                                копию.
-                              </p>
+                            {formData.syncMode === "hybrid" && (
+                              <p>{t("settings.sync_mode.hybrid_text")}</p>
                             )}
 
-                            {syncMode === "server" && (
-                              <p>
-                                Вы выбрали серверный подход, мы будем брать файл
-                                кластера только с репозитории github.
-                              </p>
+                            {formData.syncMode === "server" && (
+                              <p>{t("settings.sync_mode.server_text")}</p>
                             )}
                           </FieldDescription>
                         </Field>

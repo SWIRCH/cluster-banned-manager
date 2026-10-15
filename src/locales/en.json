@@ -25,7 +25,7 @@
       "confirm_update_hosts": {
         "title": "Confirm to update hosts",
         "description": "",
-        "add_records_info": "Будут добавлены записи типа <codeTag>0.0.0.0 domain</codeTag> для следующих доменов в регионе <regionTag>{{region}}</regionTag>:"
+        "add_records_info": "Entries of type <codeTag>0.0.0.0 domain</codeTag> will be added for the following domains in the <regionTag>{{region}}</regionTag> region:"
       },
       "will_be_blocked_one": "It will be blocked",
       "will_be_blocked_other": "They will be blocked.",
@@ -50,8 +50,8 @@
     "warp-fix": "High ping or packet loss?"
   },
   "settings": {
-    "title": "Настройки приложения",
-    "description": "Здесь вы можете настроить параметры приложения.",
+    "title": "Application settings",
+    "description": "Here you can configure the application settings.",
     "use_firewall": "Use firewall",
     "firewall_about": "Blocks connections at the network level. Works even if the game uses IP addresses directly. Requires administrator privileges.",
     "use_backups": "Create backups",
@@ -59,6 +59,15 @@
     "backups_count": "Backup count",
     "language_interface": "Interface language",
     "debug_and_diagnostic": "Debug and diagnostic",
+    "sync_mode": {
+      "title": "Synchronization",
+      "local": "Local",
+      "local_text": "You have chosen the local approach; we will take the cluster file from your PC.",
+      "hybrid": "Hybrid",
+      "hybrid_text": "You have chosen the hybrid approach; we will update the cluster file from the GitHub repository. If it is unavailable, we will enable the local copy.",
+      "server": "Server",
+      "server_text": "You have chosen the server approach; we will take the cluster file only from the GitHub repository."
+    },
     "buttons": {
       "settings": "Settings",
       "debug": "Debug"
@@ -72,13 +81,17 @@
       "loading": "Updating data..."
     },
     "admin_privileges": {
-      "title": "Требуются права администратора",
-      "description": "Приложение не обладает правами для изменения системного файла hosts. Чтобы использовать функциональность блокировки/разблокировки серверов, запустите приложение с правами администратора.",
-      "on_close": "Инструкция"
+      "title": "Administrator privileges required",
+      "description": "The application does not have permission to modify the system hosts file. To use the server blocking/unblocking functionality, run the application as administrator.",
+      "on_close": "Instructions"
+    },
+    "how_to_open_app_admin_privilege": {
+      "title": "How to run as administrator",
+      "description": "Run the application as administrator (right-click → Run as administrator) or create a shortcut and in its properties select the option to run as administrator. After that, click 'Retry'."
     },
     "blocking_all_confirm": {
-      "title": "Подтвердите блокировку всех серверов",
-      "description": "Вы собираетесь заблокировать <strong>все</strong> серверы региона <strong>{{region}}</strong>. Это приведёт к тому, что игра не сможет подключаться к серверам этого региона — вы фактически отключите доступ к игре в этом регионе."
+      "title": "Confirm blocking all servers",
+      "description": "You are about to block <strong>all</strong> servers in the <strong>{{region}}</strong> region. This will cause the game to be unable to connect to servers in this region — you will effectively disable access to the game in this region."
     }
   },
   "sidebar": {
@@ -146,6 +159,11 @@
     "default": "Error application",
     "hide_details": "Hide details",
     "show_details": "Show details",
+    "admin_mounts": {
+      "title": "Administrator rights error",
+      "description": "To clear the locks, you need to run the application with administrator privileges.",
+      "details": "Please close the application and launch it as an administrator."
+    },
     "tauri": {
       "default": "Error tauri",
       "unavailable": "Tauri is unavailable — please run the desktop application"

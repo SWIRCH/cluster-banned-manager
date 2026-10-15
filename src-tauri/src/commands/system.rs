@@ -1,3 +1,4 @@
+use crate::core::process::process_is_elevated;
 use crate::error::AppResult;
 use crate::native::paths;
 use serde_json::json;
@@ -5,15 +6,19 @@ use serde_json::json;
 #[tauri::command]
 pub fn check_elevation() -> AppResult<serde_json::Value> {
     let path = paths::hosts_path()?;
+    let is_admin = process_is_elevated();
 
-    match std::fs::OpenOptions::new().append(true).open(&path) {
-        Ok(_) => Ok(json!({ "isAdmin": true, "path": path.display().to_string() })),
-        Err(e) => Ok(json!({
-            "isAdmin": false,
-            "path": path.display().to_string(),
-            "error": e.to_string()
-        })),
-    }
+    let (hosts_writable, error) = match std::fs::OpenOptions::new().append(true).open(&path) {
+        Ok(_) => (true, None),
+        Err(e) => (false, Some(e.to_string())),
+    };
+
+    Ok(json!({
+        "isAdmin": is_admin,
+        "hostsWritable": hosts_writable,
+        "path": path.display().to_string(),
+        "error": error,
+    }))
 }
 
 #[tauri::command]

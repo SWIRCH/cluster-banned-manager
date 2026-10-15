@@ -273,7 +273,8 @@ small {
   position: sticky;
   width: 100%;
   left: 0;
-  bottom: -2px;
+  bottom: 5px;
+  translate: 0 4px;
   overflow: hidden;
   border-bottom: 10px;
 }

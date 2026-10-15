@@ -13,6 +13,9 @@
 		"log:default",
 		"clipboard-manager:default",
 		"clipboard-manager:allow-write-text",
-		"clipboard-manager:allow-read-text"
+		"clipboard-manager:allow-read-text",
+		"fs:allow-applocaldata-write-recursive",
+    "fs:allow-applocaldata-read-recursive",
+    "fs:allow-resource-read"
 	]
 }

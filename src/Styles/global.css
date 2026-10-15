@@ -12,8 +12,8 @@
 
 /* 1. Увеличиваем общую ширину скроллбара (8px плашка + 5px отступ = 13px) */
 ::-webkit-scrollbar {
-  width: 13px;
-  height: 13px;
+  width: 10px;
+  height: 5px;
 }
 
 /* 2. Фон дорожки */
@@ -24,7 +24,7 @@
 /* 3. Ползунок с отступом слева */
 ::-webkit-scrollbar-thumb {
   background-color: rgba(255, 255, 255, 0.12);
-  border-left: 5px solid transparent;
+  border-left: 6px solid transparent;
   background-clip: padding-box;
   border-radius: 8px;
   transition: background-color 0.2s ease;
@@ -33,7 +33,7 @@
 /* 4. При наведении */
 ::-webkit-scrollbar-thumb:hover {
   background-color: rgba(255, 255, 255, 0.25);
-  border-left: 5px solid transparent;
+  border-left: 6px solid transparent;
   background-clip: padding-box;
 }
 
@@ -49,7 +49,9 @@
   background: #101015;
 }
 
-
+code, pre{
+  font-family: var(--font-mono);
+}
 
 @custom-variant dark (&:is(.dark *));
 
