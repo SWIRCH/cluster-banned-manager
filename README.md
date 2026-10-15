@@ -1,26 +1,36 @@
-# <img src="./public/clusterbanned.png" height="34" style="vertical-align: middle;" /> Cluster Banned Manager
+<!-- # <img src="./public/clusterbanned.png" height="34" style="vertical-align: middle;" /> Cluster Banned Manager -->
+
+
 
 <div align="center">
-<a href="https://cbmwot.vercel.app/">
-	<img src="./public/banner-new.png" width="750" alt="ClusterBannedManager" />
-</a>
 
-[![Bun](https://img.shields.io/badge/Bun-f472b8?style=for-the-badge&logo=bun&logoColor=white)](https://bun.sh/)
-[![Rust](https://img.shields.io/badge/Rust-000000?style=for-the-badge&logo=rust&logoColor=white)](https://www.rust-lang.org/)
-[![React](https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Windows](https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white)](https://www.microsoft.com/windows/)
-[![Android](https://img.shields.io/badge/Android-34A853?style=for-the-badge&logo=android&logoColor=white)](https://www.android.com/)
-[![Tauri](https://img.shields.io/badge/Tauri-2.0-FFC131?style=for-the-badge&logo=tauri&logoColor=white)](https://v2.tauri.app/)
-[![Все скачивания](https://img.shields.io/github/downloads/SWIRCH/cluster-banned-manager/total?style=for-the-badge)](https://github.com/SWIRCH/cluster-banned-manager/releases)
-[![Последний релиз](https://img.shields.io/github/v/release/SWIRCH/cluster-banned-manager?style=for-the-badge)](https://github.com/SWIRCH/cluster-banned-manager/releases)
-[![Лицензия](https://img.shields.io/github/license/SWIRCH/cluster-banned-manager?style=for-the-badge)](https://github.com/SWIRCH/cluster-banned-manager/blob/main/LICENSE)
+[![ClusterBannedManager](./public/banner-new.png)](https://cbmwot.vercel.app/)
 
-**Управление подключением к игровым серверам World of Tanks Blitz и Tanks Blitz.<br /> Блокировка нежелательных кластеров на сетевом уровне для Windows и Android.**
+<!-- <img src="./public/clusterbanned.png" alt="Twittergram" height="180" align="right"/> -->
 
-[<img src="./public/github/WindowsDownloadRu.png" width="230" style="margin-right: 10px;" />](https://github.com/SWIRCH/cluster-banned-manager/releases/tag/v0.1.7) [<img src="./public/github/AndroidDownloadRu.png" width="230" />](https://github.com/SWIRCH/cluster-banned-manager/releases/download/v0.1.6/app-universal-release.apk)
+
+[![Bun](https://shieldcn.dev/badge/bun-f472b8.svg?logo=bun&size=sm&variant=branded&font=geist)](https://bun.sh/)
+[![Tauri](https://shieldcn.dev/badge/tauri-fcbf30.svg?logo=tauri&size=sm&variant=branded&logoColor=black&font=geist)](https://v2.tauri.app/)
+[![Rust](https://shieldcn.dev/badge/rust-d44b27.svg?logo=rust&size=sm&variant=branded&font=geist)](https://www.rust-lang.org/)
+[![React](https://shieldcn.dev/badge/react-61DAFB.svg?logo=react&size=sm&variant=branded&logoColor=black&font=geist)](https://react.dev/)
+[![TypeScript](https://shieldcn.dev/badge/typescript-3178C6.svg?logo=typescript&size=sm&variant=branded&font=geist)](https://www.typescriptlang.org/)
+[![Windows](https://shieldcn.dev/badge/windows-0078D6.svg?logo=ri:FaWindows&size=sm&variant=branded&font=geist)](https://www.microsoft.com/windows/)
+[![Android](https://shieldcn.dev/badge/android-34A853.svg?logo=android&size=sm&variant=branded&font=geist)](https://www.android.com/)
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/github/downloads/SWIRCH/cluster-banned-manager.svg?size=sm&mode=dark&font=geist&variant=outline"><img alt="Downloads v0.1.7" src="https://www.shieldcn.dev/github/assets-dl/SWIRCH/cluster-banned-manager/v0.1.7.svg?size=sm&mode=light&font=geist&variant=outline"></picture>
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://www.shieldcn.dev/github/release/SWIRCH/cluster-banned-manager.svg?size=sm&amp;mode=dark&amp;font=geist&variant=outline"><img alt="Release" src="https://www.shieldcn.dev/github/release/SWIRCH/cluster-banned-manager.svg?size=sm&amp;mode=light&amp;font=geist"></picture>
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://www.shieldcn.dev/github/license/SWIRCH/cluster-banned-manager.svg?variant=outline&amp;size=sm&amp;mode=dark&amp;font=geist&variant=outline"><img alt="License" src="https://www.shieldcn.dev/github/license/SWIRCH/cluster-banned-manager.svg?variant=outline&amp;size=sm&amp;mode=light&amp;font=geist"></picture>
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://www.shieldcn.dev/github/stars/SWIRCH/cluster-banned-manager.svg?variant=outline&amp;size=sm&amp;mode=dark&amp;font=geist"><img alt="GitHub Stars" src="https://www.shieldcn.dev/github/stars/SWIRCH/cluster-banned-manager.svg?variant=outline&amp;size=sm&amp;mode=light&amp;font=geist"></picture> <picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/views/repo/SWIRCH/cluster-banned-manager.svg?base=0&variant=outline&size=sm&mode=dark&font=geist"><img alt="Visitors" src="https://shieldcn.dev/views/repo/SWIRCH/cluster-banned-manager.svg?base=0&variant=outline&size=sm&mode=light&font=geist"></picture>
+
+**Русский** · [English](/README_EN.md)
 
 </div>
+
+<h2 align="center" id="cbm">
+	<img src="https://api.iconify.design/lucide/message-circle-question-mark.svg?color=white" width="24" height="24" alt="icon" /> 
+  Что такое CBM?
+</h2>
+
+Cluster Banned Manager (CBM) — это кроссплатформенный инструмент для управления сетевыми подключениями к игровым серверам **World of Tanks Blitz** и **Tanks Blitz**. Приложение позволяет выборочно блокировать нежелательные игровые кластеры на сетевом уровне, снижая пинг и потери пакетов **без использования сторонних VPN**.
 
 > [!TIP]
 > **Платформенные особенности:**
@@ -29,23 +39,31 @@
 > 2. **Android**: Использован архитектурный подход на базе **VpnService / Локального файрвола**, блокирующий подключение к IP-адресам нежелательных серверов на лету без необходимости получения Root-прав.
 
 > [!IMPORTANT]
-> Если у вас есть проблемы с пингом или высокий loss, прочитайте статью [WARP FIX](https://cbmwot.vercel.app/docs/ru/warp-fix/)
+> Столкнулись с высоким пингом или потерей пакетов?
+> Прочитайте [руководство WARP FIX](https://cbmwot.vercel.app/docs/ru/warp-fix/) — там описан рабочий способ решения проблемы.
 
-## 🌎 Переводы/Translations
+<h2 align="center" id="toc">
+  <img src="https://api.iconify.design/lucide/list.svg?color=white" width="24" height="24" alt="icon" /> 
+  Содержание
+</h2>
 
-- [Russian](/README.md)
-- [English](/README_EN.md)
+- [Возможности](#features)
+- [Поддерживаемые регионы](#regions)
+- [Использование](#usage)
+- [Собираем приложение сами](#build)
+- [Технологии](#tech)
+- [Поддержка проекта](#support)
+- [Лицензирование](#license)
 
-## 📋 Содержание
-
-- [🌟 Возможности](#возможности)
-- [🎮 Поддерживаемые регионы](#поддерживаемые-регионы)
-- [⚙️ Использование](#использование)
-- [🛠 Технологии](#технологии)
-- [🚀 Поддержка проекта](#поддержка-проекта)
-- [⚖️ Лицензирование](#лицензирование)
-
-## Возможности
+<h2 align="center" id="features">
+  <img 
+    src="https://api.iconify.design/lucide/layers.svg?color=white" 
+    width="24" 
+    height="24" 
+    alt="icon"
+  /> 
+  Возможности
+</h2>
 
 ### 🎯 Основные функции
 
@@ -69,16 +87,22 @@
 2. **Мультирегиональность** — поддержка всех серверов WoT Blitz (EU, NA, ASIA) и Tanks Blitz (RU/Lesta).
 3. **Статус в реальном времени** — наглядные индикаторы активных подсистем и серверов.
 
-## Поддерживаемые регионы
+<h2 align="center" id="regions">
+  <img src="https://api.iconify.design/lucide/globe.svg?color=white" width="24" height="24" alt="icon" /> 
+  Поддерживаемые регионы
+</h2>
 
 |                                                                                         | Регион               | Серверы    | Локация                               | IP Адреса                           |
 | --------------------------------------------------------------------------------------- | -------------------- | ---------- | ------------------------------------- | ----------------------------------- |
-| <img src="https://github.com/lipis/flag-icons/blob/main/flags/4x3/eu.svg" width="32" /> | **Европа**           | 5 серверов | Амстердам, Франкфурт, Варшава, Алматы | [Список IP](/src/data/servers.json) |
-| <img src="https://github.com/lipis/flag-icons/blob/main/flags/4x3/ru.svg" width="32"/>  | **Россия**           | 6 серверов | Москва, Красноярск, Екатеринбург      | [Список IP](/src/data/servers.json) |
-| <img src="https://github.com/lipis/flag-icons/blob/main/flags/4x3/jp.svg" width="32" /> | **Азия**             | 3 сервера  | Сингапур, Токио                       | [Список IP](/src/data/servers.json) |
-| <img src="https://github.com/lipis/flag-icons/blob/main/flags/4x3/us.svg" width="32" /> | **Северная Америка** | 3 сервера  | Чикаго, Вирджиния, Калифорния         | [Список IP](/src/data/servers.json) |
+| <img src="https://flagcdn.io/flags/4x3/eu.svg" width="42" /> | **Европа**           | 5 серверов | Амстердам, Франкфурт, Варшава, Алматы | [Список IP](/src/data/servers.json) |
+| <img src="https://flagcdn.io/flags/4x3/ru.svg" width="42"/>  | **Россия**           | 6 серверов | Москва, Красноярск, Екатеринбург      | [Список IP](/src/data/servers.json) |
+| <img src="https://flagcdn.io/flags/4x3/jp.svg" width="42" /> | **Азия**             | 3 сервера  | Сингапур, Токио                       | [Список IP](/src/data/servers.json) |
+| <img src="https://flagcdn.io/flags/4x3/us.svg" width="42" /> | **Северная Америка** | 3 сервера  | Чикаго, Вирджиния, Калифорния         | [Список IP](/src/data/servers.json) |
 
-## Использование
+<h2 align="center" id="usage">
+  <img src="https://api.iconify.design/lucide/gauge.svg?color=white" width="24" height="24" alt="icon" /> 
+  Использование
+</h2>
 
 ### 💻 Windows
 1. Скачайте `.exe` или `.msi` установщик со [страницы последнего релиза](https://github.com/SWIRCH/cluster-banned-manager/releases).
@@ -93,7 +117,10 @@
 > [!IMPORTANT]
 > Белый индикатор в списке у сервера означает, что он включен и доступен для подключения.
 
-## Собираем приложение сами
+<h2 align="center" id="build">
+  <img src="https://api.iconify.design/lucide/boxes.svg?color=white" width="24" height="24" alt="icon" /> 
+  Собираем приложение сами
+</h2>
 
 Требования:
 
@@ -117,7 +144,10 @@ bun tauri dev
 bun tauri build
 ```
 
-## Технологии
+<h2 align="center" id="tech">
+  <img src="https://api.iconify.design/lucide/layers.svg?color=white" width="24" height="24" alt="icon" /> 
+  Технологии
+</h2>
 
 ### ♟ Backend (Rust/Tauri)
 
@@ -134,10 +164,17 @@ bun tauri build
 4. **Framer Motion** - библиотека анимаций
 5. **Headless UI** - доступные UI-компоненты
 
-## Поддержка проекта
+<h2 align="center" id="support">
+  <img src="https://api.iconify.design/lucide/heart.svg?color=white" width="24" height="24" alt="icon" /> 
+  Поддержка проекта
+</h2>
 
-Вы можете поддержать проект, поставив :star: этому репозиторию (сверху справа этой страницы)
+Вы можете поддержать проект, поставив :star: этому репозиторию (сверху справа этой страницы) 
 
-## Лицензирование
+
+<h2 align="center" id="license">
+  <img src="https://api.iconify.design/lucide/scale.svg?color=white" width="24" height="24" alt="icon" /> 
+  Лицензирование
+</h2>
 
 Проект распространяется на условиях лицензии ⚖️ [GPL-2.0](https://github.com/SWIRCH/cluster-banned-manager/blob/main/LICENSE)

@@ -75,7 +75,9 @@ const ClusterRow = memo(function ClusterRow({
         )}
       >
         <div className="flex items-center">
-          <span className="font-semibold text-3xl text-white">{cluster.id}</span>
+          <span className="font-semibold text-3xl text-white">
+            {cluster.id}
+          </span>
           <hr className="vertical" />
           <div className="text-sm text-white/50 m-0">
             {t((cluster.location_key as any) ?? "locations.unknown")}
