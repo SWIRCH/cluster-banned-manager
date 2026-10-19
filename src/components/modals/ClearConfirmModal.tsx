@@ -21,7 +21,7 @@ export default function ClearConfirmModal({
   const onClose = () => setIsOpen(false);
 
   return (
-    <Modal open={isOpen} onClose={onClose} zIndex="z-[50]">
+    <Modal open={isOpen} onClose={onClose}>
       <h3 className="text-lg font-semibold mb-2">
         {t("modals.clear.title", {
           firewall: useFirewall ? " & Firewall" : "",

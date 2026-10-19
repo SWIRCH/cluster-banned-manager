@@ -1,55 +1,87 @@
-import tailwindcss from "@tailwindcss/vite"
-import react from "@vitejs/plugin-react"
-import path from 'path'
-import { defineConfig } from "vite"
+import tailwindcss from "@tailwindcss/vite";
+import react from "@vitejs/plugin-react";
+import { execFileSync } from "child_process";
+import path from "path";
+import { defineConfig } from "vite";
 
 // process.env.TAURI_DEV_HOST
-const host = "127.0.0.1";
+const host = process.env.TAURI_DEV_HOST;
+const dirname = import.meta.dirname;
 
 // https://vite.dev/config/
-export default defineConfig(async () => ({
-  plugins: [react(), tailwindcss()],
+export default defineConfig(async ({ mode }) => {
+  let buildHash = process.env.VITE_BUILD_HASH;
+  if (!buildHash) {
+    try {
+      const commit = execFileSync("git", ["rev-parse", "--short=12", "HEAD"], {
+        encoding: "utf8",
+      }).trim();
+      const isDirty =
+        execFileSync("git", ["status", "--porcelain"], {
+          encoding: "utf8",
+        }).trim().length > 0;
+      buildHash = `${commit}${isDirty ? "-dirty" : ""}`;
+    } catch {
+      buildHash = "unknown";
+    }
+  }
+  const buildDate = process.env.VITE_BUILD_DATE ?? new Date().toISOString();
+  const updateChannel =
+    process.env.VITE_UPDATE_CHANNEL === "beta"
+      ? "beta"
+      : mode === "development"
+        ? "development"
+        : "stable";
 
-  // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
-  //
-  // 1. prevent Vite from obscuring rust errors
-  clearScreen: false,
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src')
+  return {
+    define: {
+      __APP_BUILD_HASH__: JSON.stringify(buildHash),
+      __APP_BUILD_DATE__: JSON.stringify(buildDate),
+      __APP_UPDATE_CHANNEL__: JSON.stringify(updateChannel),
     },
-  },
-  // 2. tauri expects a fixed port, fail if that port is not available
-  server: {
-    port: 1420,
-    strictPort: true,
-    host: "192.168.0.100",
-    hmr: host
-      ? {
-          protocol: "ws",
-          host,
-          port: 1421,
-        }
-      : undefined,
-    watch: {
-      // 3. tell Vite to ignore watching `src-tauri`
-      ignored: ["**/src-tauri/**"],
+    plugins: [react(), tailwindcss()],
+
+    // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
+    //
+    // 1. prevent Vite from obscuring rust errors
+    clearScreen: false,
+    resolve: {
+      alias: {
+        "@": path.resolve(__dirname, "./src"),
+      },
     },
-  },
-  build: {
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          "tauri-api": ["@tauri-apps/api"],
-          "tauri-plugins": [
-            "@tauri-apps/plugin-opener",
-            "@tauri-apps/plugin-process",
-            "@tauri-apps/plugin-updater",
-          ],
-          vendor: ["react", "react-dom", "framer-motion"],
+    // 2. tauri expects a fixed port, fail if that port is not available
+    server: {
+      port: 1420,
+      strictPort: true,
+      host: "192.168.0.100",
+      hmr: host
+        ? {
+            protocol: "ws",
+            host,
+            port: 1421,
+          }
+        : undefined,
+      watch: {
+        // 3. tell Vite to ignore watching `src-tauri`
+        ignored: ["**/src-tauri/**"],
+      },
+    },
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            "tauri-api": ["@tauri-apps/api"],
+            "tauri-plugins": [
+              "@tauri-apps/plugin-opener",
+              "@tauri-apps/plugin-process",
+              "@tauri-apps/plugin-updater",
+            ],
+            vendor: ["react", "react-dom", "framer-motion"],
+          },
         },
       },
     },
-  },
-  chunkSizeWarningLimit: 800,
-}));
+    chunkSizeWarningLimit: 800,
+  };
+});

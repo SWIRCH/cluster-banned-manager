@@ -1,4 +1,4 @@
-import { useAppStore } from "@/store/useAppStore";
+import { useIsMobile } from "@/hooks";
 import { usePingStore } from "@/store/usePingStore";
 import type { Cluster } from "@/types/cluster";
 import { cn } from "cn";
@@ -29,7 +29,7 @@ function SelectiveBlocking({
   onDisableAll,
   onEnableAll,
 }: SelectiveBlockingProps) {
-  const isMobile = useAppStore((s) => s.isMobile);
+  const isMobile = useIsMobile();
   const pings = usePingStore((s) => s.pings);
   const [stableBestPing, setStableBestPing] = useState<BestPingObject | null>(
     null,

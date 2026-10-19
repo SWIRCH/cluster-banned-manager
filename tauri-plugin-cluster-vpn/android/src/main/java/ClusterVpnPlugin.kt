@@ -1,8 +1,12 @@
 package com.aysi.clusterbanned.vpn
 
 import android.app.Activity
+import android.app.Application
 import android.content.Intent
 import android.net.VpnService
+import android.os.Bundle
+import android.view.ViewTreeObserver
+import android.webkit.WebView
 import app.tauri.annotation.Command
 import app.tauri.annotation.InvokeArg
 import app.tauri.annotation.TauriPlugin
@@ -19,6 +23,42 @@ class StartArgs {
 
 @TauriPlugin
 class ClusterVpnPlugin(private val activity: Activity) : Plugin(activity) {
+    private var lifecycleCallbacks: Application.ActivityLifecycleCallbacks? = null
+    private var focusListener: ViewTreeObserver.OnWindowFocusChangeListener? = null
+
+    override fun load(webView: WebView) {
+        super.load(webView)
+
+        // 1. Событие от самого сервиса (остановили из шторки, отозвали VPN и т.д.)
+        ClusterVpnService.onStateChanged = {
+            activity.runOnUiThread {
+                trigger("vpnStateChanged", JSObject())
+            }
+        }
+
+        // 2. Приложение вернулось на передний план
+        val callbacks = object : Application.ActivityLifecycleCallbacks {
+            override fun onActivityResumed(a: Activity) {
+                if (a === activity) trigger("appResumed", JSObject())
+            }
+            override fun onActivityCreated(a: Activity, b: Bundle?) {}
+            override fun onActivityStarted(a: Activity) {}
+            override fun onActivityPaused(a: Activity) {}
+            override fun onActivityStopped(a: Activity) {}
+            override fun onActivitySaveInstanceState(a: Activity, b: Bundle) {}
+            override fun onActivityDestroyed(a: Activity) {}
+        }
+        lifecycleCallbacks = callbacks
+        activity.application.registerActivityLifecycleCallbacks(callbacks)
+
+        // 3. Окно снова получило фокус
+        val fl = ViewTreeObserver.OnWindowFocusChangeListener { hasFocus ->
+            if (hasFocus) trigger("appResumed", JSObject())
+        }
+        focusListener = fl
+        webView.viewTreeObserver.addOnWindowFocusChangeListener(fl)
+    }
+
     @Command
     fun start(invoke: Invoke) {
         val args = invoke.parseArgs(StartArgs::class.java)

@@ -28,7 +28,7 @@ export default function ConfirmModal({
   const { t } = useTranslation();
 
   return (
-    <Modal open={isOpen} onClose={onClose} zIndex="z-[50]">
+    <Modal open={isOpen} onClose={onClose}>
       <div id="confirm-modal" style={{ display: "none" }}></div>
 
       <h3 className="text-lg font-semibold mb-2">

@@ -1,9 +1,9 @@
-import { useClustersLoader } from "@/hooks"
-import { useAppStore } from "@/store/useAppStore"
-import type { Game, Region } from "@/types"
-import { saveRegionId } from "@/utils/regionStorage"
-import { ChevronLeft, ChevronRight } from "lucide-react"
-import Modal from "../Modal"
+import { useClustersLoader } from "@/hooks";
+import { useAppStore } from "@/store/useAppStore";
+import type { Game, Region } from "@/types";
+import { saveRegionId } from "@/utils/regionStorage";
+import { ChevronRight } from "lucide-react";
+import Modal from "../Modal";
 
 type ChangeRegionProps = {
   regions?: Region[];
@@ -44,16 +44,12 @@ export default function ChangeRegionModal({
       open={isOpen}
       onClose={onClose}
       zIndex="z-[1000]"
+      title="Смена региона"
       classNames={{
-        body: "w-full h-full p-6 sm:p-4 !rounded-none !pt-4 !px-4",
+        body: "w-full h-full !rounded-none",
       }}
     >
-      <button type="button" className="btn back" onClick={onClose}>
-        <ChevronLeft />
-        <span>Назад</span>
-      </button>
-
-      <div className="mt-5 px-3">
+      <div className="mt-5">
         <h2 className="text-lg font-semibold mb-4">Регионы</h2>
 
         <div className="flex flex-col gap-2 mb-6 mt-2">

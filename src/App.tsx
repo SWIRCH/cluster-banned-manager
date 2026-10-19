@@ -2,6 +2,7 @@ import { useAppStore } from "@/store/useAppStore";
 import { AnimatePresence } from "framer-motion";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { useShallow } from "zustand/shallow";
 import GamePoster from "./components/game/GamePoster";
 import Sidebar from "./components/layout/Sidebar";
@@ -45,10 +46,7 @@ import { ClusterBlockingPanel } from "./components/clusters";
 import MobileBottomBar from "./components/layout/mobile/BottomBar";
 import MobileTopBar from "./components/layout/mobile/TopBar";
 import SetupFirstAppSettings from "./components/modals/SetupFirstAppSettings";
-import {
-  hideGlobalError,
-  showGlobalError,
-} from "./components/system/GlobalError";
+import { showGlobalError } from "./components/system/GlobalError";
 import TurnVpnButton from "./components/vpn/TurnVpnButton";
 import { useAppBootstrap } from "./hooks/useAppBootstrap";
 
@@ -248,6 +246,7 @@ function AppContent() {
   const handleApplyHosts = useCallback(
     async (domains?: string[]) => {
       if (settings.useFirewall && !isMobile && !adminMounts) {
+        setConfirmOpen(false);
         showGlobalError(
           t("errors.admin_mounts.title"),
           t("errors.admin_mounts.description"),
@@ -258,7 +257,7 @@ function AppContent() {
 
       const result = await applyHostsUpdate(domains, currentVpnStatus === "On");
       if (result.success) {
-        infoModal.showInfo(result.title, result.message);
+        // infoModal.showInfo(result.title, result.message);
       } else {
         showGlobalError(result.title, result.message, result.details);
       }
@@ -290,14 +289,12 @@ function AppContent() {
         "VPN не включён",
         "У вас нет ни одной блокировки кластеров.",
       );
-      window.setTimeout(hideGlobalError, 3000);
       return;
     }
 
     const result = await applyHostsUpdate(allBlockedDomains, true);
     if (!result.success) {
       showGlobalError(result.title, result.message, result.details);
-      window.setTimeout(hideGlobalError, 3000);
     }
   };
 
@@ -323,7 +320,7 @@ function AppContent() {
     }
   };
 
-  const handleUpdateClick = useCallback(() => {
+  const handleUpdateClick = useCallback(async () => {
     const rmap =
       selections[selectedRegionId] ??
       Object.fromEntries(selectedRegionClusters.map((c) => [c.domain, true]));
@@ -336,7 +333,7 @@ function AppContent() {
       return;
     }
 
-    void handleApplyHosts();
+    await handleApplyHosts();
   }, [
     handleApplyHosts,
     isMobile,
@@ -445,7 +442,9 @@ function AppContent() {
                   posterUrl={posterUrl}
                   tauriAvailable={tauriAvailable}
                   hostsMismatch={hostsMismatch}
+                  allBlockedDomains={allBlockedDomains}
                   gameRunning={gameRunning}
+                  onCancel={handleCancelEditClusters}
                   onPlayClick={handlePlayClick}
                   onUpdateClick={handleUpdateClick}
                   selectedRegion={selectedRegion}
@@ -488,32 +487,6 @@ function AppContent() {
           <SetupFirstAppSettings />
 
           {/* Modals */}
-          <ConfirmModal
-            onConfirm={() => handleApplyHosts(confirmDomains)}
-            domains={confirmDomains}
-            clusters={selectedRegionClusters}
-            regionName={
-              selectedRegion?.alias_name ?? selectedRegion?.name ?? ""
-            }
-            onBlockingAllConfirm={() => setBlockingAllConfirmOpen(true)}
-          />
-
-          <BlockingAllConfirmModal
-            onConfirm={async () => {
-              setBlockingAllConfirmOpen(false);
-              await handleApplyHosts(confirmDomains);
-            }}
-            regionName={
-              selectedRegion?.alias_name ?? selectedRegion?.name ?? ""
-            }
-          />
-
-          <ClearConfirmModal
-            onConfirm={handleClearCluster}
-            useFirewall={settings.useFirewall}
-            useBackup={settings.useBackup}
-            loading={loading}
-          />
 
           <InfoModal
             open={infoModal.open}
@@ -528,27 +501,66 @@ function AppContent() {
             onClose={() => setSettingsModalOpen(false)}
             onDiagnose={handleDiagnose}
             diagnosticInfo={diagnosticInfo}
-            isMobile={isMobile}
           />
 
-          <AdminModal
-            onShowInstructions={() => {
-              setAdminModalOpen(false);
-              infoModal.showInfo(
-                t("modals.how_to_open_app_admin_privilege.title"),
-                t("modals.how_to_open_app_admin_privilege.description"),
-                false,
-              );
-            }}
-          />
+          {!isMobile && (
+            <>
+              <ConfirmModal
+                onConfirm={() => handleApplyHosts(confirmDomains)}
+                domains={confirmDomains}
+                clusters={selectedRegionClusters}
+                regionName={
+                  selectedRegion?.alias_name ?? selectedRegion?.name ?? ""
+                }
+                onBlockingAllConfirm={() => setBlockingAllConfirmOpen(true)}
+              />
 
-          {isMobile && <AboutModal />}
+              <BlockingAllConfirmModal
+                onConfirm={async () => {
+                  setBlockingAllConfirmOpen(false);
+                  await handleApplyHosts(confirmDomains);
+                }}
+                regionName={
+                  selectedRegion?.alias_name ?? selectedRegion?.name ?? ""
+                }
+              />
+
+              <ClearConfirmModal
+                onConfirm={handleClearCluster}
+                useFirewall={settings.useFirewall}
+                useBackup={settings.useBackup}
+                loading={loading}
+              />
+
+              <AdminModal
+                onShowInstructions={() => {
+                  setAdminModalOpen(false);
+                  infoModal.showInfo(
+                    t("modals.how_to_open_app_admin_privilege.title"),
+                    t("modals.how_to_open_app_admin_privilege.description"),
+                    false,
+                  );
+                }}
+              />
+            </>
+          )}
+
+          <AboutModal />
         </main>
       </AnimatePresence>
     </>
   );
 }
 
+export function AppLayout() {
+  return (
+    <>
+      <TooltipProvider />
+      <AppContent />
+    </>
+  );
+}
+
 export default function App() {
-  return <AppContent />;
+  return <AppLayout />;
 }

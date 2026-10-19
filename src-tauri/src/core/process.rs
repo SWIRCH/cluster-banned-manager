@@ -89,7 +89,12 @@ pub fn process_is_elevated() -> bool {
     is_elevated::is_elevated()
 }
 
-#[cfg(not(windows))]
+#[cfg(target_os = "android")]
+pub fn process_is_elevated() -> bool {
+    false
+}
+
+#[cfg(all(not(windows), not(target_os = "android")))]
 pub fn process_is_elevated() -> bool {
     unsafe { libc::geteuid() == 0 }
 }

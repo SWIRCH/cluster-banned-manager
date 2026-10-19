@@ -34,6 +34,7 @@ class ClusterVpnService : VpnService() {
             stopCurrentVpn()
             stopForeground(true)
             stopSelf(startId)
+            notifyStateChanged()
             return START_NOT_STICKY
         }
 
@@ -46,6 +47,7 @@ class ClusterVpnService : VpnService() {
         currentIps = ips
         startForeground(NOTIFICATION_ID, notification())
         startDnsVpn(domains, ips)
+        notifyStateChanged()
         return START_STICKY
     }
 
@@ -53,6 +55,15 @@ class ClusterVpnService : VpnService() {
         stopCurrentVpn()
         stopForeground(true)
         super.onDestroy()
+        notifyStateChanged()
+    }
+
+    override fun onRevoke() {
+        stopCurrentVpn()
+        stopForeground(true)
+        stopSelf()
+        super.onRevoke()
+        notifyStateChanged()
     }
 
     private fun stopCurrentVpn() {
@@ -106,10 +117,21 @@ class ClusterVpnService : VpnService() {
 
         currentState = STATE_ON
         worker = Thread {
-            FileInputStream(descriptor.fileDescriptor).use { input ->
-                FileOutputStream(descriptor.fileDescriptor).use { output ->
-                    processPackets(input, output, domains)
+            try {
+                FileInputStream(descriptor.fileDescriptor).use { input ->
+                    FileOutputStream(descriptor.fileDescriptor).use { output ->
+                        processPackets(input, output, domains)
+                    }
                 }
+            } catch (_: Exception) {
+            }
+
+            // Поток завершился не из-за нашего stop → VPN убрали снаружи
+            if (!stopping.get() && worker === Thread.currentThread()) {
+                stopCurrentVpn()
+                stopForeground(true)
+                stopSelf()
+                notifyStateChanged()
             }
         }.also {
             it.name = "cluster-vpn-dns"
@@ -503,6 +525,13 @@ class ClusterVpnService : VpnService() {
 
         @Volatile
         private var currentIps: List<String> = emptyList()
+
+        @Volatile
+        var onStateChanged: (() -> Unit)? = null
+
+        fun notifyStateChanged() {
+            onStateChanged?.invoke()
+        }
 
         fun start(context: Context, domains: List<String>, ips: List<String> = emptyList()) {
             val intent = Intent(context, ClusterVpnService::class.java).apply {

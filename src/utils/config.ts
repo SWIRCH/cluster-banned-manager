@@ -9,7 +9,7 @@ export const config = {
   BUILD: "release",
   NAME: "Cluster Banned Manager",
   BUNDLE_TYPE: "app",
-  VERSION: "0.1.7",
+  VERSION: "0.1.8",
   TAURI_VERSION: "2.0.0",
   BREACH: "main",
   WARP_FIX_LINK: "https://cbmwot.vercel.app/docs/warp-fix/",

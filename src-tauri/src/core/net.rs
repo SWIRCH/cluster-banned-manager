@@ -1,12 +1,33 @@
 use crate::error::AppResult;
 use crate::native::process;
 use serde_json::json;
-use std::net::{SocketAddr, TcpStream, ToSocketAddrs};
+use std::net::{IpAddr, SocketAddr, TcpStream, ToSocketAddrs};
 use std::time::{Duration, Instant};
 
 /// Пингануть хост. Возвращает JSON-совместимый отчёт.
 pub fn ping_host(hostname: &str, timeout_ms: Option<u64>) -> AppResult<serde_json::Value> {
     let start = Instant::now();
+
+    let resolved: Vec<IpAddr> = (hostname, 0u16)
+        .to_socket_addrs()
+        .map(|it| it.map(|a| a.ip()).collect())
+        .unwrap_or_default();
+
+    let ip = resolved.first().map(|i| i.to_string());
+
+    if !resolved.is_empty()
+        && resolved
+            .iter()
+            .all(|i| i.is_loopback() || i.is_unspecified())
+    {
+        return Ok(json!({
+            "ping": null,
+            "status": "blocked",
+            "ip": ip,
+            "elapsed_ms": start.elapsed().as_millis() as u64
+        }));
+    }
+
     let timeout_sec = ((timeout_ms.unwrap_or(600) as f64) / 1000.0).ceil() as u64;
 
     #[cfg(windows)]

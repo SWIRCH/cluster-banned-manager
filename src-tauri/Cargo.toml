@@ -35,6 +35,9 @@ log = "0.4"
 winping = "0.10.0"
 is_elevated = "0.1"
 
+[target.'cfg(unix)'.dependencies]
+libc = "0.2"
+
 [features]
 default = ["custom-protocol"]
 custom-protocol = ["tauri/custom-protocol"]

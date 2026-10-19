@@ -1,15 +1,10 @@
-import { useAppStore } from "@/store/useAppStore"
-import { openGithub } from "@/utils/opener"
-import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react"
-import { motion, Variants } from "framer-motion"
-import {
-  CircleEllipsis,
-  Code,
-  Github,
-  RefreshCcw,
-  Settings2,
-} from "lucide-react"
-import { useState } from "react"
+import MoreDropdownMenu from "@/components/features/MoreDropdownMenu";
+import { useAppStore } from "@/store/useAppStore";
+import { Menu, MenuButton } from "@headlessui/react";
+import { motion, Variants } from "framer-motion";
+import { Ellipsis, RefreshCcw, Settings2 } from "lucide-react";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 type BottomBarProps = {
   onSettingsClick: () => void;
@@ -35,8 +30,9 @@ export default function MobileBottomBar({
   onRefreshClick,
   onOtherClick,
 }: BottomBarProps) {
-  const { setIsAboutModalOpen } = useAppStore();
+  const setIsAboutModalOpen = useAppStore((s) => s.setIsAboutModalOpen);
   const [activeKey, setActiveKey] = useState<string | null>(null);
+  const { t } = useTranslation();
 
   const handleButtonClick = (key: string, callback?: () => void) => {
     setActiveKey(key);
@@ -66,7 +62,7 @@ export default function MobileBottomBar({
               <Settings2 className="mb-1 text-zinc-400 group-hover:text-zinc-100 transition-colors" />
             </motion.div>
             <span className="text-xs text-zinc-400 group-hover:text-zinc-100 transition-colors">
-              Настройки
+              {t("sidebar.settings")}
             </span>
           </button>
 
@@ -83,7 +79,7 @@ export default function MobileBottomBar({
               <RefreshCcw className="mb-1 text-zinc-400 group-hover:text-zinc-100 transition-colors" />
             </motion.div>
             <span className="text-xs text-zinc-400 group-hover:text-zinc-100 transition-colors">
-              Обновить
+              {t("sidebar.refresh")}
             </span>
           </button>
 
@@ -98,39 +94,14 @@ export default function MobileBottomBar({
                 variants={iconVariants}
                 animate={activeKey === "other" ? "active" : "idle"}
               >
-                <CircleEllipsis className="mb-1 text-zinc-400 group-hover:text-zinc-100 transition-colors" />
+                <Ellipsis className="mb-1 text-zinc-400 group-hover:text-zinc-100 transition-colors" />
               </motion.div>
               <span className="text-xs text-zinc-400 group-hover:text-zinc-100 transition-colors">
-                Другое
+                {t("sidebar.other")}
               </span>
             </MenuButton>
 
-            <MenuItems
-              transition
-              anchor="top end"
-              className="w-52 origin-bottom-right rounded-xl border border-white/10 bg-neutral-900/95 p-1 text-sm/6 text-white backdrop-blur-md shadow-2xl transition duration-100 ease-out [--anchor-gap:12px] focus:outline-none data-closed:scale-95 data-closed:opacity-0 z-50"
-            >
-              <MenuItem>
-                <button
-                  className="group flex w-full items-center gap-2 rounded-lg px-3 py-1.5 data-focus:bg-white/10"
-                  onClick={openGithub}
-                >
-                  <Github className="size-4 text-white/30" />
-                  GitHub
-                </button>
-              </MenuItem>
-
-              <div className="my-1 h-px bg-white/10" />
-
-              <MenuItem>
-                <button
-                  className="group flex w-full items-center gap-2 rounded-lg px-3 py-1.5 data-focus:bg-white/10"
-                  onClick={() => setIsAboutModalOpen(true)}
-                >
-                  <Code className="size-4 text-white/30" />О приложении
-                </button>
-              </MenuItem>
-            </MenuItems>
+            <MoreDropdownMenu onAboutModal={setIsAboutModalOpen} />
           </Menu>
         </div>
       </motion.div>

@@ -8,6 +8,8 @@ type CallerInfo = {
 const SKIP = /logger\.(ts|js)/;
 const FRAME =
   /(?:\(|\s|@)((?:[a-zA-Z]+:\/\/[^\s)]+)|[A-Za-z]:[\\/][^\s():]+|\/?[^\s():]+?):(\d+):(\d+)\)?$/;
+const isAndroid =
+  typeof navigator !== "undefined" && /android/i.test(navigator.userAgent);
 
 function getCaller(): CallerInfo | null {
   const stack = new Error().stack;
@@ -58,27 +60,38 @@ const COLOR = {
 
 type Level = keyof typeof COLOR;
 
+const fmt = (v: unknown): string => {
+  if (typeof v === "string") return v;
+  if (v instanceof Error) return `${v.name}: ${v.message}`;
+  try {
+    return JSON.stringify(v);
+  } catch {
+    return String(v);
+  }
+};
+
+function emitPlain(level: Level, args: unknown[]) {
+  const c = getCaller();
+  const where = c ? ` (${c.file}:${c.line})` : "";
+  const line = `[${level.toUpperCase()}] ${args.map(fmt).join(" ")}${where}`;
+
+  // чтобы logcat показал правильный приоритет
+  if (level === "error") console.error(line);
+  else if (level === "warn") console.warn(line);
+  else console.log(line);
+}
+
 function emit(level: Level, args: unknown[]) {
+  if (isAndroid) return emitPlain(level, args);
+
   const c = getCaller();
   const badge = `%c${level.toUpperCase().padEnd(5)}`;
-  // ${c.file}:${c.line}
   const tag = c ? `%c` : "";
 
-  // if (level === 'log') {
   console.groupCollapsed(badge + tag, COLOR[level], COLOR.tag, ...args);
   console.trace("Стек вызовов:");
   if (c) console.log(`%c↳ ${c.url}`, COLOR.link);
   console.groupEnd();
-  // } else if (level === 'success') {
-  // 	console.groupCollapsed(badge + tag, COLOR[level], COLOR.tag, ...args)
-  // 	console.trace('Стек вызовов:')
-  // 	if (c) console.log(`%c↳ ${c.url}`, COLOR.link)
-  // 	console.groupEnd()
-  // } else {
-  // 	// @ts-ignore
-  // 	console[level](badge + tag, COLOR[level], COLOR.tag, ...args)
-  // 	if (c) console.log(`%c↳ ${c.url}`, COLOR.link)
-  // }
 }
 
 const dev = import.meta.env.DEV;

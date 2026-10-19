@@ -5,8 +5,13 @@ import { Region } from "@/types";
 import { writeText } from "@tauri-apps/plugin-clipboard-manager";
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, Copy, X } from "lucide-react";
-import { Ref, useMemo, useState } from "react";
+import { Ref, useState } from "react";
 import { useTranslation } from "react-i18next";
+// Путь поправь под своё расположение файла
+import {
+  MismatchLines,
+  useMismatchGroups,
+} from "@/components/clusters/MismatchLines";
 import styles from "./styles.module.scss";
 
 type ApplyClusterAlertProps = {
@@ -35,13 +40,11 @@ export default function ApplyClusterAlert({
   const isMobile = useIsMobile();
   const showAlert = hostsMismatch && !isMobile;
 
-  const { blocked, unBlocked } = useMemo(() => {
-    const allBlockedSet = new Set(allBlockedDomains);
-    return {
-      blocked: mismatchDomains.filter((d) => allBlockedSet.has(d)),
-      unBlocked: mismatchDomains.filter((d) => !allBlockedSet.has(d)),
-    };
-  }, [allBlockedDomains, mismatchDomains]);
+  const groups = useMismatchGroups(
+    allBlockedDomains,
+    mismatchDomains,
+    hostsMismatch,
+  );
 
   const handleCopyError = async () => {
     if (!lastTauriError) return;
@@ -61,7 +64,7 @@ export default function ApplyClusterAlert({
   };
 
   return (
-    <AnimatePresence>
+    <AnimatePresence initial={false}>
       {showAlert && selectedRegion && hostsMismatch && (
         <motion.div
           key="apply-alert"
@@ -82,27 +85,13 @@ export default function ApplyClusterAlert({
               <div>
                 <span className="text-amber-300 font-medium">
                   {t("common.not_applied")}:{" "}
-                  {t("common.change", { count: mismatchDomains.length })}
+                  {t("common.change", { count: groups.count })}
                 </span>
-                <p className="text-gray-300 text-xs pr-10">
-                  {blocked.length > 0 && (
-                    <>
-                      {blocked.join(" ")}{" "}
-                      {t("system.hosts.will_be_blocked", {
-                        count: blocked.length,
-                      })}
-                    </>
-                  )}
-                  {unBlocked.length > 0 && (
-                    <>
-                      {blocked.length > 0 && <br />}
-                      {unBlocked.join(" ")}{" "}
-                      {t("system.hosts.will_be_unblocked", {
-                        count: unBlocked.length,
-                      })}
-                    </>
-                  )}
-                </p>
+                <MismatchLines
+                  className="text-gray-300 text-xs pr-10"
+                  blocked={groups.blocked}
+                  unBlocked={groups.unBlocked}
+                />
               </div>
               <div className="flex items-center gap-2">
                 <Button

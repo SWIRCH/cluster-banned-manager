@@ -5,6 +5,7 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogOverlay,
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
@@ -16,21 +17,42 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { useIsMobile } from "@/hooks";
 import { useSettings } from "@/hooks/useSettings";
 import { getInitialLanguage } from "@/lib/i18n";
 import { useAppStore } from "@/store/useAppStore";
 import { langFormat } from "@/utils/langForamter";
 import { defaultSettings } from "@/utils/settingsStorage";
 import confetti from "canvas-confetti";
-import { useEffect, useState } from "react";
+import { cn } from "cn";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+
+type StepId = "welcome" | "basic" | "language";
 
 export default function SetupFirstAppSettings() {
   const { t } = useTranslation();
+  const [isOpen, setIsOpen] = useState(false);
   const { settings, updateSettings, loading } = useSettings();
   const setIsSetupStore = useAppStore((state) => state.setIsSetup);
-  const [isOpen, setIsOpen] = useState(false);
-  const [step, setStep] = useState<1 | 2 | 3>(1);
+  const isMobile = useIsMobile();
+
+  const steps = useMemo<StepId[]>(
+    () =>
+      isMobile ? ["welcome", "language"] : ["welcome", "basic", "language"],
+    [isMobile],
+  );
+
+  const [stepIndex, setStepIndex] = useState(0);
+
+  const safeIndex = Math.min(stepIndex, steps.length - 1);
+  const step = steps[safeIndex];
+  const current = safeIndex + 1;
+  const total = steps.length;
+
+  const handleNext = () =>
+    setStepIndex((i) => Math.min(i + 1, steps.length - 1));
+  const handleBack = () => setStepIndex((i) => Math.max(i - 1, 0));
 
   const [formData, setFormData] = useState(defaultSettings);
 
@@ -48,31 +70,21 @@ export default function SetupFirstAppSettings() {
   }, [loading, settings]);
 
   useEffect(() => {
-    if (isOpen && step === 1) {
-      const end = Date.now() + 1.5 * 1000;
-      const interval: ReturnType<typeof setInterval> = setInterval(() => {
-        if (Date.now() > end) {
-          return clearInterval(interval);
-        }
-        confetti({
-          startVelocity: 30,
-          spread: 360,
-          ticks: 60,
-          origin: { x: Math.random(), y: Math.random() - 0.2 },
-        });
-      }, 250);
+    if (!isOpen || step !== "welcome") return;
 
-      return () => clearInterval(interval);
-    }
+    const end = Date.now() + 1.5 * 1000;
+    const interval = setInterval(() => {
+      if (Date.now() > end) return clearInterval(interval);
+      confetti({
+        startVelocity: 30,
+        spread: 360,
+        ticks: 60,
+        origin: { x: Math.random(), y: Math.random() - 0.2 },
+      });
+    }, 250);
+
+    return () => clearInterval(interval);
   }, [isOpen, step]);
-
-  const handleNext = () => {
-    setStep((prev) => (prev + 1) as 1 | 2 | 3);
-  };
-
-  const handleBack = () => {
-    setStep((prev) => (prev - 1) as 1 | 2 | 3);
-  };
 
   const handleCompleteSetup = async () => {
     await updateSettings({
@@ -94,9 +106,19 @@ export default function SetupFirstAppSettings() {
         setIsOpen(nextOpen);
       }}
     >
-      <DialogContent showCloseButton={false} className="sm:max-w-[425px]">
+      <DialogOverlay
+        className={"w-full h-full bg-black/60 backdrop-blur-xs! z-(--z-modal)"}
+      />
+
+      <DialogContent
+        showCloseButton={false}
+        className={cn(
+          "z-(--z-modal)",
+          !isMobile ? "sm:max-w-[425px]" : "max-w-full",
+        )}
+      >
         {/* ШАГ 1: Приветствие */}
-        {step === 1 && (
+        {step === "welcome" && (
           <>
             <DialogHeader>
               <DialogTitle className="text-2xl text-center">
@@ -116,11 +138,11 @@ export default function SetupFirstAppSettings() {
         )}
 
         {/* ШАГ 2: Базовые настройки */}
-        {step === 2 && (
+        {step === "basic" && (
           <>
             <DialogHeader>
               <DialogTitle>
-                {t("setup.step_2_title", { current: 2, total: 3 })}
+                {t("setup.step_2_title", { current, total })}
               </DialogTitle>
               <DialogDescription>
                 {t("setup.step_2_description")}
@@ -197,11 +219,11 @@ export default function SetupFirstAppSettings() {
         )}
 
         {/* ШАГ 3: Выбор языка */}
-        {step === 3 && (
+        {step === "language" && (
           <>
             <DialogHeader>
               <DialogTitle>
-                {t("setup.step_3_title", { current: 3, total: 3 })}
+                {t("setup.step_3_title", { current, total })}
               </DialogTitle>
               <DialogDescription>
                 {t("setup.step_3_description")}
@@ -215,6 +237,7 @@ export default function SetupFirstAppSettings() {
                 </Label>
                 <Select
                   value={formData.lang}
+                  modal={false}
                   onValueChange={(val) => {
                     if (!val) return;
 

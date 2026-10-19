@@ -1,16 +1,18 @@
 import { useEffect } from "react";
 import { useShallow } from "zustand/shallow";
 
-import { vpnStatus as getVpnStatus, safeInvoke } from "@/lib/tauri";
+import { safeInvoke } from "@/lib/tauri";
 import { useAppStore } from "@/store/useAppStore";
 import { bootstrapSettings } from "@/store/useSettingsStore";
 import { config } from "@/utils/config";
 import { logger } from "@/utils/logger";
 import { getSavedRegionId } from "@/utils/regionStorage";
 
+import { syncVpnStatus } from "@/lib/vpn";
 import type { Game } from "@/types/cluster";
 import { Elevation } from "@/types/system";
 import { ensureClusters } from "@/utils/ensureClusters";
+import { addPluginListener, PluginListener } from "@tauri-apps/api/core";
 
 interface UseAppBootstrapParams {
   game: Game;
@@ -44,8 +46,8 @@ export function useAppBootstrap({
     setAdminMounts,
     setAdminModalOpen,
     setIsSetup,
-    setVpnStatus,
-    setVpnDomains,
+    // setVpnStatus,
+    // setVpnDomains,
     setIsMobile,
   } = useAppStore(
     useShallow((s) => ({
@@ -72,8 +74,10 @@ export function useAppBootstrap({
     // Устанавливаем глобальный isMobile
     setIsMobile(isMobile);
 
-    // Merge файла кластеров
+    // Merge файла кластеров, только для Desktop
     (async () => {
+      if (isMobile) return;
+
       try {
         await ensureClusters();
       } catch (err) {
@@ -110,7 +114,7 @@ export function useAppBootstrap({
 
   // Проверка elevation (основная)
   useEffect(() => {
-    if (settingsLoading) return;
+    if (settingsLoading || isMobile) return;
 
     (async () => {
       try {
@@ -150,19 +154,37 @@ export function useAppBootstrap({
   }, [isSetup, setAdminModalOpen]);
 
   // 7. Первичная загрузка VPN-статуса (только mobile)
+  // Устанавливаем статус VPN кнопки
   useEffect(() => {
     if (!isMobile) return;
 
-    getVpnStatus()
-      .then((status) => {
-        setVpnStatus(status.state === "on" ? "On" : "Off");
-        setVpnDomains(status.domains);
+    let last = 0;
+    const run = () => {
+      const now = Date.now();
+      if (now - last < 500) return;
+      last = now;
+      if (useAppStore.getState().vpnStatus === "Loading") return;
+      void syncVpnStatus();
+    };
+
+    run();
+
+    // нативное событие из Kotlin
+    let listener: PluginListener | undefined;
+    let cancelled = false;
+    addPluginListener("cluster-vpn", "appResumed", run)
+      .then((l) => {
+        if (cancelled) void l.unregister();
+        else listener = l;
       })
-      .catch(() => {
-        setVpnStatus("Off");
-        setVpnDomains([]);
-      });
-  }, [isMobile, setVpnDomains, setVpnStatus]);
+      .catch((e) => logger.error("appResumed listener failed:", e));
+
+    return () => {
+      cancelled = true;
+      void listener?.unregister();
+      window.removeEventListener("focus", run);
+    };
+  }, [isMobile]);
 
   // 8. DEBUG-лог готовности данных
   useEffect(() => {

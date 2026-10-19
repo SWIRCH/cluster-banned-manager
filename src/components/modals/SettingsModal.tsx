@@ -18,6 +18,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ToggleGroup } from "@/components/ui/toggle-group";
+import { useIsMobile } from "@/hooks";
 import { useSettings } from "@/hooks/useSettings";
 import { getInitialLanguage } from "@/lib/i18n";
 import { SyncModeType } from "@/types/app-settings";
@@ -28,7 +29,6 @@ import { writeText } from "@tauri-apps/plugin-clipboard-manager";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Check,
-  ChevronLeft,
   Copy,
   HeartHandshake,
   Locate,
@@ -46,7 +46,6 @@ type SettingsModalProps = {
   onClose: () => void;
   onDiagnose: () => void;
   diagnosticInfo: string | null;
-  isMobile?: boolean;
 };
 
 export default function SettingsModal({
@@ -54,13 +53,13 @@ export default function SettingsModal({
   onClose,
   onDiagnose,
   diagnosticInfo,
-  isMobile,
 }: SettingsModalProps) {
   const { t } = useTranslation();
   const { settings, updateSettings, loading } = useSettings();
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState("settings");
   const [formData, setFormData] = useState(defaultSettings);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     if (!loading && settings.isSetup) {
@@ -106,6 +105,32 @@ export default function SettingsModal({
     logger.log("FormData: ", formData);
   }, [formData]);
 
+  const languageField = (
+    <Field>
+      <FieldLabel htmlFor="language" className="bg-transparent">
+        {t("settings.language_interface")}
+      </FieldLabel>
+
+      <Select
+        value={formData.lang}
+        onValueChange={(val) => {
+          if (!val) return;
+          setFormData((prev) => ({ ...prev, lang: val }));
+        }}
+      >
+        <SelectTrigger id="language" className="w-full">
+          <SelectValue>{langFormat(formData.lang)}</SelectValue>
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="ru" title="russian">
+            Русский (Russian)
+          </SelectItem>
+          <SelectItem value="en">English (Английский)</SelectItem>
+        </SelectContent>
+      </Select>
+    </Field>
+  );
+
   return (
     <Modal
       open={open}
@@ -113,7 +138,7 @@ export default function SettingsModal({
       title={t("settings.title")}
       description={t("settings.description")}
       classNames={{
-        body: `${isMobile ? "w-full h-full p-6 sm:p-4 !rounded-none !pt-4 !px-4" : ""}`,
+        body: `${isMobile ? "w-full h-full !rounded-none" : ""}`,
       }}
       footer={
         // <button
@@ -124,10 +149,9 @@ export default function SettingsModal({
         // </button>
         <div className="grid grid-cols-2 w-full gap-2">
           <DialogClose
-            className={"w-full"}
             render={<Button variant="outline">{t("buttons.cancel")}</Button>}
           />
-          <Button type="submit" className={"w-full"} onClick={onSave}>
+          <Button type="submit" onClick={onSave}>
             {t("buttons.save")}
           </Button>
         </div>
@@ -165,40 +189,8 @@ export default function SettingsModal({
                   >
                     {activeTab === "settings" && (
                       <div className="grid gap-4 py-2">
-                        <Field>
-                          <FieldLabel
-                            htmlFor="language"
-                            className="bg-transparent"
-                          >
-                            {t("settings.language_interface")}
-                          </FieldLabel>
+                        {languageField}
 
-                          <Select
-                            value={formData.lang}
-                            onValueChange={(val) => {
-                              if (!val) return;
-
-                              setFormData((prev) => ({
-                                ...prev,
-                                lang: val,
-                              }));
-                            }}
-                          >
-                            <SelectTrigger id="language" className={"w-full"}>
-                              <SelectValue>
-                                {langFormat(formData.lang)}
-                              </SelectValue>
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="ru" title="russian">
-                                Русский (Russian)
-                              </SelectItem>
-                              <SelectItem value="en">
-                                English (Английский)
-                              </SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </Field>
                         <FieldGroup className="w-full">
                           <FieldLabel htmlFor="switch-use-firewall">
                             <Field orientation="horizontal">
@@ -246,7 +238,6 @@ export default function SettingsModal({
                             </Field>
                           </FieldLabel>
                         </FieldGroup>
-
                         <AnimatePresence>
                           {formData.useBackup && (
                             <motion.div
@@ -286,7 +277,6 @@ export default function SettingsModal({
                             </motion.div>
                           )}
                         </AnimatePresence>
-
                         <Field>
                           <FieldLabel className="bg-transparent">
                             Синхронизация
@@ -494,26 +484,7 @@ export default function SettingsModal({
         </div>
       ) : (
         <>
-          <button
-            type="button"
-            className="btn back flex items-center gap-1 text-sm mb-4"
-            onClick={onClose}
-          >
-            <ChevronLeft className="w-4 h-4" />
-            <span>{t("buttons.back")}</span>
-          </button>
-          <div className="px-1">
-            <h3 className="text-lg font-semibold mb-2">Настройки приложения</h3>
-            <p className="text-sm text-white/60 mb-4">
-              Здесь вы можете настроить параметры приложения.
-            </p>
-
-            <div className="flex flex-col items-center justify-center p-6 bg-red-600/5 border border-red-600/20 rounded-2xl mb-6 mt-3">
-              <h3 className="text-xl font-bold text-white text-center">
-                Временно недоступно
-              </h3>
-            </div>
-          </div>
+          <div className="grid gap-4 py-4">{languageField}</div>
         </>
       )}
     </Modal>

@@ -79,7 +79,9 @@
     "check_status": "Проверить статус",
     "settings": "Настройки",
     "clear_blocks": "Очистить блокировки",
-    "refresh": "Обновить"
+    "refresh": "Обновить",
+    "other": "Другое",
+    "about_app": "О приложении"
   },
   "buttons": {
     "save": "Сохранить",
@@ -199,6 +201,34 @@
     "blocking_all_confirm": {
       "title": "Подтвердите блокировку всех серверов",
       "description": "Вы собираетесь заблокировать <strong>все</strong> серверы региона <strong>{{region}}</strong>. Это приведёт к тому, что игра не сможет подключаться к серверам этого региона — вы фактически отключите доступ к игре в этом регионе."
+    },
+    "about": {
+      "title": "О приложении",
+      "version": "Версия {{version}}",
+      "copy_for_report": "Скопировать для отчёта об ошибке",
+      "sections": {
+        "app": "Приложение",
+        "environment": "Окружение",
+        "links": "Ссылки"
+      },
+      "rows": {
+        "author": "Автор",
+        "build": "Сборка",
+        "channel": "Канал",
+        "build_hash": "Хэш сборки",
+        "build_date": "Дата сборки",
+        "branch": "Ветка",
+        "identifier": "Идентификатор",
+        "system": "Система",
+        "arch": "Архитектура",
+        "system_language": "Язык системы",
+        "tauri": "Tauri",
+        "webview": "WebView (Chromium)"
+      },
+      "links": {
+        "github": "GitHub репозиторий",
+        "project_page": "Страница проекта"
+      }
     }
   }
 }

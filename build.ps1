@@ -3,7 +3,10 @@
 param (
     [Parameter(Mandatory=$false)]
     [ValidateSet("all", "desktop", "android")]
-    [string]$Target = ""
+    [string]$Target = "",
+
+    [Parameter(Mandatory=$false)]
+    [switch]$SkipTests
 )
 
 # 0. Меню выбора, если параметр не передан
@@ -59,6 +62,28 @@ if (-not $tauriConfig.version) {
 $version = $tauriConfig.version
 Write-Host "[INFO] App version: $version" -ForegroundColor Cyan
 Write-Host "[INFO] Selected build target: $Target" -ForegroundColor Cyan
+
+# ==========================================
+# ЗАПУСК ТЕСТОВ
+# ==========================================
+if (-not $SkipTests) {
+    $testsScript = ".\run-tests.ps1"
+    
+    if (Test-Path $testsScript) {
+        Write-Host ""
+        Write-Host ">>> RUNNING TESTS <<<" -ForegroundColor Yellow
+        & $testsScript
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host "[ERROR] Tests failed. Aborting build." -ForegroundColor Red
+            exit 1
+        }
+        Write-Host "[OK] Tests passed." -ForegroundColor Green
+    } else {
+        Write-Host "[WARNING] Test script not found: $testsScript" -ForegroundColor Yellow
+    }
+} else {
+    Write-Host "[INFO] Tests skipped (-SkipTests)." -ForegroundColor Yellow
+}
 
 # ==========================================
 # CБОРКА DESKTOP (выполняется для 'all' и 'desktop')

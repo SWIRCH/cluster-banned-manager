@@ -92,13 +92,43 @@
     "blocking_all_confirm": {
       "title": "Confirm blocking all servers",
       "description": "You are about to block <strong>all</strong> servers in the <strong>{{region}}</strong> region. This will cause the game to be unable to connect to servers in this region — you will effectively disable access to the game in this region."
+    },
+    "about": {
+      "title": "About",
+      "version": "Version {{version}}",
+      "copy_for_report": "Copy for bug report",
+      "sections": {
+        "app": "Application",
+        "environment": "Environment",
+        "links": "Links"
+      },
+      "rows": {
+        "author": "Author",
+        "build": "Build",
+        "channel": "Channel",
+        "build_hash": "Build hash",
+        "build_date": "Build date",
+        "branch": "Branch",
+        "identifier": "Identifier",
+        "system": "System",
+        "arch": "Architecture",
+        "system_language": "System language",
+        "tauri": "Tauri",
+        "webview": "WebView (Chromium)"
+      },
+      "links": {
+        "github": "GitHub repository",
+        "project_page": "Project page"
+      }
     }
   },
   "sidebar": {
     "check_status": "Checking status",
     "settings": "Settings",
     "clear_blocks": "Clear blocks",
-    "refresh": "Refresh"
+    "refresh": "Refresh",
+    "other": "Other",
+    "about_app": "About app"
   },
   "buttons": {
     "save": "Save",

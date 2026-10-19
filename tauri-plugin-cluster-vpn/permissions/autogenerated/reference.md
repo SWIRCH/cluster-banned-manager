@@ -7,6 +7,8 @@ Default permissions for the cluster VPN plugin
 - `allow-start`
 - `allow-stop`
 - `allow-status`
+- `allow-register-listener`
+- `allow-remove-listener`
 
 ## Permission Table
 
@@ -16,6 +18,58 @@ Default permissions for the cluster VPN plugin
 <th>Description</th>
 </tr>
 
+
+<tr>
+<td>
+
+`cluster-vpn:allow-register-listener`
+
+</td>
+<td>
+
+Enables the register_listener command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`cluster-vpn:deny-register-listener`
+
+</td>
+<td>
+
+Denies the register_listener command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`cluster-vpn:allow-remove-listener`
+
+</td>
+<td>
+
+Enables the remove_listener command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`cluster-vpn:deny-remove-listener`
+
+</td>
+<td>
+
+Denies the remove_listener command without any pre-configured scope.
+
+</td>
+</tr>
 
 <tr>
 <td>

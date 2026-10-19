@@ -53,6 +53,18 @@ code, pre{
   font-family: var(--font-mono);
 }
 
+::selection {
+  background-color: color-mix(in oklab, var(--color-fg) 25%, transparent);
+  color: var(--color-fg);
+  text-shadow: none;
+}
+
+::-moz-selection {
+  background-color: color-mix(in oklab, var(--color-fg) 25%, transparent);
+  color: var(--color-fg);
+  text-shadow: none;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme static {
@@ -131,6 +143,18 @@ code, pre{
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+@theme {
+  --z-base: 0;
+  --z-dropdown: 40;
+  --z-sticky: 50;
+  --z-overlay: 60;
+  --z-sidebar: 60;
+  --z-modal: 100;
+  --z-popover: 120;
+  --z-tooltip: 90;
+  --z-toast: 100;
 }
 
 @theme inline {

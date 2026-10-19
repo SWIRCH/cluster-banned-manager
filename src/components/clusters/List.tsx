@@ -70,7 +70,7 @@ const ClusterRow = memo(function ClusterRow({
   const ping = usePingStore((s) => s.pings[cluster.domain]);
 
   return (
-    <motion.div variants={itemVariants} className="cluster w-full mt-2">
+    <motion.div variants={itemVariants} className={cn("cluster w-full mt-2")}>
       <div
         onClick={() => onToggle && onToggle(cluster.domain, !isChecked)}
         className={cn(
@@ -165,8 +165,8 @@ function ClusterList({
         ref={ref}
         className={cn(
           "ban-clusters-2-container scrollbarYAuto flex-1 min-h-0",
-          isMobile ? "space-y-2 pb-4" : "",
-          hasOverflow ? "is-scrollable" : "",
+          isMobile && "space-y-2 pb-4",
+          hasOverflow && "is-scrollable",
         )}
       >
         <AnimatePresence mode="wait" initial>

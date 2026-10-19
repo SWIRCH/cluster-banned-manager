@@ -1,5 +1,8 @@
 use crate::error::{AppError, AppResult};
+
+#[cfg(windows)]
 use crate::native::process;
+#[cfg(windows)]
 use std::collections::BTreeSet;
 
 pub const RULE_PREFIX: &str = "WoT_Blitz_Block_";

@@ -2,6 +2,8 @@ import {
   safeInvoke,
   updateFirewallRules,
   vpnStart,
+  VpnStatus,
+  vpnStatus,
   vpnStop,
 } from "@/lib/tauri";
 import { useAppStore } from "@/store/useAppStore";
@@ -15,6 +17,15 @@ import {
 } from "@/utils/blocking";
 import { useState } from "react";
 import { useShallow } from "zustand/shallow";
+
+async function waitSettled(first: VpnStatus, tries = 30) {
+  let s = first;
+  while ((s.state === "starting" || s.state === "stopping") && tries-- > 0) {
+    await new Promise((r) => setTimeout(r, 300));
+    s = await vpnStatus();
+  }
+  return s;
+}
 
 export function useHostsActions(
   selectedRegionId: string,
@@ -91,11 +102,13 @@ export function useHostsActions(
       }
 
       setLoading(true);
+
       try {
-        const response =
+        const response = await waitSettled(
           domains.length && keepVpnRunning
             ? await vpnStart(domains, getIpsForDomains(domains))
-            : await vpnStop();
+            : await vpnStop(),
+        );
 
         if (response.state === "needsPermission") {
           setVpnStatus("NeedsApply");
@@ -115,6 +128,7 @@ export function useHostsActions(
         setVpnDomains(response.domains);
         setVpnBaselineDomains(getBlockedDomains());
         setVpnDirty(false);
+
         return {
           success: true,
           title: response.state === "on" ? "VPN включён" : "VPN выключен",
